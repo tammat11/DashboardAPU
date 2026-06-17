@@ -639,7 +639,10 @@
         };
 
         rows.forEach((row) => {
-          const key = row['Состояние задачи'];
+          let key = row['Состояние задачи'];
+          if (key === 'Без дедлайна') {
+            key = 'Открыта в срок';
+          }
           if (Object.prototype.hasOwnProperty.call(counts, key)) {
             counts[key] += 1;
           }
