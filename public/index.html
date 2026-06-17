@@ -673,7 +673,7 @@
         });
 
         ids.statOverdueOpen.textContent = counts['Открыта просрочена'];
-        ids.statOpenInTime.textContent = counts['Открыта в срок'];
+        ids.statOpenInTime.textContent = counts['Открыта в срок'] + counts['Открыта просрочена'];
         ids.statClosedLate.textContent = counts['Закрыта с просрочкой'];
         ids.statClosedInTime.textContent = counts['Закрыта в срок'];
       }
@@ -722,38 +722,222 @@
           return `<span style="font-size: 9.5px; color: var(--text-muted); font-weight: 500; margin-left: 8px; border-left: 2px solid #ccc; padding-left: 6px;">→ другим: ${data.total} (${parts.join(', ')})</span>`;
         };
 
+        // Units of measurement formatters
+        const formatTasks = (count) => {
+          return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">шт.</span>`;
+        };
+
+        const formatDays = (count) => {
+          return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">дн.</span>`;
+        };
+
+        const formatPoints = (count) => {
+          const abs = Math.abs(count);
+          let unit = 'баллов';
+          if (abs % 100 < 11 || abs % 100 > 19) {
+            const lastDigit = abs % 10;
+            if (lastDigit === 1) {
+              unit = 'балл';
+            } else if (lastDigit >= 2 && lastDigit <= 4) {
+              unit = 'балла';
+            }
+          }
+          return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">${unit}</span>`;
+        };
+
+        // Helper to render an employee's tasks
+        const renderEmployeeTasks = (emp, deptName, empName, indentOffset = 0) => {
+          let empHtml = '';
+          const sortedTasks = emp.tasks.slice().sort((a, b) => {
+            const isAImportant = a.priority == '2' || a.priority == 2 || String(a.priority).toLowerCase().includes('high') || String(a.priority).toLowerCase().includes('важн');
+            const isBImportant = b.priority == '2' || b.priority == 2 || String(b.priority).toLowerCase().includes('high') || String(b.priority).toLowerCase().includes('важн');
+
+            if (isAImportant && !isBImportant) return -1;
+            if (!isAImportant && isBImportant) return 1;
+
+            const getDeadlineTime = (t) => {
+              if (t.deadlineRaw) {
+                const d = new Date(t.deadlineRaw);
+                if (!Number.isNaN(d.getTime())) return d.getTime();
+              }
+              if (t.deadline) {
+                const d = parseDateStr(t.deadline);
+                if (d) return d.getTime();
+              }
+              return Infinity;
+            };
+
+            const dateA = getDeadlineTime(a);
+            const dateB = getDeadlineTime(b);
+            
+            if (dateA !== dateB) {
+              return dateA - dateB;
+            }
+
+            const getCreatedTime = (t) => {
+              if (t.createdDateRaw) {
+                const d = new Date(t.createdDateRaw);
+                if (!Number.isNaN(d.getTime())) return d.getTime();
+              }
+              if (t.created) {
+                const d = parseDateStr(t.created);
+                if (d) return d.getTime();
+              }
+              return 0;
+            };
+
+            return getCreatedTime(a) - getCreatedTime(b);
+          });
+
+          // Separate active and closed tasks
+          const activeTasks = [];
+          const closedTasks = [];
+          
+          sortedTasks.forEach((t) => {
+            const isClosed = t.state && t.state.startsWith('Закрыта');
+            if (isClosed) {
+              closedTasks.push(t);
+            } else {
+              activeTasks.push(t);
+            }
+          });
+
+          // Render active tasks
+          activeTasks.forEach((task) => {
+            const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
+            const taskIcon = isImportant ? '🔥' : '📋';
+            let taskTitleHtml = escapeHtml(task.title);
+            if (state.portalHost && task.id) {
+              const idNum = String(task.id).replace('#', '').trim();
+              taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link">${taskTitleHtml}</a>`;
+            }
+            
+            let projectPrefix = '';
+            if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+              projectPrefix = `<span style="font-weight: 800; color: var(--text-dark); margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
+            }
+            
+            let rowClass = '';
+            let statusBadge = '';
+            
+            if (task.state && !task.state.startsWith('Закрыта') && task.deadlineRaw) {
+              const deadlineDate = new Date(task.deadlineRaw);
+              if (!Number.isNaN(deadlineDate.getTime())) {
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const target = new Date(deadlineDate.getFullYear(), deadlineDate.getMonth(), deadlineDate.getDate());
+                const diffTime = target - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffTime < 0) {
+                  rowClass = 'row-overdue';
+                  statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #ef4444; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Просрочено</span>';
+                } else if (diffDays === 0) {
+                  rowClass = 'row-today';
+                  statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #ffedd5; color: #f97316; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Дедлайн сегодня</span>';
+                } else if (diffDays > 0 && diffDays <= 3) {
+                  rowClass = 'row-soon';
+                  statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fef9c3; color: #ca8a04; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Скоро дедлайн</span>';
+                }
+              }
+            }
+            
+            empHtml += `
+              <tr class="tree-row tree-level-3 ${rowClass}">
+                <td style="padding-left: ${48 + indentOffset}px; color: #555555;">${taskIcon} ${projectPrefix}${taskTitleHtml}${statusBadge}</td>
+                <td>${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
+                <td>${escapeHtml(formatShortName(task.creator))}</td>
+                <td></td>
+                <td></td>
+                <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${formatPoints(task.efficiency)}</td>
+              </tr>
+            `;
+          });
+
+          // Render Closed Tasks folder if there are any
+          if (closedTasks.length > 0) {
+            const closedFolderKey = `closed:${deptName}:${empName}`;
+            const isClosedFolderExpanded = state.expandedNodes.has(closedFolderKey);
+            const closedFolderToggleIcon = isClosedFolderExpanded ? '▼' : '▶';
+            
+            empHtml += `
+              <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${closedFolderKey}" style="font-weight: 600; background-color: rgba(200, 200, 200, 0.1); cursor: pointer; color: var(--text-muted);">
+                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${closedFolderToggleIcon}</span> 📁 Закрытые задачи (${closedTasks.length})</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            `;
+            
+            if (isClosedFolderExpanded) {
+              closedTasks.forEach((task) => {
+                const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
+                const taskIcon = isImportant ? '🔥' : '📋';
+                let taskTitleHtml = escapeHtml(task.title);
+                if (state.portalHost && task.id) {
+                  const idNum = String(task.id).replace('#', '').trim();
+                  taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 500;">${taskTitleHtml}</a>`;
+                }
+                
+                let projectPrefix = '';
+                if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+                  projectPrefix = `<span style="font-weight: 800; color: #888888; margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
+                }
+                
+                const closedRowBg = task.overdue > 0 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(240, 240, 240, 0.3)';
+                
+                empHtml += `
+                  <tr class="tree-row tree-level-4 closed-task-row" style="background-color: ${closedRowBg}; color: #888888;">
+                    <td style="padding-left: ${68 + indentOffset}px; color: #888888;">${taskIcon} ${projectPrefix}<span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
+                    <td style="color: #888888; white-space: normal; line-height: 1.25; font-size: 10.5px;">
+                      <div style="font-size: 9.5px; opacity: 0.8;">🏁 ${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</div>
+                      <div style="font-weight: 600; margin-top: 1px;">✔️ ${escapeHtml(removeYear(task.closedDateRaw, task.closed))}</div>
+                    </td>
+                    <td style="color: #888888;">${escapeHtml(formatShortName(task.creator))}</td>
+                    <td></td>
+                    <td></td>
+                    <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                    <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}" style="opacity: 0.8;">${formatPoints(task.efficiency)}</td>
+                  </tr>
+                `;
+              });
+            }
+          }
+          return empHtml;
+        };
+
         // Group the rows dynamically on client-side
         state.filteredRows.forEach((row) => {
-          const dept = row['Отдел'] || 'Без отдела';
+          let dept = row['Отдел'] || 'Без отдела';
           const assignee = row['Исполнитель'] || 'Без исполнителя';
           const taskTitle = row['Название задачи'] || 'Без названия';
           
           const overdue = parseInt(row['Просрочка, дней']) || 0;
           const efficiency = parseInt(row['Баллы эффективности']) || 0;
           
+          let subDept = null;
+          if (dept === 'Бухгалтерия') {
+            subDept = 'Бухгалтерия';
+            dept = 'ФУ';
+          }
+          
           if (!tree[dept]) {
             tree[dept] = { 
               name: dept, 
               overdueSum: 0, 
               efficiencySum: 0, 
-              employees: {} 
+              employees: {},
+              subDepts: {}
             };
           }
           tree[dept].overdueSum += overdue;
           tree[dept].efficiencySum += efficiency;
           
-          if (!tree[dept].employees[assignee]) {
-            tree[dept].employees[assignee] = { 
-              name: assignee, 
-              overdueSum: 0, 
-              efficiencySum: 0, 
-              tasks: [] 
-            };
-          }
-          tree[dept].employees[assignee].overdueSum += overdue;
-          tree[dept].employees[assignee].efficiencySum += efficiency;
-          
-          tree[dept].employees[assignee].tasks.push({
+          const taskData = {
             id: row['ID задачи'],
             title: taskTitle,
             overdue: overdue,
@@ -768,13 +952,50 @@
             closed: row['Дата закрытия'],
             closedDateRaw: row['closedDateRaw'],
             project: row['Проект']
-          });
+          };
+
+          if (subDept) {
+            if (!tree[dept].subDepts[subDept]) {
+              tree[dept].subDepts[subDept] = {
+                name: subDept,
+                overdueSum: 0,
+                efficiencySum: 0,
+                employees: {}
+              };
+            }
+            tree[dept].subDepts[subDept].overdueSum += overdue;
+            tree[dept].subDepts[subDept].efficiencySum += efficiency;
+            
+            if (!tree[dept].subDepts[subDept].employees[assignee]) {
+              tree[dept].subDepts[subDept].employees[assignee] = {
+                name: assignee,
+                overdueSum: 0,
+                efficiencySum: 0,
+                tasks: []
+              };
+            }
+            tree[dept].subDepts[subDept].employees[assignee].overdueSum += overdue;
+            tree[dept].subDepts[subDept].employees[assignee].efficiencySum += efficiency;
+            tree[dept].subDepts[subDept].employees[assignee].tasks.push(taskData);
+          } else {
+            if (!tree[dept].employees[assignee]) {
+              tree[dept].employees[assignee] = {
+                name: assignee,
+                overdueSum: 0,
+                efficiencySum: 0,
+                tasks: []
+              };
+            }
+            tree[dept].employees[assignee].overdueSum += overdue;
+            tree[dept].employees[assignee].efficiencySum += efficiency;
+            tree[dept].employees[assignee].tasks.push(taskData);
+          }
         });
 
         // Set columns headers
         const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'В работе', 'Просрочка, дн.', 'Баллы'];
         ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
-        
+
         let html = '';
         const depts = Object.keys(tree).sort();
         
@@ -789,13 +1010,21 @@
           const isDeptExpanded = state.expandedNodes.has(deptKey);
           const deptIcon = isDeptExpanded ? '▼' : '▶';
           
-          // Calculate Department tasks count
+          // Calculate Department tasks count (including sub-departments)
           let deptTasksCount = 0;
           let deptActiveCount = 0;
           Object.values(dept.employees).forEach(emp => {
             deptTasksCount += emp.tasks.length;
             deptActiveCount += emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
           });
+          if (dept.subDepts) {
+            Object.values(dept.subDepts).forEach(sub => {
+              Object.values(sub.employees).forEach(emp => {
+                deptTasksCount += emp.tasks.length;
+                deptActiveCount += emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+              });
+            });
+          }
           
           // Render Department row
           html += `
@@ -803,14 +1032,76 @@
               <td><span class="tree-toggle">${deptIcon}</span> 📁 ${escapeHtml(deptName)}${formatDeptCrossAssignments(deptName)}</td>
               <td></td>
               <td></td>
-              <td>${deptTasksCount}</td>
-              <td>${deptActiveCount}</td>
-              <td class="${dept.overdueSum > 0 ? 'color-danger' : ''}">${dept.overdueSum}</td>
-              <td class="${dept.efficiencySum < 0 ? 'color-danger' : (dept.efficiencySum > 0 ? 'color-success' : '')}">${dept.efficiencySum}</td>
+              <td>${formatTasks(deptTasksCount)}</td>
+              <td>${formatTasks(deptActiveCount)}</td>
+              <td class="${dept.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(dept.overdueSum)}</td>
+              <td class="${dept.efficiencySum < 0 ? 'color-danger' : (dept.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(dept.efficiencySum)}</td>
             </tr>
           `;
           
           if (isDeptExpanded) {
+            // 1. Render sub-departments under this department
+            if (dept.subDepts) {
+              const subDeptsNames = Object.keys(dept.subDepts).sort();
+              subDeptsNames.forEach((subDeptName) => {
+                const subDept = dept.subDepts[subDeptName];
+                const subDeptKey = `subdept:${deptName}:${subDeptName}`;
+                const isSubExpanded = state.expandedNodes.has(subDeptKey);
+                const subIcon = isSubExpanded ? '▼' : '▶';
+                
+                let subTasksCount = 0;
+                let subActiveCount = 0;
+                Object.values(subDept.employees).forEach(emp => {
+                  subTasksCount += emp.tasks.length;
+                  subActiveCount += emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+                });
+                
+                // Render Sub-department row (Level 1.5, uses tree-level-2 styling)
+                html += `
+                  <tr class="tree-row tree-level-2" data-key="${subDeptKey}" style="font-weight: 800; background-color: rgba(138, 196, 63, 0.04); cursor: pointer;">
+                    <td style="padding-left: 28px;"><span class="tree-toggle">${subIcon}</span> 📁 ${escapeHtml(subDeptName)}</td>
+                    <td></td>
+                    <td></td>
+                    <td>${formatTasks(subTasksCount)}</td>
+                    <td>${formatTasks(subActiveCount)}</td>
+                    <td class="${subDept.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(subDept.overdueSum)}</td>
+                    <td class="${subDept.efficiencySum < 0 ? 'color-danger' : (subDept.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(subDept.efficiencySum)}</td>
+                  </tr>
+                `;
+                
+                if (isSubExpanded) {
+                  const subEmployees = Object.keys(subDept.employees).sort();
+                  subEmployees.forEach((empName) => {
+                    const emp = subDept.employees[empName];
+                    const empKey = `emp:${deptName}:${subDeptName}:${empName}`;
+                    const isEmpExpanded = state.expandedNodes.has(empKey);
+                    const empIcon = isEmpExpanded ? '▼' : '▶';
+                    
+                    const empTasksCount = emp.tasks.length;
+                    const empActiveCount = emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+                    
+                    // Render Employee row under sub-department
+                    html += `
+                      <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
+                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                        <td></td>
+                        <td></td>
+                        <td>${formatTasks(empTasksCount)}</td>
+                        <td>${formatTasks(empActiveCount)}</td>
+                        <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
+                        <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
+                      </tr>
+                    `;
+                    
+                    if (isEmpExpanded) {
+                      html += renderEmployeeTasks(emp, `${deptName}:${subDeptName}`, empName, 28);
+                    }
+                  });
+                }
+              });
+            }
+
+            // 2. Render direct employees of this department
             const employees = Object.keys(dept.employees).sort();
             employees.forEach((empName) => {
               const emp = dept.employees[empName];
@@ -827,176 +1118,15 @@
                   <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
                   <td></td>
                   <td></td>
-                  <td>${empTasksCount}</td>
-                  <td>${empActiveCount}</td>
-                  <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${emp.overdueSum}</td>
-                  <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${emp.efficiencySum}</td>
+                  <td>${formatTasks(empTasksCount)}</td>
+                  <td>${formatTasks(empActiveCount)}</td>
+                  <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
+                  <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
                 </tr>
               `;
               
               if (isEmpExpanded) {
-                // Sort tasks: high priority (fire 🔥) first, then sort by deadline ascending (earliest first, no deadline at the bottom)
-                const sortedTasks = emp.tasks.slice().sort((a, b) => {
-                  const isAImportant = a.priority == '2' || a.priority == 2 || String(a.priority).toLowerCase().includes('high') || String(a.priority).toLowerCase().includes('важн');
-                  const isBImportant = b.priority == '2' || b.priority == 2 || String(b.priority).toLowerCase().includes('high') || String(b.priority).toLowerCase().includes('важн');
-
-                  if (isAImportant && !isBImportant) return -1;
-                  if (!isAImportant && isBImportant) return 1;
-
-                  const getDeadlineTime = (t) => {
-                    if (t.deadlineRaw) {
-                      const d = new Date(t.deadlineRaw);
-                      if (!Number.isNaN(d.getTime())) return d.getTime();
-                    }
-                    if (t.deadline) {
-                      const d = parseDateStr(t.deadline);
-                      if (d) return d.getTime();
-                    }
-                    return Infinity;
-                  };
-
-                  const dateA = getDeadlineTime(a);
-                  const dateB = getDeadlineTime(b);
-                  
-                  if (dateA !== dateB) {
-                    return dateA - dateB;
-                  }
-
-                  const getCreatedTime = (t) => {
-                    if (t.createdDateRaw) {
-                      const d = new Date(t.createdDateRaw);
-                      if (!Number.isNaN(d.getTime())) return d.getTime();
-                    }
-                    if (t.created) {
-                      const d = parseDateStr(t.created);
-                      if (d) return d.getTime();
-                    }
-                    return 0;
-                  };
-
-                  return getCreatedTime(a) - getCreatedTime(b);
-                });
-
-                // Separate active and closed tasks
-                const activeTasks = [];
-                const closedTasks = [];
-                
-                sortedTasks.forEach((t) => {
-                  const isClosed = t.state && t.state.startsWith('Закрыта');
-                  if (isClosed) {
-                    closedTasks.push(t);
-                  } else {
-                    activeTasks.push(t);
-                  }
-                });
-
-                // Render active tasks
-                activeTasks.forEach((task) => {
-                  const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
-                  const taskIcon = isImportant ? '🔥' : '📋';
-                  let taskTitleHtml = escapeHtml(task.title);
-                  if (state.portalHost && task.id) {
-                    const idNum = String(task.id).replace('#', '').trim();
-                    taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link">${taskTitleHtml}</a>`;
-                  }
-                  
-                  let projectPrefix = '';
-                  if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
-                    projectPrefix = `<span style="font-weight: 800; color: var(--text-dark); margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
-                  }
-                  
-                  // Calculate deadline status and styling
-                  let rowClass = '';
-                  let statusBadge = '';
-                  
-                  if (task.state && !task.state.startsWith('Закрыта') && task.deadlineRaw) {
-                    const deadlineDate = new Date(task.deadlineRaw);
-                    if (!Number.isNaN(deadlineDate.getTime())) {
-                      const now = new Date();
-                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-                      const target = new Date(deadlineDate.getFullYear(), deadlineDate.getMonth(), deadlineDate.getDate());
-                      const diffTime = target - today;
-                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                      
-                      if (diffTime < 0) {
-                        rowClass = 'row-overdue';
-                        statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #ef4444; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Просрочено</span>';
-                      } else if (diffDays === 0) {
-                        rowClass = 'row-today';
-                        statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #ffedd5; color: #f97316; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Дедлайн сегодня</span>';
-                      } else if (diffDays > 0 && diffDays <= 3) {
-                        rowClass = 'row-soon';
-                        statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fef9c3; color: #ca8a04; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Скоро дедлайн</span>';
-                      }
-                    }
-                  }
-                  
-                  // Render Task row (leaf)
-                  html += `
-                    <tr class="tree-row tree-level-3 ${rowClass}">
-                      <td style="padding-left: 48px; color: #555555;">${taskIcon} ${projectPrefix}${taskTitleHtml}${statusBadge}</td>
-                      <td>${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
-                      <td>${escapeHtml(formatShortName(task.creator))}</td>
-                      <td></td>
-                      <td></td>
-                      <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue}</td>
-                      <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${task.efficiency}</td>
-                    </tr>
-                  `;
-                });
-
-                // Render Closed Tasks folder if there are any
-                if (closedTasks.length > 0) {
-                  const closedFolderKey = `closed:${deptName}:${empName}`;
-                  const isClosedFolderExpanded = state.expandedNodes.has(closedFolderKey);
-                  const closedFolderToggleIcon = isClosedFolderExpanded ? '▼' : '▶';
-                  
-                  html += `
-                    <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${closedFolderKey}" style="font-weight: 600; background-color: rgba(200, 200, 200, 0.1); cursor: pointer; color: var(--text-muted);">
-                      <td style="padding-left: 48px;"><span class="tree-toggle">${closedFolderToggleIcon}</span> 📁 Закрытые задачи (${closedTasks.length})</td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                  `;
-                  
-                  if (isClosedFolderExpanded) {
-                    closedTasks.forEach((task) => {
-                      const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
-                      const taskIcon = isImportant ? '🔥' : '📋';
-                      let taskTitleHtml = escapeHtml(task.title);
-                      if (state.portalHost && task.id) {
-                        const idNum = String(task.id).replace('#', '').trim();
-                        taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 500;">${taskTitleHtml}</a>`;
-                      }
-                      
-                      let projectPrefix = '';
-                      if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
-                        projectPrefix = `<span style="font-weight: 800; color: #888888; margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
-                      }
-                      
-                      const closedRowBg = task.overdue > 0 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(240, 240, 240, 0.3)';
-                      
-                      html += `
-                        <tr class="tree-row tree-level-4 closed-task-row" style="background-color: ${closedRowBg}; color: #888888;">
-                          <td style="padding-left: 68px; color: #888888;">${taskIcon} ${projectPrefix}<span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
-                          <td style="color: #888888; white-space: normal; line-height: 1.25; font-size: 10.5px;">
-                            <div style="font-size: 9.5px; opacity: 0.8;">🏁 ${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</div>
-                            <div style="font-weight: 600; margin-top: 1px;">✔️ ${escapeHtml(removeYear(task.closedDateRaw, task.closed))}</div>
-                          </td>
-                          <td style="color: #888888;">${escapeHtml(formatShortName(task.creator))}</td>
-                          <td></td>
-                          <td></td>
-                          <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue}</td>
-                          <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}" style="opacity: 0.8;">${task.efficiency}</td>
-                        </tr>
-                      `;
-                    });
-                  }
-                }
+                html += renderEmployeeTasks(emp, deptName, empName, 0);
               }
             });
           }
