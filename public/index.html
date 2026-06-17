@@ -734,12 +734,14 @@
             deadlineRaw: row['deadlineRaw'],
             createdDateRaw: row['createdDateRaw'],
             created: row['Дата создания'],
-            state: row['Состояние задачи']
+            state: row['Состояние задачи'],
+            closed: row['Дата закрытия'],
+            closedDateRaw: row['closedDateRaw']
           });
         });
 
         // Set columns headers
-        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн', 'Поручил', 'Кол-во задач', 'Просрочка, дн.', 'Баллы'];
+        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'Просрочка, дн.', 'Баллы'];
         ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
         
         let html = '';
@@ -931,7 +933,10 @@
                       html += `
                         <tr class="tree-row tree-level-4 closed-task-row" style="background-color: rgba(240, 240, 240, 0.3); color: #888888;">
                           <td style="padding-left: 68px; color: #888888;">${taskIcon} <span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
-                          <td style="color: #888888;">${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
+                          <td style="color: #888888; white-space: normal; line-height: 1.25; font-size: 10.5px;">
+                            <div style="font-size: 9.5px; opacity: 0.8;">Дл: ${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</div>
+                            <div style="font-weight: 600; margin-top: 1px;">Вып: ${escapeHtml(removeYear(task.closedDateRaw, task.closed))}</div>
+                          </td>
                           <td style="color: #888888;">${escapeHtml(formatShortName(task.creator))}</td>
                           <td></td>
                           <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue}</td>
