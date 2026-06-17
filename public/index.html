@@ -553,6 +553,7 @@
         columns: [],
         rows: [],
         filteredRows: [],
+        departments: [],
         refreshTimer: null,
         refreshIntervalMs: 10 * 60 * 1000,
         portalHost: null,
@@ -910,6 +911,59 @@
           return empHtml;
         };
 
+        // Build departments maps for dynamic nesting walk-up
+        const depById = {};
+        const depByName = {};
+        if (state.departments) {
+          state.departments.forEach(d => {
+            depById[String(d.ID)] = d;
+            depByName[d.NAME] = d;
+          });
+        }
+
+        // Helper to find parent-child relationship dynamically
+        function getDeptGroupAndSub(deptName) {
+          const chain = [];
+          let current = depByName[deptName];
+          while (current) {
+            chain.push(current);
+            if (current.PARENT) {
+              current = depById[String(current.PARENT)];
+            } else {
+              current = null;
+            }
+          }
+          
+          const topLevelNames = ['ФУ', 'I1C', 'ПС', 'Аккаунты'];
+          
+          let topIndex = chain.findIndex(d => topLevelNames.includes(d.NAME));
+          if (topIndex !== -1) {
+            const topDept = chain[topIndex];
+            if (topIndex === 0) {
+              return { dept: topDept.NAME, subDept: null };
+            } else {
+              return { dept: topDept.NAME, subDept: deptName };
+            }
+          }
+          
+          if (chain.length > 1) {
+            let idx = chain.length - 1;
+            while (idx >= 0 && (chain[idx].ID === '1' || chain[idx].ID === '157' || chain[idx].NAME === 'IC Group' || chain[idx].NAME === 'АУП')) {
+              idx--;
+            }
+            if (idx >= 0) {
+              const topDeptName = chain[idx].NAME;
+              if (topDeptName === deptName) {
+                return { dept: deptName, subDept: null };
+              } else {
+                return { dept: topDeptName, subDept: deptName };
+              }
+            }
+          }
+          
+          return { dept: deptName, subDept: null };
+        }
+
         // Group the rows dynamically on client-side
         state.filteredRows.forEach((row) => {
           let dept = row['Отдел'] || 'Без отдела';
@@ -920,12 +974,10 @@
           const efficiency = parseInt(row['Баллы эффективности']) || 0;
           
           let subDept = null;
-          if (dept === 'Бухгалтерия') {
-            subDept = 'Бухгалтерия';
-            dept = 'ФУ';
-          } else if (dept === 'Крутые ребята' || dept === 'Крутые ребята v2') {
-            subDept = dept;
-            dept = 'ФУ';
+          if (dept !== 'Без отдела') {
+            const resolved = getDeptGroupAndSub(dept);
+            dept = resolved.dept;
+            subDept = resolved.subDept;
           }
           
           if (!tree[dept]) {
@@ -1278,6 +1330,7 @@
 
           state.columns = payload.columns;
           state.rows = payload.rows;
+          state.departments = payload.departments || [];
           state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
           state.portalHost = payload.portalHost || null;
 
