@@ -426,6 +426,19 @@
         font-weight: 800;
       }
 
+      /* Crown badge for department heads */
+      .head-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+        margin-left: 5px;
+        vertical-align: middle;
+        opacity: 0.85;
+        cursor: default;
+        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+      }
+
+
       .row-overdue {
         background-color: rgba(239, 68, 68, 0.08) !important;
       }
@@ -914,11 +927,27 @@
         // Build departments maps for dynamic nesting walk-up
         const depById = {};
         const depByName = {};
+        // Set of user IDs who are department heads (UF_HEAD)
+        const headUserIds = new Set();
         if (state.departments) {
           state.departments.forEach(d => {
             depById[String(d.ID)] = d;
             depByName[d.NAME] = d;
+            if (d.UF_HEAD) headUserIds.add(String(d.UF_HEAD));
           });
+        }
+
+        // Map: employee display name → user ID (built from rows)
+        const empNameToId = new Map();
+        state.filteredRows.forEach(row => {
+          const name = row['Исполнитель'];
+          const id = String(row['ID исполнителя'] || '');
+          if (name && id && !empNameToId.has(name)) empNameToId.set(name, id);
+        });
+
+        function isHead(empName) {
+          const id = empNameToId.get(empName);
+          return id && headUserIds.has(id);
         }
 
         // Helper to find parent-child relationship dynamically
@@ -1136,11 +1165,12 @@
                     
                     const empTasksCount = emp.tasks.length;
                     const empActiveCount = emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+                    const isEmpHead2 = isHead(empName);
                     
                     // Render Employee row under sub-department
                     html += `
                       <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
-                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${isEmpHead2 ? ' <span class="head-badge" title="Руководитель отдела">👑</span>' : ''}${formatEmpCrossAssignments(empName)}</td>
                         <td></td>
                         <td></td>
                         <td>${formatTasks(empTasksCount)}</td>
@@ -1168,11 +1198,12 @@
               
               const empTasksCount = emp.tasks.length;
               const empActiveCount = emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+              const isEmpHead = isHead(empName);
               
               // Render Employee row
               html += `
                 <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
-                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${isEmpHead ? ' <span class="head-badge" title="Руководитель отдела">👑</span>' : ''}${formatEmpCrossAssignments(empName)}</td>
                   <td></td>
                   <td></td>
                   <td>${formatTasks(empTasksCount)}</td>
