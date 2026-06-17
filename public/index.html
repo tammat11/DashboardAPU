@@ -1170,7 +1170,7 @@
                     // Render Employee row under sub-department
                     html += `
                       <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
-                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${isEmpHead2 ? ' <span class="head-badge" title="Руководитель отдела">👑</span>' : ''}${formatEmpCrossAssignments(empName)}</td>
+                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> ${isEmpHead2 ? '👑' : '👤'} ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
                         <td></td>
                         <td></td>
                         <td>${formatTasks(empTasksCount)}</td>
@@ -1203,7 +1203,7 @@
               // Render Employee row
               html += `
                 <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
-                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${isEmpHead ? ' <span class="head-badge" title="Руководитель отдела">👑</span>' : ''}${formatEmpCrossAssignments(empName)}</td>
+                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> ${isEmpHead ? '👑' : '👤'} ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
                   <td></td>
                   <td></td>
                   <td>${formatTasks(empTasksCount)}</td>
