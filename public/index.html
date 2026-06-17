@@ -923,10 +923,9 @@
           if (dept === 'Бухгалтерия') {
             subDept = 'Бухгалтерия';
             dept = 'ФУ';
-          } else if (dept === 'Крутые ребята') {
-            subDept = 'Крутые ребята';
-            const parentName = state.filteredRows.find(r => r['Отдел'] === 'ПС' || r['Отдел'] === 'I1C' || r['Отдел'] === 'I1c');
-            dept = parentName ? parentName['Отдел'] : 'I1C';
+          } else if (dept === 'Крутые ребята' || dept === 'Крутые ребята v2') {
+            subDept = dept;
+            dept = 'ФУ';
           }
           
           if (!tree[dept]) {
