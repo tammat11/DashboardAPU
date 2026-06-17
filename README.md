@@ -24,6 +24,24 @@
 
 ## Формат webhook
 
+### Самый простой вариант
+
+Если в `TASK_REPORT_WEBHOOK_URL` указать обычный Bitrix base webhook вида:
+
+```txt
+https://yourportal.bitrix24.kz/rest/281/xxxxxxxxxxxx/
+```
+
+то проект сам вызовет нужные Bitrix методы:
+
+- `tasks.task.list`
+- `user.get`
+- `department.get`
+
+и соберет отчет без внешнего промежуточного webhook-сервиса.
+
+### Внешний webhook
+
 По умолчанию проект шлет `POST` JSON:
 
 ```json
