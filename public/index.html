@@ -394,41 +394,40 @@
         .wrap { padding: 0 8px; }
         .stats-grid { grid-template-columns: 1fr; }
       }
+
+      .tv-meta {
+        font-size: 11px;
+        color: var(--text-muted);
+        font-weight: 600;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+      }
+      .tv-meta strong {
+        color: var(--text-dark);
+      }
+      .tv-meta .divider {
+        color: var(--border-color);
+      }
+      .tv-meta .host-text {
+        color: var(--brand-green);
+      }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <!-- Floating Navigation Bar -->
-      <header class="navbar">
-        <div class="navbar-container">
-          <a href="#" class="logo-wrap">
-            <div class="logo">
-              <div class="logo-ic">iC<span class="leaf"></span></div>
-              <div class="logo-group">group</div>
-            </div>
-          </a>
-          
-          <nav class="nav-links">
-            <span class="nav-link active">Отчет по задачам</span>
-            <span style="font-size: 11px; font-weight: 700; color: var(--brand-green); margin-left: 8px;" id="host"></span>
-          </nav>
-          
-          <div class="header-meta">
-            <div class="meta-item">
-              <span class="meta-label">Всего строк</span>
-              <span id="rowCount" class="meta-val">0</span>
-            </div>
-            <div class="meta-item">
-              <span class="meta-label">Обновлено</span>
-              <span id="fetchedAt" class="meta-val">—</span>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- Main Title (Hero) -->
-      <section class="hero">
+      <!-- Main Title & TV Metadata (No Navbar) -->
+      <section class="hero" style="margin-top: 20px;">
         <h1 class="page-title">ОТЧЕТ <span class="text-green">ПО ЗАДАЧАМ</span></h1>
+        <div class="tv-meta">
+          <span>Всего строк: <strong id="rowCount">0</strong></span>
+          <span class="divider">|</span>
+          <span>Обновлено: <strong id="fetchedAt">—</strong></span>
+          <span class="divider">|</span>
+          <span id="host" class="host-text"></span>
+        </div>
       </section>
 
       <!-- Stats Grid -->
