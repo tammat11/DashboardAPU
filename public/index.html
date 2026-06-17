@@ -396,6 +396,16 @@
         font-weight: 800;
       }
 
+      .row-overdue {
+        background-color: rgba(239, 68, 68, 0.08) !important;
+      }
+      .row-today {
+        background-color: rgba(249, 115, 22, 0.1) !important;
+      }
+      .row-soon {
+        background-color: rgba(234, 179, 8, 0.06) !important;
+      }
+
       /* Grid formatting on medium/small viewports */
       @media (max-width: 1024px) {
         .stats-grid { grid-template-columns: repeat(2, 1fr); }
@@ -707,7 +717,8 @@
             deadline: row['Дедлайн'],
             deadlineRaw: row['deadlineRaw'],
             createdDateRaw: row['createdDateRaw'],
-            created: row['Дата создания']
+            created: row['Дата создания'],
+            state: row['Состояние задачи']
           });
         });
 
@@ -821,10 +832,36 @@
                     taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link">${taskTitleHtml}</a>`;
                   }
                   
+                  // Calculate deadline status and styling
+                  let rowClass = '';
+                  let statusBadge = '';
+                  
+                  if (task.state && !task.state.startsWith('Закрыта') && task.deadlineRaw) {
+                    const deadlineDate = new Date(task.deadlineRaw);
+                    if (!Number.isNaN(deadlineDate.getTime())) {
+                      const now = new Date();
+                      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                      const target = new Date(deadlineDate.getFullYear(), deadlineDate.getMonth(), deadlineDate.getDate());
+                      const diffTime = target - today;
+                      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                      
+                      if (diffTime < 0) {
+                        rowClass = 'row-overdue';
+                        statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #ef4444; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Просрочено</span>';
+                      } else if (diffDays === 0) {
+                        rowClass = 'row-today';
+                        statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #ffedd5; color: #f97316; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Дедлайн сегодня</span>';
+                      } else if (diffDays > 0 && diffDays <= 3) {
+                        rowClass = 'row-soon';
+                        statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fef9c3; color: #ca8a04; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Скоро дедлайн</span>';
+                      }
+                    }
+                  }
+                  
                   // Render Task row (leaf)
                   html += `
-                    <tr class="tree-row tree-level-3">
-                      <td style="padding-left: 48px; color: #555555;">${taskIcon} ${taskTitleHtml}</td>
+                    <tr class="tree-row tree-level-3 ${rowClass}">
+                      <td style="padding-left: 48px; color: #555555;">${taskIcon} ${taskTitleHtml}${statusBadge}</td>
                       <td>${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
                       <td>${escapeHtml(task.creator || '—')}</td>
                       <td></td>
