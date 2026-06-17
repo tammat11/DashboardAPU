@@ -1038,9 +1038,38 @@
               <td class="${dept.efficiencySum < 0 ? 'color-danger' : (dept.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(dept.efficiencySum)}</td>
             </tr>
           `;
-          
+
           if (isDeptExpanded) {
-            // 1. Render sub-departments under this department
+            // 1. Render direct employees of this department
+            const employees = Object.keys(dept.employees).sort();
+            employees.forEach((empName) => {
+              const emp = dept.employees[empName];
+              const empKey = `emp:${deptName}:${empName}`;
+              const isEmpExpanded = state.expandedNodes.has(empKey);
+              const empIcon = isEmpExpanded ? '▼' : '▶';
+              
+              const empTasksCount = emp.tasks.length;
+              const empActiveCount = emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+              
+              // Render Employee row
+              html += `
+                <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
+                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                  <td></td>
+                  <td></td>
+                  <td>${formatTasks(empTasksCount)}</td>
+                  <td>${formatTasks(empActiveCount)}</td>
+                  <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
+                  <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
+                </tr>
+              `;
+              
+              if (isEmpExpanded) {
+                html += renderEmployeeTasks(emp, deptName, empName, 0);
+              }
+            });
+
+            // 2. Render sub-departments under this department
             if (dept.subDepts) {
               const subDeptsNames = Object.keys(dept.subDepts).sort();
               subDeptsNames.forEach((subDeptName) => {
@@ -1100,36 +1129,9 @@
                 }
               });
             }
-
-            // 2. Render direct employees of this department
-            const employees = Object.keys(dept.employees).sort();
-            employees.forEach((empName) => {
-              const emp = dept.employees[empName];
-              const empKey = `emp:${deptName}:${empName}`;
-              const isEmpExpanded = state.expandedNodes.has(empKey);
-              const empIcon = isEmpExpanded ? '▼' : '▶';
-              
-              const empTasksCount = emp.tasks.length;
-              const empActiveCount = emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
-              
-              // Render Employee row
-              html += `
-                <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
-                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
-                  <td></td>
-                  <td></td>
-                  <td>${formatTasks(empTasksCount)}</td>
-                  <td>${formatTasks(empActiveCount)}</td>
-                  <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
-                  <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
-                </tr>
-              `;
-              
-              if (isEmpExpanded) {
-                html += renderEmployeeTasks(emp, deptName, empName, 0);
-              }
-            });
           }
+          
+
         });
         
         ids.tableBody.innerHTML = html;
