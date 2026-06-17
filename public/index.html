@@ -414,6 +414,31 @@
       .tv-meta .host-text {
         color: var(--brand-green);
       }
+      .refresh-link {
+        background: transparent;
+        border: none;
+        color: var(--text-dark);
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        padding: 2px 6px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        transition: all 0.2s ease;
+      }
+      .refresh-link:hover {
+        color: var(--brand-green);
+        background: var(--brand-green-light);
+      }
+      .refresh-link:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
     </style>
   </head>
   <body>
@@ -425,6 +450,8 @@
           <span>Всего строк: <strong id="rowCount">0</strong></span>
           <span class="divider">|</span>
           <span>Обновлено: <strong id="fetchedAt">—</strong></span>
+          <span class="divider">|</span>
+          <button id="refreshBtn" class="refresh-link">🔄 Обновить</button>
           <span class="divider">|</span>
           <span id="host" class="host-text"></span>
         </div>
@@ -515,7 +542,8 @@
         statOverdueOpen: document.getElementById('statOverdueOpen'),
         statOpenInTime: document.getElementById('statOpenInTime'),
         statClosedLate: document.getElementById('statClosedLate'),
-        statClosedInTime: document.getElementById('statClosedInTime')
+        statClosedInTime: document.getElementById('statClosedInTime'),
+        refreshBtn: document.getElementById('refreshBtn')
       };
 
       ids.host.textContent = window.location.host;
@@ -697,6 +725,7 @@
       async function loadReport(method = 'GET') {
         ids.errorBox.hidden = true;
         ids.loadingBox.hidden = false;
+        if (ids.refreshBtn) ids.refreshBtn.disabled = true;
 
         try {
           const response = await fetch(`/api/task-report?t=${Date.now()}`, {
@@ -737,6 +766,7 @@
           ids.errorBox.textContent = error.message || 'Ошибка загрузки отчета';
         } finally {
           ids.loadingBox.hidden = true;
+          if (ids.refreshBtn) ids.refreshBtn.disabled = false;
         }
       }
 
@@ -748,6 +778,10 @@
         state.refreshTimer = setTimeout(() => {
           loadReport('GET');
         }, state.refreshIntervalMs);
+      }
+
+      if (ids.refreshBtn) {
+        ids.refreshBtn.addEventListener('click', () => loadReport('POST'));
       }
 
       loadReport('GET');
