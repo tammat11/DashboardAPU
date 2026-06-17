@@ -934,7 +934,9 @@
             }
           }
           
-          const topLevelNames = ['ФУ', 'I1C', 'ПС', 'Аккаунты'];
+          // Top-level departments = direct children of АУП (ID: 157)
+          // Аккаунты is a sub of УКС, so it must NOT be listed here
+          const topLevelNames = ['УКС', 'ФУ', 'УРБ', 'АУ', 'I1C', 'ПС'];
           
           let topIndex = chain.findIndex(d => topLevelNames.includes(d.NAME));
           if (topIndex !== -1) {
