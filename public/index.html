@@ -913,17 +913,17 @@
                       let taskTitleHtml = escapeHtml(task.title);
                       if (state.portalHost && task.id) {
                         const idNum = String(task.id).replace('#', '').trim();
-                        taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="opacity: 0.9;">${taskTitleHtml}</a>`;
+                        taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 600;">${taskTitleHtml}</a>`;
                       }
                       
                       html += `
-                        <tr class="tree-row tree-level-4 closed-task-row" style="background-color: rgba(240, 240, 240, 0.3);">
-                          <td style="padding-left: 68px; color: #555555;">${taskIcon} <span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
-                          <td style="color: #555555;">${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
-                          <td style="color: #555555;">${escapeHtml(task.creator || '—')}</td>
+                        <tr class="tree-row tree-level-4 closed-task-row" style="background-color: rgba(240, 240, 240, 0.3); color: #888888;">
+                          <td style="padding-left: 68px; color: #888888;">${taskIcon} <span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
+                          <td style="color: #888888;">${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
+                          <td style="color: #888888;">${escapeHtml(task.creator || '—')}</td>
                           <td></td>
-                          <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue}</td>
-                          <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${task.efficiency}</td>
+                          <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue}</td>
+                          <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}" style="opacity: 0.8;">${task.efficiency}</td>
                         </tr>
                       `;
                     });
