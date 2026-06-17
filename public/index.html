@@ -770,7 +770,7 @@
               `;
               
               if (isEmpExpanded) {
-                // Sort tasks: high priority (fire 🔥) first, then sort by creation date (oldest to newest)
+                // Sort tasks: high priority (fire 🔥) first, then sort by deadline ascending (earliest first, no deadline at the bottom)
                 const sortedTasks = emp.tasks.slice().sort((a, b) => {
                   const isAImportant = a.priority == '2' || a.priority == 2 || String(a.priority).toLowerCase().includes('high') || String(a.priority).toLowerCase().includes('важн');
                   const isBImportant = b.priority == '2' || b.priority == 2 || String(b.priority).toLowerCase().includes('high') || String(b.priority).toLowerCase().includes('важн');
@@ -778,7 +778,26 @@
                   if (isAImportant && !isBImportant) return -1;
                   if (!isAImportant && isBImportant) return 1;
 
-                  const getTaskCreatedTime = (t) => {
+                  const getDeadlineTime = (t) => {
+                    if (t.deadlineRaw) {
+                      const d = new Date(t.deadlineRaw);
+                      if (!Number.isNaN(d.getTime())) return d.getTime();
+                    }
+                    if (t.deadline) {
+                      const d = parseDateStr(t.deadline);
+                      if (d) return d.getTime();
+                    }
+                    return Infinity;
+                  };
+
+                  const dateA = getDeadlineTime(a);
+                  const dateB = getDeadlineTime(b);
+                  
+                  if (dateA !== dateB) {
+                    return dateA - dateB;
+                  }
+
+                  const getCreatedTime = (t) => {
                     if (t.createdDateRaw) {
                       const d = new Date(t.createdDateRaw);
                       if (!Number.isNaN(d.getTime())) return d.getTime();
@@ -790,9 +809,7 @@
                     return 0;
                   };
 
-                  const dateA = getTaskCreatedTime(a);
-                  const dateB = getTaskCreatedTime(b);
-                  return dateA - dateB;
+                  return getCreatedTime(a) - getCreatedTime(b);
                 });
 
                 sortedTasks.forEach((task) => {
