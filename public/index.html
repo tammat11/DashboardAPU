@@ -592,6 +592,18 @@
         return `${datePart} | ${timePart}`;
       }
 
+      function formatShortName(fullName) {
+        if (!fullName || fullName === '—') return '—';
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length === 1) return parts[0];
+        if (parts.length >= 2) {
+          const firstName = parts[0];
+          const lastName = parts[1];
+          return `${firstName} ${lastName.charAt(0)}.`;
+        }
+        return fullName;
+      }
+
       function parseDateStr(str) {
         if (!str || str === '—') return null;
         const parts = str.split(' ');
@@ -881,7 +893,7 @@
                     <tr class="tree-row tree-level-3 ${rowClass}">
                       <td style="padding-left: 48px; color: #555555;">${taskIcon} ${taskTitleHtml}${statusBadge}</td>
                       <td>${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
-                      <td>${escapeHtml(task.creator || '—')}</td>
+                      <td>${escapeHtml(formatShortName(task.creator))}</td>
                       <td></td>
                       <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue}</td>
                       <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${task.efficiency}</td>
@@ -920,7 +932,7 @@
                         <tr class="tree-row tree-level-4 closed-task-row" style="background-color: rgba(240, 240, 240, 0.3); color: #888888;">
                           <td style="padding-left: 68px; color: #888888;">${taskIcon} <span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
                           <td style="color: #888888;">${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
-                          <td style="color: #888888;">${escapeHtml(task.creator || '—')}</td>
+                          <td style="color: #888888;">${escapeHtml(formatShortName(task.creator))}</td>
                           <td></td>
                           <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue}</td>
                           <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}" style="opacity: 0.8;">${task.efficiency}</td>
