@@ -3,278 +3,712 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Efficiency Report</title>
+    <title>Efficiency Report — iC group</title>
     <meta name="robots" content="noindex,nofollow,noarchive" />
+    
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
       :root {
         color-scheme: light;
-        --bg: #edf1ea;
+        --bg: #fdfefe;
         --surface: #ffffff;
-        --surface-soft: #f5f7f2;
-        --text: #18221d;
-        --muted: #68756d;
-        --line: rgba(24, 34, 29, 0.1);
-        --brand: #1e6b47;
-        --brand-dark: #154a32;
-        --danger: #b83e3e;
+        --text-dark: #1a1a1a;
+        --text-muted: #777777;
+        --brand-green: #8ac43f;
+        --brand-green-hover: #7cb342;
+        --brand-green-light: rgba(138, 196, 63, 0.1);
+        --brand-black: #1a1a1a;
+        --brand-black-hover: #333333;
+        --border-color: rgba(233, 235, 232, 0.8);
+        --shadow-soft: 0 8px 30px rgba(0, 0, 0, 0.02);
+        --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.06);
+        --line: rgba(26, 26, 26, 0.08);
       }
 
-      * { box-sizing: border-box; }
+      * { 
+        box-sizing: border-box; 
+      }
+      
       body {
         margin: 0;
-        font-family: "Segoe UI", Arial, sans-serif;
-        background:
-          radial-gradient(circle at top left, rgba(30, 107, 71, 0.15), transparent 26%),
-          linear-gradient(180deg, #eef3ed 0%, #e7ece7 100%);
-        color: var(--text);
+        font-family: 'Montserrat', "Segoe UI", Arial, sans-serif;
+        background-color: var(--bg);
+        color: var(--text-dark);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        padding-bottom: 60px;
       }
 
       .wrap {
-        max-width: 1800px;
+        max-width: 1400px;
         margin: 0 auto;
-        padding: 24px;
+        padding: 0 24px;
       }
 
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 28px;
-        overflow: hidden;
-        box-shadow: 0 22px 70px rgba(24, 34, 29, 0.08);
+      /* Glassmorphic Floating Header */
+      .navbar {
+        position: sticky;
+        top: 20px;
+        z-index: 100;
+        margin: 20px auto 40px;
       }
-
-      .hero {
-        padding: 28px;
-        color: white;
-        background:
-          radial-gradient(circle at top left, rgba(143, 224, 182, 0.18), transparent 30%),
-          linear-gradient(135deg, #16382a 0%, #1e5e42 55%, #2f7d5f 100%);
-      }
-
-      .eyebrow {
-        font-size: 12px;
-        letter-spacing: 0.28em;
-        text-transform: uppercase;
-        opacity: 0.74;
-      }
-
-      h1 {
-        margin: 14px 0 10px;
-        font-size: clamp(32px, 4vw, 54px);
-        line-height: 0.96;
-      }
-
-      .hero p {
-        margin: 0;
-        max-width: 900px;
-        color: rgba(255, 255, 255, 0.82);
-      }
-
-      .meta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 14px 24px;
-        margin-top: 18px;
-        font-size: 14px;
-        color: rgba(255, 255, 255, 0.82);
-      }
-
-      .body {
-        padding: 24px 28px 28px;
-      }
-
-      .toolbar {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto auto;
-        gap: 12px;
-      }
-
-      .search {
+      
+      .navbar-container {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid var(--border-color);
+        border-radius: 9999px;
+        padding: 12px 32px;
         display: flex;
         align-items: center;
-        gap: 10px;
-        background: var(--surface-soft);
-        border: 1px solid var(--line);
-        border-radius: 18px;
-        padding: 0 14px;
+        justify-content: space-between;
+        box-shadow: var(--shadow-soft);
       }
 
-      .search input {
+      /* iC group Logo */
+      .logo-wrap {
+        text-decoration: none;
+        display: flex;
+      }
+      
+      .logo {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        line-height: 0.85;
+      }
+      
+      .logo-ic {
+        color: var(--brand-green);
+        font-size: 26px;
+        font-weight: 900;
+        position: relative;
+        letter-spacing: -0.5px;
+      }
+      
+      .logo-ic .leaf {
+        position: absolute;
+        top: -4px;
+        right: -6px;
+        width: 7px;
+        height: 7px;
+        background: #e53935;
+        border-radius: 50% 0 50% 50%;
+        transform: rotate(-15deg);
+      }
+      
+      .logo-group {
+        color: #4b6584;
+        font-size: 10px;
+        font-weight: 700;
+        text-transform: lowercase;
+        letter-spacing: 0.5px;
+        margin-top: 1px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 6px;
+        background: rgba(233, 235, 232, 0.5);
+        padding: 4px;
+        border-radius: 9999px;
+      }
+      
+      .nav-link {
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        padding: 8px 20px;
+        border-radius: 9999px;
+        text-decoration: none;
+        color: var(--text-dark);
+        border: none;
+        background: transparent;
+      }
+      
+      .nav-link.active {
+        background: var(--brand-black);
+        color: #ffffff;
+      }
+      
+      .header-meta {
+        display: flex;
+        gap: 20px;
+      }
+      
+      .meta-item {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+      }
+      
+      .meta-label {
+        color: var(--text-muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 9px;
+        letter-spacing: 0.5px;
+      }
+      
+      .meta-val {
+        color: var(--text-dark);
+        font-weight: 800;
+        font-size: 12px;
+        margin-top: 1px;
+      }
+
+      /* Hero Section */
+      .hero {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+
+      .page-title {
+        font-size: clamp(34px, 5vw, 54px);
+        font-weight: 900;
+        color: var(--text-dark);
+        margin: 0 0 16px;
+        letter-spacing: -1.5px;
+        text-transform: uppercase;
+      }
+
+      .text-green {
+        color: var(--brand-green);
+      }
+
+      .page-subtitle {
+        font-size: 15px;
+        color: #555555;
+        max-width: 700px;
+        margin: 0 auto 18px;
+        line-height: 1.6;
+        font-weight: 500;
+      }
+
+      .host-badge {
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--brand-green);
+        background: var(--brand-green-light);
+        padding: 6px 16px;
+        border-radius: 9999px;
+        display: inline-block;
+        letter-spacing: 0.5px;
+      }
+
+      /* Stats Cards Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 16px;
+        margin-bottom: 32px;
+      }
+      
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        padding: 24px;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        box-shadow: var(--shadow-soft);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-hover);
+        border-color: rgba(138, 196, 63, 0.35);
+      }
+      
+      .stat-icon-wrap {
+        width: 48px;
+        height: 48px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      
+      .stat-icon {
+        width: 22px;
+        height: 22px;
+      }
+      
+      .overdue-bg { background: #fee2e2; color: #ef4444; }
+      .intime-bg { background: #dcfce7; color: #22c55e; }
+      .closed-late-bg { background: #ffedd5; color: #f97316; }
+      .closed-intime-bg { background: #e0f2fe; color: #3b82f6; }
+
+      .stat-content {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+      }
+      
+      .stat-number {
+        font-size: 32px;
+        font-weight: 800;
+        margin-top: 4px;
+        line-height: 1;
+        color: var(--text-dark);
+      }
+
+      /* Toolbar / Controls */
+      .controls-panel {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+      
+      .search-box {
+        flex-grow: 1;
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 9999px;
+        padding: 0 22px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--shadow-soft);
+        max-width: 600px;
+        transition: all 0.2s ease;
+      }
+      
+      .search-box:focus-within {
+        border-color: rgba(138, 196, 63, 0.5);
+        box-shadow: 0 8px 30px rgba(138, 196, 63, 0.06);
+      }
+      
+      .search-icon {
+        width: 18px;
+        height: 18px;
+        color: var(--text-muted);
+        stroke-width: 2.5;
+      }
+      
+      .search-box input {
         width: 100%;
         border: 0;
         outline: none;
         background: transparent;
         padding: 14px 0;
-        color: var(--text);
-      }
-
-      button {
-        border: 0;
-        border-radius: 18px;
-        padding: 14px 18px;
-        cursor: pointer;
+        color: var(--text-dark);
+        font-family: 'Montserrat', sans-serif;
         font-weight: 600;
-      }
-
-      .primary {
-        background: var(--brand-dark);
-        color: white;
-      }
-
-      .ghost {
-        background: white;
-        color: var(--brand-dark);
-        border: 1px solid var(--line);
-      }
-
-      .stats {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 18px;
-      }
-
-      .stat {
-        background: var(--surface-soft);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        padding: 16px;
-      }
-
-      .stat small {
-        display: block;
-        font-size: 12px;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--muted);
-      }
-
-      .stat strong {
-        display: block;
-        margin-top: 10px;
-        font-size: 34px;
-      }
-
-      .submeta {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px 18px;
-        margin-top: 16px;
-        color: var(--muted);
         font-size: 14px;
       }
-
-      .error {
-        margin-top: 16px;
-        background: #fff4f4;
-        border: 1px solid rgba(184, 62, 62, 0.18);
-        color: var(--danger);
-        border-radius: 18px;
-        padding: 14px 16px;
+      
+      .search-box input::placeholder {
+        color: #aaaaaa;
+      }
+      
+      .actions-group {
+        display: flex;
+        gap: 12px;
+      }
+      
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 0;
+        border-radius: 9999px;
+        padding: 14px 28px;
+        cursor: pointer;
+        font-weight: 800;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.8px;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        font-family: 'Montserrat', sans-serif;
+      }
+      
+      .btn-icon {
+        width: 16px;
+        height: 16px;
+        stroke-width: 2.5;
+      }
+      
+      .btn-black {
+        background: var(--brand-black);
+        color: #ffffff;
+      }
+      
+      .btn-black:hover:not(:disabled) {
+        background: var(--brand-black-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+      }
+      
+      .btn-black:disabled {
+        background: #cccccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+      
+      .btn-green {
+        background: var(--brand-green);
+        color: #ffffff;
+      }
+      
+      .btn-green:hover:not(:disabled) {
+        background: var(--brand-green-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(138, 196, 63, 0.25);
       }
 
-      .table-wrap {
-        margin-top: 18px;
-        max-height: 72vh;
-        overflow: auto;
-        border: 1px solid var(--line);
+      /* Report/Table Container */
+      .sub-meta-panel {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 16px;
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+        padding: 0 8px;
+      }
+      
+      .sub-meta-item strong {
+        color: var(--text-dark);
+      }
+      
+      .error-panel {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #ef4444;
+        border-radius: 20px;
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        font-weight: 700;
+        font-size: 14px;
+      }
+      
+      .loading-panel {
+        background: var(--surface);
+        border: 1px solid var(--border-color);
         border-radius: 24px;
-        background: white;
+        padding: 60px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        color: var(--text-muted);
+        font-weight: 700;
+        box-shadow: var(--shadow-soft);
+      }
+      
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid rgba(138, 196, 63, 0.15);
+        border-top-color: var(--brand-green);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
       }
 
+      .table-card {
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 24px;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+      }
+      
+      .table-scroller {
+        overflow-x: auto;
+        scrollbar-width: thin;
+        scrollbar-gutter: stable;
+      }
+      
       table {
         width: 100%;
-        min-width: 1400px;
         border-collapse: separate;
         border-spacing: 0;
-        font-size: 14px;
+        font-size: 13px;
+        text-align: left;
       }
-
-      th, td {
-        padding: 12px 14px;
-        border-bottom: 1px solid var(--line);
-        vertical-align: top;
-      }
-
+      
       th {
+        background: #fcfdfc;
+        color: #555555;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.8px;
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border-color);
         position: sticky;
         top: 0;
-        z-index: 1;
-        background: #edf2ec;
-        text-align: left;
+        z-index: 10;
         white-space: nowrap;
       }
-
-      td { color: #314039; }
-      td.description {
-        max-width: 480px;
-        white-space: pre-wrap;
-        word-break: break-word;
+      
+      td {
+        padding: 16px 24px;
+        border-bottom: 1px solid rgba(233, 235, 232, 0.6);
+        color: #333333;
+        vertical-align: middle;
+        font-weight: 500;
+        line-height: 1.4;
+      }
+      
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      
+      tbody tr {
+        transition: background-color 0.15s ease;
+      }
+      
+      tbody tr:nth-child(even) {
+        background-color: #fafbfa;
+      }
+      
+      tbody tr:hover {
+        background-color: rgba(138, 196, 63, 0.04);
       }
 
-      tbody tr:nth-child(odd) { background: #fcfcfa; }
-      .loading { margin-top: 18px; color: var(--muted); }
+      /* Bitrix Link */
+      .task-link {
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 800;
+        border-bottom: 1.5px dashed rgba(26, 26, 26, 0.3);
+        transition: all 0.2s ease;
+        padding-bottom: 1px;
+      }
+      
+      .task-link:hover {
+        color: var(--brand-green);
+        border-bottom-color: var(--brand-green);
+      }
 
+      /* Tree Grid Styles */
+      .tree-row {
+        user-select: none;
+      }
+      
+      .tree-toggle {
+        display: inline-block;
+        width: 14px;
+        font-size: 9px;
+        margin-right: 8px;
+        color: var(--text-muted);
+        text-align: center;
+        transition: transform 0.2s ease;
+      }
+      
+      .tree-level-1 {
+        font-size: 13px;
+      }
+      
+      .tree-level-2 {
+        font-size: 12.5px;
+      }
+      
+      .tree-level-3 {
+        font-size: 12px;
+      }
+      
+      .color-success {
+        color: #16a34a !important;
+        font-weight: 700;
+      }
+      
+      .color-danger {
+        color: #ef4444 !important;
+        font-weight: 700;
+      }
+
+      /* Responsive Adjustments */
       @media (max-width: 980px) {
-        .wrap { padding: 14px; }
-        .hero, .body { padding: 18px; }
-        .toolbar { grid-template-columns: 1fr; }
-        .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .navbar-container {
+          border-radius: 24px;
+          flex-direction: column;
+          gap: 16px;
+          padding: 20px;
+        }
+        .nav-links {
+          width: 100%;
+          justify-content: center;
+        }
+        .header-meta {
+          width: 100%;
+          justify-content: space-around;
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
+          padding-top: 12px;
+        }
+        .meta-item {
+          align-items: center;
+        }
+        .controls-panel {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .search-box {
+          max-width: none;
+        }
+        .actions-group {
+          justify-content: stretch;
+        }
+        .btn {
+          flex-grow: 1;
+          justify-content: center;
+        }
       }
 
       @media (max-width: 640px) {
-        .stats { grid-template-columns: 1fr; }
+        .wrap { padding: 0 16px; }
+        .stats-grid { grid-template-columns: 1fr; }
+        .sub-meta-panel { flex-direction: column; gap: 8px; }
       }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <section class="card">
-        <div class="hero">
-          <div class="eyebrow">Efficiency Report</div>
-          <h1>Отчет по задачам</h1>
-          <p>Отдельный поддоменный отчет по SQL-данным. Автообновление каждые 10 минут, ручное обновление без кеша и быстрая выгрузка в CSV.</p>
-          <div class="meta">
-            <span>Хост: <span id="host"></span></span>
-            <span>Последнее обновление: <span id="fetchedAt">—</span></span>
-            <span>Строк: <span id="rowCount">0</span></span>
+      <!-- Floating Navigation Bar -->
+      <header class="navbar">
+        <div class="navbar-container">
+          <a href="#" class="logo-wrap">
+            <div class="logo">
+              <div class="logo-ic">iC<span class="leaf"></span></div>
+              <div class="logo-group">group</div>
+            </div>
+          </a>
+          
+          <nav class="nav-links">
+            <span class="nav-link active">Отчет по задачам</span>
+          </nav>
+          
+          <div class="header-meta">
+            <div class="meta-item">
+              <span class="meta-label">Всего строк</span>
+              <span id="rowCount" class="meta-val">0</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Последний запрос</span>
+              <span id="fetchedAt" class="meta-val">—</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Title (Hero) -->
+      <section class="hero">
+        <h1 class="page-title">ОТЧЕТ <span class="text-green">ПО ЗАДАЧАМ</span></h1>
+        <p class="page-subtitle">Отдельный поддоменный отчет по SQL-данным. Автообновление каждые 10 минут, ручное обновление без кеша и быстрая выгрузка в CSV.</p>
+        <div class="host-badge">Хост: <span id="host"></span></div>
+      </section>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap overdue-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Открыта просрочена</span>
+            <strong id="statOverdueOpen" class="stat-number">0</strong>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon-wrap intime-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Открыта в срок</span>
+            <strong id="statOpenInTime" class="stat-number">0</strong>
           </div>
         </div>
 
-        <div class="body">
-          <div class="toolbar">
-            <label class="search">
-              <span>Поиск</span>
-              <input id="searchInput" placeholder="По задаче, проекту, исполнителю, отделу" />
-            </label>
-            <button id="refreshBtn" class="primary">Обновить сейчас</button>
-            <button id="csvBtn" class="ghost">Скачать CSV</button>
+        <div class="stat-card">
+          <div class="stat-icon-wrap closed-late-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
           </div>
-
-          <div class="stats">
-            <div class="stat"><small>Открыта просрочена</small><strong id="statOverdueOpen">0</strong></div>
-            <div class="stat"><small>Открыта в срок</small><strong id="statOpenInTime">0</strong></div>
-            <div class="stat"><small>Закрыта с просрочкой</small><strong id="statClosedLate">0</strong></div>
-            <div class="stat"><small>Закрыта в срок</small><strong id="statClosedInTime">0</strong></div>
+          <div class="stat-content">
+            <span class="stat-label">Закрыта с просрочкой</span>
+            <strong id="statClosedLate" class="stat-number">0</strong>
           </div>
+        </div>
 
-          <div class="submeta">
-            <span>Автообновление: <span id="refreshInterval">10</span> мин.</span>
-            <span>Длительность запроса: <span id="durationMs">—</span></span>
-            <span>Отфильтровано: <span id="filteredCount">0</span></span>
+        <div class="stat-card">
+          <div class="stat-icon-wrap closed-intime-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
+          <div class="stat-content">
+            <span class="stat-label">Закрыта в срок</span>
+            <strong id="statClosedInTime" class="stat-number">0</strong>
+          </div>
+        </div>
+      </div>
 
-          <div id="errorBox" class="error" hidden></div>
-          <div id="loadingBox" class="loading">Загружаю отчет…</div>
+      <!-- Controls & Search -->
+      <div class="controls-panel">
+        <div class="search-box">
+          <svg class="search-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <input id="searchInput" placeholder="Поиск по задаче, проекту, исполнителю, отделу..." />
+        </div>
+        
+        <div class="actions-group">
+          <button id="refreshBtn" class="btn btn-black">
+            <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H17"></path></svg>
+            Обновить сейчас
+          </button>
+          <button id="csvBtn" class="btn btn-green">
+            <svg class="btn-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2z"></path></svg>
+            Скачать CSV
+          </button>
+        </div>
+      </div>
 
-          <div class="table-wrap" id="tableWrap" hidden>
+      <!-- Report Table Section -->
+      <div class="report-container">
+        <div class="sub-meta-panel">
+          <div class="sub-meta-item">Автообновление: <strong><span id="refreshInterval">10</span> мин.</strong></div>
+          <div class="sub-meta-item">Длительность запроса: <strong><span id="durationMs">—</span></strong></div>
+          <div class="sub-meta-item">Отфильтровано: <strong><span id="filteredCount">0</span></strong></div>
+        </div>
+
+        <div id="errorBox" class="error-panel" hidden></div>
+        <div id="loadingBox" class="loading-panel">
+          <div class="spinner"></div>
+          <span>Синхронизация с базой данных…</span>
+        </div>
+
+        <div class="table-card" id="tableWrap" hidden>
+          <div class="table-scroller">
             <table>
               <thead><tr id="tableHead"></tr></thead>
               <tbody id="tableBody"></tbody>
             </table>
           </div>
         </div>
-      </section>
+      </div>
     </div>
 
     <script>
@@ -283,7 +717,9 @@
         rows: [],
         filteredRows: [],
         refreshTimer: null,
-        refreshIntervalMs: 10 * 60 * 1000
+        refreshIntervalMs: 10 * 60 * 1000,
+        portalHost: null,
+        expandedNodes: new Set() // Keeps track of expanded node keys (e.g. "dept:1C")
       };
 
       const ids = {
@@ -344,17 +780,134 @@
       }
 
       function renderTable() {
-        ids.tableHead.innerHTML = state.columns.map((column) => `<th>${column}</th>`).join('');
-        ids.tableBody.innerHTML = state.filteredRows.map((row) => {
-          return `<tr>${state.columns.map((column) => {
-            const value = row[column] === null || row[column] === '' ? '—' : String(row[column]);
-            const className = column === 'Описание' ? 'description' : '';
-            return `<td class="${className}">${escapeHtml(value)}</td>`;
-          }).join('')}</tr>`;
-        }).join('');
+        const tree = {};
+        
+        // Group the rows dynamically on client-side
+        state.filteredRows.forEach((row) => {
+          const dept = row['Отдел'] || 'Без отдела';
+          const assignee = row['Исполнитель'] || 'Без исполнителя';
+          const taskTitle = row['Название задачи'] || 'Без названия';
+          
+          const overdue = parseInt(row['Просрочка, дней']) || 0;
+          const efficiency = parseInt(row['Баллы эффективности']) || 0;
+          
+          if (!tree[dept]) {
+            tree[dept] = { 
+              name: dept, 
+              overdueSum: 0, 
+              efficiencySum: 0, 
+              employees: {} 
+            };
+          }
+          tree[dept].overdueSum += overdue;
+          tree[dept].efficiencySum += efficiency;
+          
+          if (!tree[dept].employees[assignee]) {
+            tree[dept].employees[assignee] = { 
+              name: assignee, 
+              overdueSum: 0, 
+              efficiencySum: 0, 
+              tasks: [] 
+            };
+          }
+          tree[dept].employees[assignee].overdueSum += overdue;
+          tree[dept].employees[assignee].efficiencySum += efficiency;
+          
+          tree[dept].employees[assignee].tasks.push({
+            id: row['ID задачи'],
+            title: taskTitle,
+            overdue: overdue,
+            efficiency: efficiency
+          });
+        });
+
+        // Set columns headers
+        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Просрочка, дней (Сумма)', 'Баллы эффективности (Сумма)'];
+        ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+        
+        let html = '';
+        const depts = Object.keys(tree).sort();
+        
+        if (depts.length === 0) {
+          ids.tableBody.innerHTML = `<tr><td colspan="3" style="text-align:center;color:var(--text-muted);padding:40px;">Нет данных для группировки</td></tr>`;
+          return;
+        }
+        
+        depts.forEach((deptName) => {
+          const dept = tree[deptName];
+          const deptKey = `dept:${deptName}`;
+          const isDeptExpanded = state.expandedNodes.has(deptKey);
+          const deptIcon = isDeptExpanded ? '▼' : '▶';
+          
+          // Render Department row
+          html += `
+            <tr class="tree-row tree-level-1" data-key="${deptKey}" style="font-weight: 700; background-color: rgba(138, 196, 63, 0.08); cursor: pointer;">
+              <td><span class="tree-toggle">${deptIcon}</span> 📁 ${escapeHtml(deptName)}</td>
+              <td class="${dept.overdueSum > 0 ? 'color-danger' : ''}">${dept.overdueSum}</td>
+              <td class="${dept.efficiencySum < 0 ? 'color-danger' : (dept.efficiencySum > 0 ? 'color-success' : '')}">${dept.efficiencySum}</td>
+            </tr>
+          `;
+          
+          if (isDeptExpanded) {
+            const employees = Object.keys(dept.employees).sort();
+            employees.forEach((empName) => {
+              const emp = dept.employees[empName];
+              const empKey = `emp:${deptName}:${empName}`;
+              const isEmpExpanded = state.expandedNodes.has(empKey);
+              const empIcon = isEmpExpanded ? '▼' : '▶';
+              
+              // Render Employee row
+              html += `
+                <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 600; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
+                  <td style="padding-left: 36px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}</td>
+                  <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${emp.overdueSum}</td>
+                  <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${emp.efficiencySum}</td>
+                </tr>
+              `;
+              
+              if (isEmpExpanded) {
+                emp.tasks.forEach((task) => {
+                  let taskTitleHtml = escapeHtml(task.title);
+                  if (state.portalHost && task.id) {
+                    const idNum = String(task.id).replace('#', '').trim();
+                    taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link">#${idNum}</a> ${taskTitleHtml}`;
+                  } else if (task.id) {
+                    taskTitleHtml = `<span style="font-weight:700;">#${task.id}</span> ${taskTitleHtml}`;
+                  }
+                  
+                  // Render Task row (leaf)
+                  html += `
+                    <tr class="tree-row tree-level-3">
+                      <td style="padding-left: 64px; color: #555555;">📋 ${taskTitleHtml}</td>
+                      <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue}</td>
+                      <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${task.efficiency}</td>
+                    </tr>
+                  `;
+                });
+              }
+            });
+          }
+        });
+        
+        ids.tableBody.innerHTML = html;
         ids.filteredCount.textContent = state.filteredRows.length;
         ids.tableWrap.hidden = false;
         renderStats(state.filteredRows);
+        
+        // Attach click listeners to expand/collapse toggles
+        document.querySelectorAll('.tree-row[data-key]').forEach((row) => {
+          row.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') return; // Don't collapse if clicked on task link
+            
+            const key = row.getAttribute('data-key');
+            if (state.expandedNodes.has(key)) {
+              state.expandedNodes.delete(key);
+            } else {
+              state.expandedNodes.add(key);
+            }
+            renderTable();
+          });
+        });
       }
 
       function escapeHtml(value) {
@@ -417,6 +970,7 @@
           state.rows = payload.rows;
           state.filteredRows = payload.rows.slice();
           state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
+          state.portalHost = payload.portalHost || null;
 
           ids.fetchedAt.textContent = formatDate(payload.fetchedAt);
           ids.rowCount.textContent = payload.rowCount;
