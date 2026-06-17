@@ -351,7 +351,7 @@
       .task-link {
         color: var(--text-dark);
         text-decoration: none;
-        font-weight: 800;
+        font-weight: 500;
         border-bottom: 1px dashed rgba(26, 26, 26, 0.3);
       }
       
@@ -736,7 +736,8 @@
             created: row['Дата создания'],
             state: row['Состояние задачи'],
             closed: row['Дата закрытия'],
-            closedDateRaw: row['closedDateRaw']
+            closedDateRaw: row['closedDateRaw'],
+            project: row['Проект']
           });
         });
 
@@ -788,7 +789,7 @@
               
               // Render Employee row
               html += `
-                <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 600; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
+                <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
                   <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
                   <td></td>
                   <td></td>
@@ -864,6 +865,11 @@
                     taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link">${taskTitleHtml}</a>`;
                   }
                   
+                  let projectPrefix = '';
+                  if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+                    projectPrefix = `<span style="font-weight: 800; color: var(--text-dark); margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
+                  }
+                  
                   // Calculate deadline status and styling
                   let rowClass = '';
                   let statusBadge = '';
@@ -893,7 +899,7 @@
                   // Render Task row (leaf)
                   html += `
                     <tr class="tree-row tree-level-3 ${rowClass}">
-                      <td style="padding-left: 48px; color: #555555;">${taskIcon} ${taskTitleHtml}${statusBadge}</td>
+                      <td style="padding-left: 48px; color: #555555;">${taskIcon} ${projectPrefix}${taskTitleHtml}${statusBadge}</td>
                       <td>${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
                       <td>${escapeHtml(formatShortName(task.creator))}</td>
                       <td></td>
@@ -927,12 +933,17 @@
                       let taskTitleHtml = escapeHtml(task.title);
                       if (state.portalHost && task.id) {
                         const idNum = String(task.id).replace('#', '').trim();
-                        taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 600;">${taskTitleHtml}</a>`;
+                        taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 500;">${taskTitleHtml}</a>`;
+                      }
+                      
+                      let projectPrefix = '';
+                      if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+                        projectPrefix = `<span style="font-weight: 800; color: #888888; margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
                       }
                       
                       html += `
                         <tr class="tree-row tree-level-4 closed-task-row" style="background-color: rgba(240, 240, 240, 0.3); color: #888888;">
-                          <td style="padding-left: 68px; color: #888888;">${taskIcon} <span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
+                          <td style="padding-left: 68px; color: #888888;">${taskIcon} ${projectPrefix}<span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
                           <td style="color: #888888; white-space: normal; line-height: 1.25; font-size: 10.5px;">
                             <div style="font-size: 9.5px; opacity: 0.8;">🏁 ${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</div>
                             <div style="font-weight: 600; margin-top: 1px;">✔️ ${escapeHtml(removeYear(task.closedDateRaw, task.closed))}</div>
