@@ -443,10 +443,10 @@
       <!-- Main Title & TV Metadata (No Navbar) -->
       <section class="hero" style="margin-top: 20px;">
         <div class="tv-meta">
-          <span>Всего строк: <strong id="rowCount">0</strong></span>
-          <span class="divider">|</span>
-          <span>Обновлено: <strong id="fetchedAt">—</strong></span>
-          <span class="divider">|</span>
+          <span id="rowCount" hidden></span>
+          <span id="fetchedAt" hidden></span>
+          <span id="host" class="host-text" hidden></span>
+          
           <button id="refreshBtn" class="refresh-link">🔄 Обновить</button>
           <span class="divider">|</span>
           <span class="period-selector">
@@ -455,12 +455,10 @@
               <option value="all">Все время</option>
               <option value="today">Сегодня</option>
               <option value="week">Текущая неделя</option>
-              <option value="month">Текущий месяц</option>
+              <option value="month" selected>Текущий месяц</option>
               <option value="lastMonth">Прошлый месяц</option>
             </select>
           </span>
-          <span class="divider">|</span>
-          <span id="host" class="host-text"></span>
         </div>
       </section>
 
@@ -1148,6 +1146,8 @@
         const savedPeriod = localStorage.getItem('dashboard_period');
         if (savedPeriod) {
           ids.periodSelect.value = savedPeriod;
+        } else {
+          ids.periodSelect.value = 'month';
         }
         
         ids.periodSelect.addEventListener('change', () => {
