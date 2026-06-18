@@ -822,10 +822,15 @@
           e.score   += parseInt(row['Баллы эффективности']) || 0;
         });
 
+        // Keep only real users — skip department/group "assignees" that have no valid user ID
+        const realPeople = Object.values(empMap).filter(emp => emp.id && /^\d+$/.test(emp.id) && emp.id !== '0');
+
         // Sort by score desc, then by name asc
-        const sorted = Object.values(empMap).sort((a, b) =>
+
+        const sorted = realPeople.sort((a, b) =>
           b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name, 'ru')
         );
+
 
         const medals = ['🥇', '🥈', '🥉'];
         const rowClasses = ['lb-row-1', 'lb-row-2', 'lb-row-3'];
