@@ -506,6 +506,55 @@
       .hide-task-details td:nth-child(3) {
         display: none !important;
       }
+
+      /* View Switcher Island */
+      .view-switcher {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(0,0,0,0.04);
+        border-radius: 20px;
+        padding: 3px;
+        gap: 2px;
+      }
+      .view-btn {
+        background: transparent;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        padding: 4px 12px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+      .view-btn.active {
+        background: var(--surface);
+        color: var(--text-dark);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+      }
+      .view-btn:not(.active):hover { color: var(--text-dark); }
+
+      /* Leaderboard Table */
+      .lb-rank {
+        font-size: 13px;
+        font-weight: 900;
+        color: var(--text-muted);
+        min-width: 36px;
+        text-align: center;
+      }
+      .lb-medal { font-size: 18px; line-height: 1; }
+      .lb-name { font-weight: 800; font-size: 13px; }
+      .lb-dept { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
+      .lb-score-pos { color: #16a34a; font-weight: 900; font-size: 15px; }
+      .lb-score-neg { color: #ef4444; font-weight: 900; font-size: 15px; }
+      .lb-score-zero { color: var(--text-muted); font-weight: 700; font-size: 15px; }
+      .lb-row-1 { background: linear-gradient(90deg, rgba(255,215,0,0.08) 0%, transparent 60%) !important; }
+      .lb-row-2 { background: linear-gradient(90deg, rgba(192,192,192,0.08) 0%, transparent 60%) !important; }
+      .lb-row-3 { background: linear-gradient(90deg, rgba(205,127,50,0.08) 0%, transparent 60%) !important; }
     </style>
   </head>
   <body>
@@ -542,6 +591,11 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             <input id="searchInput" class="search-input" type="text" placeholder="Имя исполнителя…" autocomplete="off" spellcheck="false">
             <button id="searchClear" class="search-clear" tabindex="-1" title="Очистить">✕</button>
+          </span>
+          <span class="divider"></span>
+          <span class="view-switcher">
+            <button id="viewBtn1" class="view-btn active">🏗️ Структура</button>
+            <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
           </span>
         </div>
       </section>
@@ -618,8 +672,12 @@
         refreshIntervalMs: 10 * 60 * 1000,
         portalHost: null,
         searchQuery: '',
-        expandedNodes: new Set() // Keeps track of expanded node keys (e.g. "dept:1C")
+        viewMode: 'table1', // 'table1' | 'table2'
+        expandedNodes: new Set()
       };
+
+      // Module-level set of department head user IDs (built in renderTable, used in renderLeaderboard too)
+      let headUserIds = new Set();
 
       const ids = {
         host: document.getElementById('host'),
@@ -638,10 +696,13 @@
         refreshBtn: document.getElementById('refreshBtn'),
         periodSelect: document.getElementById('periodSelect'),
         searchInput: document.getElementById('searchInput'),
-        searchClear: document.getElementById('searchClear')
+        searchClear: document.getElementById('searchClear'),
+        viewBtn1: document.getElementById('viewBtn1'),
+        viewBtn2: document.getElementById('viewBtn2')
       };
 
       ids.host.textContent = window.location.host;
+
 
       function normalize(value) {
         return String(value ?? '').toLowerCase().trim();
@@ -742,7 +803,71 @@
         ids.statClosedInTime.textContent = counts['Закрыта в срок'];
       }
 
+      // ── Leaderboard (Table 2) ─────────────────────────────────────────
+      function renderLeaderboard() {
+        // Aggregate by employee
+        const empMap = {};
+        state.filteredRows.forEach(row => {
+          const name = row['Исполнитель'] || 'Без исполнителя';
+          const id   = String(row['ID исполнителя'] || '');
+          const dept = row['Отдел'] || '';
+          if (!empMap[name]) {
+            empMap[name] = { name, id, dept, tasks: 0, active: 0, overdue: 0, score: 0 };
+          }
+          const e = empMap[name];
+          e.tasks++;
+          const state_ = row['Состояние задачи'] || '';
+          if (!state_.startsWith('Закрыта')) e.active++;
+          e.overdue += parseInt(row['Просрочка, дней']) || 0;
+          e.score   += parseInt(row['Баллы эффективности']) || 0;
+        });
+
+        // Sort by score desc, then by name asc
+        const sorted = Object.values(empMap).sort((a, b) =>
+          b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name, 'ru')
+        );
+
+        const medals = ['🥇', '🥈', '🥉'];
+        const rowClasses = ['lb-row-1', 'lb-row-2', 'lb-row-3'];
+
+        const headers = ['#', 'Сотрудник', 'Задач', 'В работе', 'Просрочка, дн.', 'Баллы'];
+        ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+
+        if (sorted.length === 0) {
+          ids.tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
+        } else {
+          ids.tableBody.innerHTML = sorted.map((emp, i) => {
+            const rank = i + 1;
+            const rowCls = rowClasses[i] || '';
+            const rankCell = rank <= 3
+              ? `<td class="lb-rank"><span class="lb-medal">${medals[i]}</span></td>`
+              : `<td class="lb-rank">${rank}</td>`;
+            const headIcon = headUserIds && headUserIds.has(emp.id) ? ' 👑' : ' 👤';
+            const scoreClass = emp.score > 0 ? 'lb-score-pos' : emp.score < 0 ? 'lb-score-neg' : 'lb-score-zero';
+            const scoreSign = emp.score > 0 ? '+' : '';
+            return `
+              <tr class="${rowCls}">
+                ${rankCell}
+                <td>
+                  <div class="lb-name">${headIcon} ${escapeHtml(emp.name)}</div>
+                  <div class="lb-dept">${escapeHtml(emp.dept)}</div>
+                </td>
+                <td>${formatTasks(emp.tasks)}</td>
+                <td>${formatTasks(emp.active)}</td>
+                <td class="${emp.overdue > 0 ? 'color-danger' : ''}">${formatDays(emp.overdue)}</td>
+                <td class="${scoreClass}">${scoreSign}${emp.score} <span style="font-size:9.5px;font-weight:500;opacity:0.75;margin-left:2px;">${scoreSign}${Math.abs(emp.score) === 1 ? 'балл' : (Math.abs(emp.score) >= 2 && Math.abs(emp.score) <= 4) ? 'балла' : 'баллов'}</span></td>
+              </tr>`;
+          }).join('');
+        }
+
+        ids.tableWrap.hidden = false;
+        renderStats(state.filteredRows);
+      }
+
+      // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
+        if (state.viewMode === 'table2') { renderLeaderboard(); return; }
+
         const tree = {};
         
         // Calculate cross-department assignments
@@ -978,7 +1103,7 @@
         const depById = {};
         const depByName = {};
         // Set of user IDs who are department heads (UF_HEAD)
-        const headUserIds = new Set();
+        headUserIds = new Set();
         if (state.departments) {
           state.departments.forEach(d => {
             depById[String(d.ID)] = d;
@@ -1506,7 +1631,18 @@
         });
       }
 
+      // View switcher
+      function setView(mode) {
+        state.viewMode = mode;
+        ids.viewBtn1.classList.toggle('active', mode === 'table1');
+        ids.viewBtn2.classList.toggle('active', mode === 'table2');
+        renderTable();
+      }
+      if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
+      if (ids.viewBtn2) ids.viewBtn2.addEventListener('click', () => setView('table2'));
+
       loadReport('GET');
+
 
     </script>
   </body>
