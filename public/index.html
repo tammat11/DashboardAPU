@@ -555,6 +555,37 @@
       .lb-row-1 { background: linear-gradient(90deg, rgba(255,215,0,0.08) 0%, transparent 60%) !important; }
       .lb-row-2 { background: linear-gradient(90deg, rgba(192,192,192,0.08) 0%, transparent 60%) !important; }
       .lb-row-3 { background: linear-gradient(90deg, rgba(205,127,50,0.08) 0%, transparent 60%) !important; }
+
+      /* Avatars */
+      .lb-person { display: flex; align-items: center; gap: 10px; }
+      .lb-ava-wrap { display: inline-flex; flex-shrink: 0; }
+      .lb-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: var(--surface-muted, #eef0f4);
+        border: 1.5px solid rgba(0,0,0,0.06);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+      }
+      .lb-avatar-fallback {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        border: 1.5px solid rgba(0,0,0,0.06);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+      }
+      tr.lb-row-1 .lb-avatar, tr.lb-row-1 .lb-avatar-fallback { width: 42px; height: 42px; border-color: rgba(255,193,7,0.55); }
+      tr.lb-row-2 .lb-avatar, tr.lb-row-2 .lb-avatar-fallback { width: 38px; height: 38px; }
+      tr.lb-row-3 .lb-avatar, tr.lb-row-3 .lb-avatar-fallback { width: 38px; height: 38px; }
     </style>
   </head>
   <body>
@@ -596,6 +627,7 @@
           <span class="view-switcher">
             <button id="viewBtn1" class="view-btn active">🏗️ Структура</button>
             <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
+            <button id="viewBtn3" class="view-btn">🖼️ Галерея</button>
           </span>
         </div>
       </section>
@@ -698,7 +730,8 @@
         searchInput: document.getElementById('searchInput'),
         searchClear: document.getElementById('searchClear'),
         viewBtn1: document.getElementById('viewBtn1'),
-        viewBtn2: document.getElementById('viewBtn2')
+        viewBtn2: document.getElementById('viewBtn2'),
+        viewBtn3: document.getElementById('viewBtn3')
       };
 
       ids.host.textContent = window.location.host;
@@ -822,7 +855,38 @@
       }
 
       // ── Leaderboard (Table 2) ─────────────────────────────────────────
-      function renderLeaderboard() {
+      // Deterministic color for avatar fallback initials
+      function avatarColor(seed) {
+        let hash = 0;
+        const str = String(seed || '');
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        const hue = Math.abs(hash) % 360;
+        return `hsl(${hue}, 55%, 52%)`;
+      }
+
+      function getInitials(name) {
+        const parts = String(name || '').trim().split(/\s+/);
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return (parts[0] || '?').slice(0, 2).toUpperCase();
+      }
+
+      function avatarMarkup(emp) {
+        const initials = escapeHtml(getInitials(emp.name));
+        const color = avatarColor(emp.id || emp.name);
+        const fallback = (hidden) =>
+          `<div class="lb-avatar-fallback" style="${hidden ? 'display:none;' : ''}background:${color};">${initials}</div>`;
+        if (emp.avatar) {
+          const safeUrl = escapeHtml(emp.avatar);
+          return `<span class="lb-ava-wrap">` +
+            `<img class="lb-avatar" src="${safeUrl}" alt="${escapeHtml(emp.name)}" loading="lazy" referrerpolicy="no-referrer" ` +
+            `onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` +
+            fallback(true) +
+            `</span>`;
+        }
+        return fallback(false);
+      }
+
+      function renderLeaderboard(withAvatars = false) {
         // Aggregate by employee
         const empMap = {};
         state.filteredRows.forEach(row => {
@@ -831,19 +895,21 @@
           const dept = row['Отдел'] || '';
           if (name && name !== 'Без исполнителя') {
             if (!empMap[name]) {
-              empMap[name] = { 
-                name, 
-                id, 
-                dept, 
-                tasks: 0, 
-                active: 0, 
-                overdue: 0, 
-                score: 0, 
-                assignedCount: 0, 
-                assignedToOtherDepts: 0 
+              empMap[name] = {
+                name,
+                id,
+                dept,
+                avatar: row['Аватар'] || '',
+                tasks: 0,
+                active: 0,
+                overdue: 0,
+                score: 0,
+                assignedCount: 0,
+                assignedToOtherDepts: 0
               };
             }
             const e = empMap[name];
+            if (!e.avatar && row['Аватар']) e.avatar = row['Аватар'];
             e.tasks++;
             const state_ = row['Состояние задачи'] || '';
             if (!state_.startsWith('Закрыта')) e.active++;
@@ -857,17 +923,21 @@
           const executorDept = row['Отдел'] || 'Без отдела';
           if (creatorName && creatorName !== 'Без постановщика') {
             if (!empMap[creatorName]) {
-              empMap[creatorName] = { 
-                name: creatorName, 
-                id: creatorId, 
-                dept: creatorDept, 
-                tasks: 0, 
-                active: 0, 
-                overdue: 0, 
-                score: 0, 
-                assignedCount: 0, 
-                assignedToOtherDepts: 0 
+              empMap[creatorName] = {
+                name: creatorName,
+                id: creatorId,
+                dept: creatorDept,
+                avatar: row['Аватар постановщика'] || '',
+                tasks: 0,
+                active: 0,
+                overdue: 0,
+                score: 0,
+                assignedCount: 0,
+                assignedToOtherDepts: 0
               };
+            }
+            if (!empMap[creatorName].avatar && row['Аватар постановщика']) {
+              empMap[creatorName].avatar = row['Аватар постановщика'];
             }
             empMap[creatorName].assignedCount++;
             if (creatorDept !== executorDept) {
@@ -906,15 +976,24 @@
             const rankCell = rank <= 3
               ? `<td class="lb-rank"><span class="lb-medal">${medals[i]}</span></td>`
               : `<td class="lb-rank">${rank}</td>`;
-            const headIcon = headUserIds && headUserIds.has(emp.id) ? ' 👑' : ' 👤';
+            const isHead = headUserIds && headUserIds.has(emp.id);
+            const headIcon = isHead ? ' 👑' : ' 👤';
             const scoreClass = emp.score > 0 ? 'lb-score-pos' : emp.score < 0 ? 'lb-score-neg' : 'lb-score-zero';
             const scoreSign = emp.score > 0 ? '+' : '';
+            const nameCell = withAvatars
+              ? `<td>
+                  <div class="lb-person">
+                    ${avatarMarkup(emp)}
+                    <div class="lb-name">${isHead ? '👑 ' : ''}${escapeHtml(emp.name)}</div>
+                  </div>
+                </td>`
+              : `<td>
+                  <div class="lb-name">${headIcon} ${escapeHtml(emp.name)}</div>
+                </td>`;
             return `
               <tr class="${rowCls}">
                 ${rankCell}
-                <td>
-                  <div class="lb-name">${headIcon} ${escapeHtml(emp.name)}</div>
-                </td>
+                ${nameCell}
                 <td>${formatTasks(emp.tasks)}</td>
                 <td>${formatTasks(emp.active)}</td>
                 <td>${formatTasks(emp.assignedCount)}</td>
@@ -936,7 +1015,8 @@
 
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
-        if (state.viewMode === 'table2') { renderLeaderboard(); return; }
+        if (state.viewMode === 'table2') { renderLeaderboard(false); return; }
+        if (state.viewMode === 'table3') { renderLeaderboard(true); return; }
 
         const tree = {};
         
@@ -1716,10 +1796,12 @@
         state.viewMode = mode;
         ids.viewBtn1.classList.toggle('active', mode === 'table1');
         ids.viewBtn2.classList.toggle('active', mode === 'table2');
+        ids.viewBtn3.classList.toggle('active', mode === 'table3');
         renderTable();
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
       if (ids.viewBtn2) ids.viewBtn2.addEventListener('click', () => setView('table2'));
+      if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
 
       loadReport('GET');
 
