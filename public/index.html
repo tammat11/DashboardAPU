@@ -884,6 +884,11 @@
 
         ids.tableWrap.hidden = false;
         renderStats(state.filteredRows);
+
+        const table = document.querySelector('table');
+        if (table) {
+          table.classList.remove('hide-task-details');
+        }
       }
 
       // ── Table dispatcher ──────────────────────────────────────────────
