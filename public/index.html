@@ -1419,7 +1419,7 @@
         });
 
         const table = document.querySelector('table');
-        if (table) {
+        if (table && state.viewMode === 'table1') {
           let hasExpandedEmp = false;
           for (const key of state.expandedNodes) {
             if (key.startsWith('emp:')) {
@@ -1432,7 +1432,10 @@
           } else {
             table.classList.add('hide-task-details');
           }
+        } else if (table) {
+          table.classList.remove('hide-task-details');
         }
+
       }
 
       function escapeHtml(value) {
