@@ -586,6 +586,99 @@
       tr.lb-row-1 .lb-avatar, tr.lb-row-1 .lb-avatar-fallback { width: 42px; height: 42px; border-color: rgba(255,193,7,0.55); }
       tr.lb-row-2 .lb-avatar, tr.lb-row-2 .lb-avatar-fallback { width: 38px; height: 38px; }
       tr.lb-row-3 .lb-avatar, tr.lb-row-3 .lb-avatar-fallback { width: 38px; height: 38px; }
+
+      /* Gallery view */
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+        padding: 4px;
+      }
+      .g-card {
+        position: relative;
+        background: var(--surface, #fff);
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 18px;
+        padding: 22px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+      .g-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.10); }
+      .g-rank {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--text-muted);
+      }
+      .g-ava-wrap { position: relative; width: 84px; height: 84px; margin-bottom: 12px; }
+      .g-avatar, .g-avatar-fallback {
+        width: 84px;
+        height: 84px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      }
+      .g-avatar-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 700;
+        color: #fff;
+      }
+      .g-crown {
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%) rotate(-8deg);
+        font-size: 26px;
+        line-height: 1;
+        filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));
+        pointer-events: none;
+      }
+      .g-medal {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        font-size: 22px;
+        line-height: 1;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+      }
+      .g-name { font-weight: 600; font-size: 13.5px; color: var(--text-dark); line-height: 1.3; }
+      .g-dept { font-size: 10.5px; color: var(--text-muted); font-weight: 500; margin-top: 3px; min-height: 13px; }
+      .g-score {
+        margin-top: 10px;
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .g-score-unit { font-size: 10px; font-weight: 600; opacity: 0.7; margin-left: 2px; }
+      .g-score-pos { color: #16a34a; }
+      .g-score-neg { color: #ef4444; }
+      .g-score-zero { color: var(--text-muted); }
+      .g-meta {
+        margin-top: 12px;
+        padding-top: 11px;
+        border-top: 1px solid rgba(0,0,0,0.06);
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
+        gap: 6px;
+      }
+      .g-meta-item { display: flex; flex-direction: column; gap: 2px; }
+      .g-meta-val { font-size: 14px; font-weight: 700; color: var(--text-dark); }
+      .g-meta-val.danger { color: #ef4444; }
+      .g-meta-lbl { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+      .g-card.g-top1 { border-color: rgba(255,193,7,0.6); background: linear-gradient(180deg, rgba(255,215,0,0.07), transparent 55%); }
+      .g-card.g-top2 { border-color: rgba(192,192,192,0.6); }
+      .g-card.g-top3 { border-color: rgba(205,127,50,0.5); }
     </style>
   </head>
   <body>
@@ -691,6 +784,8 @@
             </table>
           </div>
         </div>
+
+        <div id="galleryWrap" class="gallery-grid" hidden></div>
       </div>
     </div>
 
@@ -718,6 +813,7 @@
         tableHead: document.getElementById('tableHead'),
         tableBody: document.getElementById('tableBody'),
         tableWrap: document.getElementById('tableWrap'),
+        galleryWrap: document.getElementById('galleryWrap'),
         errorBox: document.getElementById('errorBox'),
         loadingBox: document.getElementById('loadingBox'),
         syncIndicator: document.getElementById('syncIndicator'),
@@ -886,8 +982,8 @@
         return fallback(false);
       }
 
-      function renderLeaderboard(withAvatars = false) {
-        // Aggregate by employee
+      // Aggregate filtered rows into sorted people (shared by Rating & Gallery)
+      function aggregatePeople() {
         const empMap = {};
         state.filteredRows.forEach(row => {
           const name = row['Исполнитель'] || 'Без исполнителя';
@@ -957,9 +1053,13 @@
         }
 
         // Sort by score desc, then by name asc
-        const sorted = displayPeople.sort((a, b) =>
+        return displayPeople.sort((a, b) =>
           b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name, 'ru')
         );
+      }
+
+      function renderLeaderboard() {
+        const sorted = aggregatePeople();
 
         const medals = ['🥇', '🥈', '🥉'];
         const rowClasses = ['lb-row-1', 'lb-row-2', 'lb-row-3'];
@@ -976,24 +1076,15 @@
             const rankCell = rank <= 3
               ? `<td class="lb-rank"><span class="lb-medal">${medals[i]}</span></td>`
               : `<td class="lb-rank">${rank}</td>`;
-            const isHead = headUserIds && headUserIds.has(emp.id);
-            const headIcon = isHead ? ' 👑' : ' 👤';
+            const headIcon = headUserIds && headUserIds.has(emp.id) ? ' 👑' : ' 👤';
             const scoreClass = emp.score > 0 ? 'lb-score-pos' : emp.score < 0 ? 'lb-score-neg' : 'lb-score-zero';
             const scoreSign = emp.score > 0 ? '+' : '';
-            const nameCell = withAvatars
-              ? `<td>
-                  <div class="lb-person">
-                    ${avatarMarkup(emp)}
-                    <div class="lb-name">${isHead ? '👑 ' : ''}${escapeHtml(emp.name)}</div>
-                  </div>
-                </td>`
-              : `<td>
-                  <div class="lb-name">${headIcon} ${escapeHtml(emp.name)}</div>
-                </td>`;
             return `
               <tr class="${rowCls}">
                 ${rankCell}
-                ${nameCell}
+                <td>
+                  <div class="lb-name">${headIcon} ${escapeHtml(emp.name)}</div>
+                </td>
                 <td>${formatTasks(emp.tasks)}</td>
                 <td>${formatTasks(emp.active)}</td>
                 <td>${formatTasks(emp.assignedCount)}</td>
@@ -1013,10 +1104,68 @@
         }
       }
 
+      // Large avatar for gallery cards
+      function galleryAvatarMarkup(emp) {
+        const initials = escapeHtml(getInitials(emp.name));
+        const color = avatarColor(emp.id || emp.name);
+        const fallback = (hidden) =>
+          `<div class="g-avatar-fallback" style="${hidden ? 'display:none;' : ''}background:${color};">${initials}</div>`;
+        if (emp.avatar) {
+          const safeUrl = escapeHtml(emp.avatar);
+          return `<img class="g-avatar" src="${safeUrl}" alt="${escapeHtml(emp.name)}" loading="lazy" referrerpolicy="no-referrer" ` +
+            `onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` +
+            fallback(true);
+        }
+        return fallback(false);
+      }
+
+      // ── Gallery (Table 3) ─────────────────────────────────────────────
+      function renderGallery() {
+        const sorted = aggregatePeople();
+        const medals = ['🥇', '🥈', '🥉'];
+        const topCls = ['g-top1', 'g-top2', 'g-top3'];
+
+        if (sorted.length === 0) {
+          ids.galleryWrap.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:32px;">Нет данных</div>`;
+        } else {
+          ids.galleryWrap.innerHTML = sorted.map((emp, i) => {
+            const rank = i + 1;
+            const isHead = headUserIds && headUserIds.has(emp.id);
+            const scoreClass = emp.score > 0 ? 'g-score-pos' : emp.score < 0 ? 'g-score-neg' : 'g-score-zero';
+            const scoreSign = emp.score > 0 ? '+' : '';
+            const unit = Math.abs(emp.score) === 1 ? 'балл' : (Math.abs(emp.score) >= 2 && Math.abs(emp.score) <= 4) ? 'балла' : 'баллов';
+            const crown = isHead ? `<span class="g-crown" title="Руководитель">👑</span>` : '';
+            const medal = rank <= 3 ? `<span class="g-medal">${medals[i]}</span>` : '';
+            return `
+              <div class="g-card ${topCls[i] || ''}">
+                <span class="g-rank">#${rank}</span>
+                <div class="g-ava-wrap">
+                  ${galleryAvatarMarkup(emp)}
+                  ${crown}
+                  ${medal}
+                </div>
+                <div class="g-name">${escapeHtml(emp.name)}</div>
+                <div class="g-dept">${escapeHtml(emp.dept || '')}</div>
+                <div class="g-score ${scoreClass}">${scoreSign}${emp.score}<span class="g-score-unit">${scoreSign}${unit}</span></div>
+                <div class="g-meta">
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.tasks}</span><span class="g-meta-lbl">Задач</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Просрочка</span></div>
+                </div>
+              </div>`;
+          }).join('');
+        }
+
+        ids.galleryWrap.hidden = false;
+        ids.tableWrap.hidden = true;
+        renderStats(state.filteredRows);
+      }
+
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
-        if (state.viewMode === 'table2') { renderLeaderboard(false); return; }
-        if (state.viewMode === 'table3') { renderLeaderboard(true); return; }
+        if (state.viewMode === 'table3') { renderGallery(); return; }
+        ids.galleryWrap.hidden = true;
+        if (state.viewMode === 'table2') { renderLeaderboard(); return; }
 
         const tree = {};
         
@@ -1686,6 +1835,7 @@
         if (isFirstLoad) {
           ids.loadingBox.hidden = false;
           ids.tableWrap.hidden = true;
+          ids.galleryWrap.hidden = true;
         } else {
           if (ids.syncIndicator) ids.syncIndicator.hidden = false;
         }
