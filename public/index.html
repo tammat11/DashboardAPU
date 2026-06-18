@@ -1500,6 +1500,30 @@
         const now = new Date();
         
         let filtered = state.rows.slice();
+
+        // Keep only АУП (ID: 157) and its descendants in the department structure
+        if (state.departments && state.departments.length > 0) {
+          const allowedDeptIds = new Set(['157']);
+          let added = true;
+          while (added) {
+            added = false;
+            state.departments.forEach(d => {
+              const parentId = String(d.PARENT || '');
+              const id = String(d.ID);
+              if (parentId && allowedDeptIds.has(parentId) && !allowedDeptIds.has(id)) {
+                allowedDeptIds.add(id);
+                added = true;
+              }
+            });
+          }
+          const allowedDeptNames = new Set();
+          state.departments.forEach(d => {
+            if (allowedDeptIds.has(String(d.ID))) {
+              allowedDeptNames.add(d.NAME);
+            }
+          });
+          filtered = filtered.filter(row => allowedDeptNames.has(row['Отдел']));
+        }
         
         if (period !== 'all') {
           // Prepare period boundaries in user's browser local time
