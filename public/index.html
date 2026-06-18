@@ -541,17 +541,17 @@
       /* Leaderboard Table */
       .lb-rank {
         font-size: 13px;
-        font-weight: 900;
+        font-weight: 500;
         color: var(--text-muted);
         min-width: 36px;
         text-align: center;
       }
       .lb-medal { font-size: 18px; line-height: 1; }
-      .lb-name { font-weight: 800; font-size: 13px; }
-      .lb-dept { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
-      .lb-score-pos { color: #16a34a; font-weight: 900; font-size: 15px; }
-      .lb-score-neg { color: #ef4444; font-weight: 900; font-size: 15px; }
-      .lb-score-zero { color: var(--text-muted); font-weight: 700; font-size: 15px; }
+      .lb-name { font-weight: 500; font-size: 13px; }
+      .lb-dept { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 1px; }
+      .lb-score-pos { color: #16a34a; font-weight: 600; font-size: 15px; }
+      .lb-score-neg { color: #ef4444; font-weight: 600; font-size: 15px; }
+      .lb-score-zero { color: var(--text-muted); font-weight: 500; font-size: 15px; }
       .lb-row-1 { background: linear-gradient(90deg, rgba(255,215,0,0.08) 0%, transparent 60%) !important; }
       .lb-row-2 { background: linear-gradient(90deg, rgba(192,192,192,0.08) 0%, transparent 60%) !important; }
       .lb-row-3 { background: linear-gradient(90deg, rgba(205,127,50,0.08) 0%, transparent 60%) !important; }
@@ -829,35 +829,52 @@
           const name = row['Исполнитель'] || 'Без исполнителя';
           const id   = String(row['ID исполнителя'] || '');
           const dept = row['Отдел'] || '';
-          if (!empMap[name]) {
-            empMap[name] = { name, id, dept, tasks: 0, active: 0, overdue: 0, score: 0 };
+          if (name && name !== 'Без исполнителя') {
+            if (!empMap[name]) {
+              empMap[name] = { name, id, dept, tasks: 0, active: 0, overdue: 0, score: 0, assignedCount: 0 };
+            }
+            const e = empMap[name];
+            e.tasks++;
+            const state_ = row['Состояние задачи'] || '';
+            if (!state_.startsWith('Закрыта')) e.active++;
+            e.overdue += parseInt(row['Просрочка, дней']) || 0;
+            e.score   += parseInt(row['Баллы эффективности']) || 0;
           }
-          const e = empMap[name];
-          e.tasks++;
-          const state_ = row['Состояние задачи'] || '';
-          if (!state_.startsWith('Закрыта')) e.active++;
-          e.overdue += parseInt(row['Просрочка, дней']) || 0;
-          e.score   += parseInt(row['Баллы эффективности']) || 0;
+
+          const creatorName = row['Постановщик'];
+          const creatorId   = String(row['ID постановщика'] || '');
+          const creatorDept = row['Отдел постановщика'] || '';
+          if (creatorName && creatorName !== 'Без постановщика') {
+            if (!empMap[creatorName]) {
+              empMap[creatorName] = { name: creatorName, id: creatorId, dept: creatorDept, tasks: 0, active: 0, overdue: 0, score: 0, assignedCount: 0 };
+            }
+            empMap[creatorName].assignedCount++;
+          }
         });
 
         // Keep only real users — skip department/group "assignees" that have no valid user ID
         const realPeople = Object.values(empMap).filter(emp => emp.id && /^\d+$/.test(emp.id) && emp.id !== '0');
 
-        // Sort by score desc, then by name asc
+        // Filter by name search query if any
+        let displayPeople = realPeople;
+        const q = state.searchQuery.toLowerCase().trim();
+        if (q) {
+          displayPeople = realPeople.filter(emp => emp.name.toLowerCase().includes(q));
+        }
 
-        const sorted = realPeople.sort((a, b) =>
+        // Sort by score desc, then by name asc
+        const sorted = displayPeople.sort((a, b) =>
           b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name, 'ru')
         );
-
 
         const medals = ['🥇', '🥈', '🥉'];
         const rowClasses = ['lb-row-1', 'lb-row-2', 'lb-row-3'];
 
-        const headers = ['#', 'Сотрудник', 'Задач', 'В работе', 'Просрочка, дн.', 'Баллы'];
+        const headers = ['#', 'Сотрудник', 'Задач', 'В работе', 'Поручил', 'Просрочка, дн.', 'Баллы'];
         ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
 
         if (sorted.length === 0) {
-          ids.tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
+          ids.tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
         } else {
           ids.tableBody.innerHTML = sorted.map((emp, i) => {
             const rank = i + 1;
@@ -876,6 +893,7 @@
                 </td>
                 <td>${formatTasks(emp.tasks)}</td>
                 <td>${formatTasks(emp.active)}</td>
+                <td>${formatTasks(emp.assignedCount)}</td>
                 <td class="${emp.overdue > 0 ? 'color-danger' : ''}">${formatDays(emp.overdue)}</td>
                 <td class="${scoreClass}">${scoreSign}${emp.score} <span style="font-size:9.5px;font-weight:500;opacity:0.75;margin-left:2px;">${scoreSign}${Math.abs(emp.score) === 1 ? 'балл' : (Math.abs(emp.score) >= 2 && Math.abs(emp.score) <= 4) ? 'балла' : 'баллов'}</span></td>
               </tr>`;
@@ -1513,12 +1531,14 @@
         // Apply name search filter
         const q = state.searchQuery.toLowerCase().trim();
         if (q) {
-          const matchedAssignees = new Set();
+          const matchedPeople = new Set();
           filtered.forEach(row => {
-            const name = (row['Исполнитель'] || '').toLowerCase();
-            if (name.includes(q)) matchedAssignees.add(row['Исполнитель']);
+            const executor = (row['Исполнитель'] || '').toLowerCase();
+            const creator = (row['Постановщик'] || '').toLowerCase();
+            if (executor.includes(q)) matchedPeople.add(row['Исполнитель']);
+            if (creator.includes(q)) matchedPeople.add(row['Постановщик']);
           });
-          filtered = filtered.filter(row => matchedAssignees.has(row['Исполнитель']));
+          filtered = filtered.filter(row => matchedPeople.has(row['Исполнитель']) || matchedPeople.has(row['Постановщик']));
         }
 
         state.filteredRows = filtered;
