@@ -50,6 +50,10 @@
         margin: 0 auto;
         padding: 0 16px;
       }
+      body.gallery-active .wrap {
+        max-width: none;
+        padding: 0 28px;
+      }
 
       /* Hero Section & TV Metadata */
       .hero {
@@ -590,7 +594,7 @@
       /* Gallery view */
       .gallery-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
         gap: 16px;
         padding: 4px;
       }
@@ -675,7 +679,7 @@
       .g-meta-item { display: flex; flex-direction: column; gap: 2px; }
       .g-meta-val { font-size: 14px; font-weight: 700; color: var(--text-dark); }
       .g-meta-val.danger { color: #ef4444; }
-      .g-meta-lbl { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+      .g-meta-lbl { font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); white-space: nowrap; }
       .g-card.g-top1 { border-color: rgba(255,193,7,0.6); background: linear-gradient(180deg, rgba(255,215,0,0.07), transparent 55%); }
       .g-card.g-top2 { border-color: rgba(192,192,192,0.6); }
       .g-card.g-top3 { border-color: rgba(205,127,50,0.5); }
@@ -1163,6 +1167,7 @@
 
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
+        document.body.classList.toggle('gallery-active', state.viewMode === 'table3');
         if (state.viewMode === 'table3') { renderGallery(); return; }
         ids.galleryWrap.hidden = true;
         if (state.viewMode === 'table2') { renderLeaderboard(); return; }
