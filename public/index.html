@@ -620,10 +620,10 @@
         font-weight: 800;
         color: var(--text-muted);
       }
-      .g-ava-wrap { position: relative; width: 66px; height: 66px; margin-bottom: 10px; }
+      .g-ava-wrap { position: relative; width: 92px; height: 92px; margin-bottom: 10px; }
       .g-avatar, .g-avatar-fallback {
-        width: 66px;
-        height: 66px;
+        width: 92px;
+        height: 92px;
         border-radius: 50%;
         object-fit: cover;
         border: 3px solid #fff;
@@ -633,7 +633,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 22px;
+        font-size: 30px;
         font-weight: 700;
         color: #fff;
       }
@@ -1149,7 +1149,6 @@
                   ${medal}
                 </div>
                 <div class="g-name">${escapeHtml(emp.name)}</div>
-                <div class="g-dept">${escapeHtml(emp.dept || '')}</div>
                 <div class="g-score ${scoreClass}">${scoreSign}${emp.score}<span class="g-score-unit">${unit}</span></div>
                 <div class="g-meta">
                   <div class="g-meta-item"><span class="g-meta-val">${emp.tasks}</span><span class="g-meta-lbl">Задач</span></div>
