@@ -552,30 +552,6 @@
       .lb-score-pos { color: #16a34a; font-weight: 600; font-size: 15px; }
       .lb-score-neg { color: #ef4444; font-weight: 600; font-size: 15px; }
       .lb-score-zero { color: var(--text-muted); font-weight: 500; font-size: 15px; }
-      .badge-own {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        background: rgba(21, 128, 61, 0.08);
-        color: #15803d;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 700;
-        vertical-align: middle;
-      }
-      .badge-other {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        background: rgba(29, 78, 216, 0.08);
-        color: #1d4ed8;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 700;
-        vertical-align: middle;
-      }
       .lb-row-1 { background: linear-gradient(90deg, rgba(255,215,0,0.08) 0%, transparent 60%) !important; }
       .lb-row-2 { background: linear-gradient(90deg, rgba(192,192,192,0.08) 0%, transparent 60%) !important; }
       .lb-row-3 { background: linear-gradient(90deg, rgba(205,127,50,0.08) 0%, transparent 60%) !important; }
@@ -864,8 +840,7 @@
                 overdue: 0, 
                 score: 0, 
                 assignedCount: 0, 
-                assignedToOtherDepts: 0,
-                assignedToOwnDept: 0
+                assignedToOtherDepts: 0 
               };
             }
             const e = empMap[name];
@@ -891,15 +866,12 @@
                 overdue: 0, 
                 score: 0, 
                 assignedCount: 0, 
-                assignedToOtherDepts: 0,
-                assignedToOwnDept: 0
+                assignedToOtherDepts: 0 
               };
             }
             empMap[creatorName].assignedCount++;
             if (creatorDept !== executorDept) {
               empMap[creatorName].assignedToOtherDepts++;
-            } else {
-              empMap[creatorName].assignedToOwnDept++;
             }
           }
         });
@@ -922,19 +894,11 @@
         const medals = ['🥇', '🥈', '🥉'];
         const rowClasses = ['lb-row-1', 'lb-row-2', 'lb-row-3'];
 
-        const headers = [
-          '#', 
-          'Сотрудник', 
-          'Задач', 
-          'В работе', 
-          'Поручил<br><span style="font-size: 10px; font-weight: 600; text-transform: none; display: inline-flex; gap: 6px; align-items: center; justify-content: center; width: 100%; margin-top: 2px;"><span style="color:#15803d;">🏢 свой отд.</span> <span style="color:var(--text-muted);">/</span> <span style="color:#1d4ed8;">↗️ др. отд.</span></span>', 
-          'Просрочка, дн.', 
-          'Баллы'
-        ];
+        const headers = ['#', 'Сотрудник', 'Задач', 'В работе', 'Поручил', 'Поручил др. отделам', 'Просрочка, дн.', 'Баллы'];
         ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
 
         if (sorted.length === 0) {
-          ids.tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
+          ids.tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
         } else {
           ids.tableBody.innerHTML = sorted.map((emp, i) => {
             const rank = i + 1;
@@ -953,10 +917,8 @@
                 </td>
                 <td>${formatTasks(emp.tasks)}</td>
                 <td>${formatTasks(emp.active)}</td>
-                <td style="white-space: nowrap;">
-                  <span class="badge-own" title="Своему отделу">🏢 ${emp.assignedToOwnDept}</span>
-                  <span class="badge-other" style="margin-left: 4px;" title="Другим отделам">↗️ ${emp.assignedToOtherDepts}</span>
-                </td>
+                <td>${formatTasks(emp.assignedCount)}</td>
+                <td>${formatTasks(emp.assignedToOtherDepts)}</td>
                 <td class="${emp.overdue > 0 ? 'color-danger' : ''}">${formatDays(emp.overdue)}</td>
                 <td class="${scoreClass}">${scoreSign}${emp.score} <span style="font-size:9.5px;font-weight:500;opacity:0.75;margin-left:2px;">${scoreSign}${Math.abs(emp.score) === 1 ? 'балл' : (Math.abs(emp.score) >= 2 && Math.abs(emp.score) <= 4) ? 'балла' : 'баллов'}</span></td>
               </tr>`;
