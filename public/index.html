@@ -148,6 +148,47 @@
         color: var(--text-muted);
       }
 
+      /* Search input in toolbar */
+      .search-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        position: relative;
+      }
+      .search-input {
+        background: transparent;
+        border: none;
+        border-bottom: 1.5px solid var(--border-color);
+        color: var(--text-dark);
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 3px 18px 3px 2px;
+        width: 120px;
+        outline: none;
+        transition: border-color 0.2s, width 0.25s ease;
+        border-radius: 0;
+      }
+      .search-input::placeholder { color: var(--text-muted); font-weight: 600; }
+      .search-input:focus { border-color: var(--brand-green); width: 160px; }
+      .search-clear {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 1;
+        padding: 0 2px;
+        display: none;
+      }
+      .search-clear.visible { display: block; }
+      .search-clear:hover { color: var(--text-dark); }
+
       .compact-select {
         background: transparent;
         border: none;
@@ -496,6 +537,12 @@
               <option value="lastMonth">Прошлый месяц</option>
             </select>
           </span>
+          <span class="divider"></span>
+          <span class="search-wrap" title="Поиск по имени исполнителя">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="searchInput" class="search-input" type="text" placeholder="Имя исполнителя…" autocomplete="off" spellcheck="false">
+            <button id="searchClear" class="search-clear" tabindex="-1" title="Очистить">✕</button>
+          </span>
         </div>
       </section>
 
@@ -570,6 +617,7 @@
         refreshTimer: null,
         refreshIntervalMs: 10 * 60 * 1000,
         portalHost: null,
+        searchQuery: '',
         expandedNodes: new Set() // Keeps track of expanded node keys (e.g. "dept:1C")
       };
 
@@ -588,7 +636,9 @@
         statClosedLate: document.getElementById('statClosedLate'),
         statClosedInTime: document.getElementById('statClosedInTime'),
         refreshBtn: document.getElementById('refreshBtn'),
-        periodSelect: document.getElementById('periodSelect')
+        periodSelect: document.getElementById('periodSelect'),
+        searchInput: document.getElementById('searchInput'),
+        searchClear: document.getElementById('searchClear')
       };
 
       ids.host.textContent = window.location.host;
@@ -1324,6 +1374,17 @@
           });
         }
         
+        // Apply name search filter
+        const q = state.searchQuery.toLowerCase().trim();
+        if (q) {
+          const matchedAssignees = new Set();
+          filtered.forEach(row => {
+            const name = (row['Исполнитель'] || '').toLowerCase();
+            if (name.includes(q)) matchedAssignees.add(row['Исполнитель']);
+          });
+          filtered = filtered.filter(row => matchedAssignees.has(row['Исполнитель']));
+        }
+
         state.filteredRows = filtered;
         
         // We do NOT clear/re-populate state.expandedNodes here anymore.
@@ -1424,7 +1485,29 @@
         });
       }
 
+      // Search input with 200ms debounce
+      if (ids.searchInput) {
+        let searchTimer = null;
+        ids.searchInput.addEventListener('input', () => {
+          clearTimeout(searchTimer);
+          const val = ids.searchInput.value;
+          ids.searchClear.classList.toggle('visible', val.length > 0);
+          searchTimer = setTimeout(() => {
+            state.searchQuery = val;
+            applyFilters();
+          }, 200);
+        });
+        ids.searchClear.addEventListener('click', () => {
+          ids.searchInput.value = '';
+          ids.searchClear.classList.remove('visible');
+          state.searchQuery = '';
+          applyFilters();
+          ids.searchInput.focus();
+        });
+      }
+
       loadReport('GET');
+
     </script>
   </body>
 </html>
