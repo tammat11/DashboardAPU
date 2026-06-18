@@ -803,6 +803,24 @@
         ids.statClosedInTime.textContent = counts['Закрыта в срок'];
       }
 
+      // ── Shared formatters (used by both views) ───────────────────────
+      function formatTasks(count) {
+        return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">шт.</span>`;
+      }
+      function formatDays(count) {
+        return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">дн.</span>`;
+      }
+      function formatPoints(count) {
+        const abs = Math.abs(count);
+        let unit = 'баллов';
+        if (abs % 100 < 11 || abs % 100 > 19) {
+          const lastDigit = abs % 10;
+          if (lastDigit === 1) unit = 'балл';
+          else if (lastDigit >= 2 && lastDigit <= 4) unit = 'балла';
+        }
+        return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">${unit}</span>`;
+      }
+
       // ── Leaderboard (Table 2) ─────────────────────────────────────────
       function renderLeaderboard() {
         // Aggregate by employee
@@ -915,28 +933,9 @@
           return `<span style="font-size: 9.5px; color: var(--text-muted); font-weight: 500; margin-left: 8px; border-left: 2px solid #ccc; padding-left: 6px;">→ другим: ${data.total} (${parts.join(', ')})</span>`;
         };
 
-        // Units of measurement formatters
-        const formatTasks = (count) => {
-          return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">шт.</span>`;
-        };
 
-        const formatDays = (count) => {
-          return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">дн.</span>`;
-        };
+        // (formatTasks / formatDays / formatPoints are module-level functions above)
 
-        const formatPoints = (count) => {
-          const abs = Math.abs(count);
-          let unit = 'баллов';
-          if (abs % 100 < 11 || abs % 100 > 19) {
-            const lastDigit = abs % 10;
-            if (lastDigit === 1) {
-              unit = 'балл';
-            } else if (lastDigit >= 2 && lastDigit <= 4) {
-              unit = 'балла';
-            }
-          }
-          return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">${unit}</span>`;
-        };
 
         // Helper to render an employee's tasks
         const renderEmployeeTasks = (emp, deptName, empName, indentOffset = 0) => {
