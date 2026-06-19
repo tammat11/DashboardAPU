@@ -997,7 +997,9 @@
       function formatPoints(count) {
         const abs = Math.abs(count);
         let unit = 'баллов';
-        if (abs % 100 < 11 || abs % 100 > 19) {
+        if (abs % 1 !== 0) {
+          unit = 'балла';
+        } else if (abs % 100 < 11 || abs % 100 > 19) {
           const lastDigit = abs % 10;
           if (lastDigit === 1) unit = 'балл';
           else if (lastDigit >= 2 && lastDigit <= 4) unit = 'балла';
@@ -1200,7 +1202,7 @@
           html += `
             <div class="g-col">
               <div class="g-section-header">
-                <span class="g-section-emoji">🏆</span> Победители
+                Победители
               </div>
               <div class="gallery-grid">
           `;
@@ -1235,7 +1237,7 @@
             html += `
               <div class="g-col">
                 <div class="g-section-header g-losers-header">
-                  <span class="g-section-emoji">💩</span> Лузеры
+                  Лузеры
                   <div class="g-losers-crown">👑</div>
                 </div>
                 <div class="gallery-grid">
