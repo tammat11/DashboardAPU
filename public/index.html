@@ -740,6 +740,66 @@
         0%, 100% { transform: translateY(0) rotate(-6deg); }
         50% { transform: translateY(-5px) rotate(6deg); }
       }
+
+      /* AI Analysis */
+      .ai-analysis-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 14px;
+        padding: 4px;
+      }
+      .ai-card {
+        background: var(--surface, #fff);
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+      }
+      .ai-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.10); }
+      .ai-card-title { font-weight: 600; font-size: 13px; color: var(--text-dark); margin-bottom: 10px; word-break: break-word; }
+      .ai-card-value {
+        font-size: 32px;
+        font-weight: 800;
+        text-align: center;
+        margin: 12px 0;
+      }
+      .ai-value-1, .ai-value-2, .ai-value-3 { color: #ef4444; }
+      .ai-value-4, .ai-value-5, .ai-value-6 { color: #f59e0b; }
+      .ai-value-7, .ai-value-8 { color: #10b981; }
+      .ai-value-9, .ai-value-10 { color: #059669; }
+      .ai-card-rec {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 8px;
+      }
+      .ai-rec-do { background: #dcfce7; color: #166534; }
+      .ai-rec-delegate { background: #dbeafe; color: #1e40af; }
+      .ai-rec-automate { background: #fef3c7; color: #92400e; }
+      .ai-rec-exclude { background: #fee2e2; color: #991b1b; }
+      .ai-card-routine {
+        font-size: 10px;
+        color: var(--text-muted);
+        padding-top: 8px;
+        border-top: 1px solid rgba(0,0,0,0.06);
+        margin-top: 8px;
+      }
+      .ai-card-protocol {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-top: 8px;
+        padding: 8px;
+        background: rgba(0,0,0,0.02);
+        border-radius: 6px;
+        max-height: 60px;
+        overflow-y: auto;
+        line-height: 1.4;
+      }
     </style>
   </head>
   <body>
@@ -782,6 +842,7 @@
             <button id="viewBtn1" class="view-btn">🏗️ Структура</button>
             <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
             <button id="viewBtn3" class="view-btn active">🖼️ Галерея</button>
+            <button id="viewBtn4" class="view-btn">🤖 AI Анализ</button>
           </span>
         </div>
       </section>
@@ -847,6 +908,15 @@
         </div>
 
         <div id="galleryWrap" hidden></div>
+
+        <div id="aiAnalysisWrap" hidden>
+          <div id="aiAnalysisLoading" class="loading-panel">
+            <div class="spinner"></div>
+            <span>Анализ задач AI…</span>
+          </div>
+          <div id="aiAnalysisContent" class="ai-analysis-container"></div>
+          <div id="aiAnalysisError" class="error-panel" hidden></div>
+        </div>
       </div>
     </div>
 
@@ -888,7 +958,12 @@
         searchClear: document.getElementById('searchClear'),
         viewBtn1: document.getElementById('viewBtn1'),
         viewBtn2: document.getElementById('viewBtn2'),
-        viewBtn3: document.getElementById('viewBtn3')
+        viewBtn3: document.getElementById('viewBtn3'),
+        viewBtn4: document.getElementById('viewBtn4'),
+        aiAnalysisWrap: document.getElementById('aiAnalysisWrap'),
+        aiAnalysisLoading: document.getElementById('aiAnalysisLoading'),
+        aiAnalysisContent: document.getElementById('aiAnalysisContent'),
+        aiAnalysisError: document.getElementById('aiAnalysisError')
       };
 
       ids.host.textContent = window.location.host;
@@ -1279,10 +1354,83 @@
         renderStats(state.filteredRows);
       }
 
+      // ── AI Analysis (Table 4) ───────────────────────────────────────────
+      async function renderAIAnalysis() {
+        ids.aiAnalysisWrap.hidden = false;
+        ids.tableWrap.hidden = true;
+        ids.galleryWrap.hidden = true;
+        ids.aiAnalysisLoading.hidden = false;
+        ids.aiAnalysisContent.innerHTML = '';
+        ids.aiAnalysisError.hidden = true;
+
+        try {
+          // Prepare tasks for analysis
+          const tasks = state.filteredRows.map(row => ({
+            id: row['ID задачи'],
+            title: row['Название задачи'],
+            description: row['Описание'],
+            executor: row['Исполнитель'],
+            department: row['Отдел'],
+            deadline: row['Дедлайн'],
+            status: row['Состояние задачи']
+          }));
+
+          if (tasks.length === 0) {
+            ids.aiAnalysisLoading.hidden = true;
+            ids.aiAnalysisContent.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:32px;">Нет задач для анализа</div>';
+            return;
+          }
+
+          // Call AI analysis API
+          const response = await fetch('/api/ai-analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tasks })
+          });
+
+          if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'AI analysis failed');
+          }
+
+          const result = await response.json();
+          if (!result.ok) {
+            throw new Error(result.error || 'Analysis returned error');
+          }
+
+          // Render analysis cards
+          const html = result.analyses.map((analysis) => {
+            const recClass = `ai-rec-${analysis.recommendation === 'делать' ? 'do' : analysis.recommendation === 'делегировать' ? 'delegate' : analysis.recommendation === 'автоматизировать' ? 'automate' : 'exclude'}`;
+            const valueClass = `ai-value-${analysis.value}`;
+            const routineText = analysis.isRoutine ? 'Типовая задача' : 'Уникальная задача';
+            return `
+              <div class="ai-card">
+                <div class="ai-card-title">${escapeHtml(analysis.title)}</div>
+                <div class="ai-card-value ${valueClass}">${analysis.value}</div>
+                <div class="ai-card-rec ${recClass}">${escapeHtml(analysis.recommendation)}</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">${escapeHtml(analysis.reasoning)}</div>
+                <div class="ai-card-routine">${routineText}</div>
+                <div class="ai-card-protocol" title="${escapeHtml(analysis.protocol)}">${escapeHtml(analysis.protocol)}</div>
+              </div>`;
+          }).join('');
+
+          ids.aiAnalysisContent.innerHTML = html;
+          ids.aiAnalysisLoading.hidden = true;
+          renderStats(state.filteredRows);
+        } catch (error) {
+          ids.aiAnalysisLoading.hidden = true;
+          ids.aiAnalysisError.hidden = false;
+          ids.aiAnalysisError.textContent = 'Ошибка анализа: ' + error.message;
+          console.error('AI analysis error:', error);
+        }
+      }
+
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3');
+        if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
         if (state.viewMode === 'table3') { renderGallery(); return; }
+        ids.aiAnalysisWrap.hidden = true;
         ids.galleryWrap.hidden = true;
         if (state.viewMode === 'table2') { renderLeaderboard(); return; }
 
@@ -2113,11 +2261,13 @@
         ids.viewBtn1.classList.toggle('active', mode === 'table1');
         ids.viewBtn2.classList.toggle('active', mode === 'table2');
         ids.viewBtn3.classList.toggle('active', mode === 'table3');
+        ids.viewBtn4.classList.toggle('active', mode === 'table4');
         renderTable();
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
       if (ids.viewBtn2) ids.viewBtn2.addEventListener('click', () => setView('table2'));
       if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
+      if (ids.viewBtn4) ids.viewBtn4.addEventListener('click', () => setView('table4'));
 
       loadReport('GET');
 
