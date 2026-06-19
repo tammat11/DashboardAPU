@@ -779,9 +779,9 @@
           </span>
           <span class="divider"></span>
           <span class="view-switcher">
-            <button id="viewBtn1" class="view-btn active">🏗️ Структура</button>
+            <button id="viewBtn1" class="view-btn">🏗️ Структура</button>
             <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
-            <button id="viewBtn3" class="view-btn">🖼️ Галерея</button>
+            <button id="viewBtn3" class="view-btn active">🖼️ Галерея</button>
           </span>
         </div>
       </section>
@@ -860,7 +860,7 @@
         refreshIntervalMs: 5 * 60 * 1000,
         portalHost: null,
         searchQuery: '',
-        viewMode: 'table1', // 'table1' | 'table2'
+        viewMode: 'table3', // 'table1' | 'table2' | 'table3'
         expandedNodes: new Set()
       };
 
@@ -1080,7 +1080,7 @@
             const state_ = row['Состояние задачи'] || '';
             if (!state_.startsWith('Закрыта')) e.active++;
             e.overdue += parseInt(row['Просрочка, дней']) || 0;
-            e.score   += parseInt(row['Баллы эффективности']) || 0;
+            e.score   += parseFloat(row['Баллы эффективности']) || 0;
           }
 
           const creatorName = row['Постановщик'];
@@ -1146,7 +1146,7 @@
             const rankCell = rank <= 3
               ? `<td class="lb-rank"><span class="lb-medal">${medals[i]}</span></td>`
               : `<td class="lb-rank">${rank}</td>`;
-            const headIcon = headUserIds && headUserIds.has(emp.id) ? ' 👑' : ' 👤';
+            const headIcon = ' 👤';
             const scoreClass = emp.score > 0 ? 'lb-score-pos' : emp.score < 0 ? 'lb-score-neg' : 'lb-score-zero';
             const scoreSign = emp.score > 0 ? '+' : '';
             return `
@@ -1216,7 +1216,7 @@
             const rank = i + 1;
             const isHead = headUserIds && headUserIds.has(emp.id);
             const scoreClass = emp.score > 0 ? 'g-score-pos' : emp.score < 0 ? 'g-score-neg' : 'g-score-zero';
-            const crown = isHead ? `<span class="g-crown" title="Руководитель">👑</span>` : '';
+            const crown = '';
             const medal = rank <= 3 ? `<span class="g-medal">${medals[i]}</span>` : '';
             return `
               <div class="g-card ${topCls[i] || ''}">
@@ -1229,7 +1229,7 @@
                 <div class="g-name">${formatNameTwoLines(emp.name)}</div>
                 <div class="g-score ${scoreClass}">${emp.score}</div>
                 <div class="g-meta">
-                  <div class="g-meta-item"><span class="g-meta-val">${emp.tasks}</span><span class="g-meta-lbl">Задач</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
                   <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
                   <div class="g-meta-item"><span class="g-meta-val">${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
                   <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср.</span></div>
@@ -1260,7 +1260,7 @@
                   <div class="g-name">${formatNameTwoLines(emp.name)}</div>
                   <div class="g-score ${scoreClass}">${emp.score}</div>
                   <div class="g-meta">
-                    <div class="g-meta-item"><span class="g-meta-val">${emp.tasks}</span><span class="g-meta-lbl">Задач</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
                     <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
                     <div class="g-meta-item"><span class="g-meta-val">${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
                     <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср.</span></div>
@@ -1576,7 +1576,7 @@
           const taskTitle = row['Название задачи'] || 'Без названия';
           
           const overdue = parseInt(row['Просрочка, дней']) || 0;
-          const efficiency = parseInt(row['Баллы эффективности']) || 0;
+          const efficiency = parseFloat(row['Баллы эффективности']) || 0;
           
           let subDept = null;
           if (dept !== 'Без отдела') {
@@ -1744,7 +1744,7 @@
                     // Render Employee row under sub-department
                     html += `
                       <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
-                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> ${isEmpHead2 ? '👑' : '👤'} ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
                         <td></td>
                         <td></td>
                         <td>${formatTasks(empTasksCount)}</td>
@@ -1777,7 +1777,7 @@
               // Render Employee row
               html += `
                 <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
-                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> ${isEmpHead ? '👑' : '👤'} ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
                   <td></td>
                   <td></td>
                   <td>${formatTasks(empTasksCount)}</td>
