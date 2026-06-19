@@ -693,6 +693,33 @@
       .g-card.g-top1 { border-color: rgba(255,193,7,0.75); background: linear-gradient(180deg, rgba(255,200,0,0.16), transparent 60%); }
       .g-card.g-top2 { border-color: rgba(160,160,168,0.7); background: linear-gradient(180deg, rgba(176,180,190,0.18), transparent 60%); }
       .g-card.g-top3 { border-color: rgba(205,127,50,0.7); background: linear-gradient(180deg, rgba(205,127,50,0.16), transparent 60%); }
+      .g-section-header {
+        grid-column: 1 / -1;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin: 24px 0 14px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .g-losers-header {
+        border-bottom-color: #ef4444;
+        position: relative;
+        margin-top: 36px;
+      }
+      .g-losers-crown {
+        font-size: 38px;
+        filter: drop-shadow(0 2px 8px rgba(250, 204, 21, 0.45));
+        animation: float-crown 3s ease-in-out infinite;
+        margin-left: auto;
+      }
+      @keyframes float-crown {
+        0%, 100% { transform: translateY(0) rotate(-6deg); }
+        50% { transform: translateY(-5px) rotate(6deg); }
+      }
     </style>
   </head>
   <body>
@@ -1149,12 +1176,22 @@
         if (sorted.length === 0) {
           ids.galleryWrap.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:32px;">Нет данных</div>`;
         } else {
-          ids.galleryWrap.innerHTML = sorted.map((emp, i) => {
+          const half = Math.ceil(sorted.length / 2);
+          const winners = sorted.slice(0, half);
+          const losers = sorted.slice(half);
+
+          let html = '';
+
+          // 1. Winners Section
+          html += `
+            <div class="g-section-header">
+              <span class="g-section-emoji">🏆</span> Победители
+            </div>
+          `;
+          html += winners.map((emp, i) => {
             const rank = i + 1;
             const isHead = headUserIds && headUserIds.has(emp.id);
             const scoreClass = emp.score > 0 ? 'g-score-pos' : emp.score < 0 ? 'g-score-neg' : 'g-score-zero';
-            const scoreSign = emp.score > 0 ? '+' : '';
-            const unit = Math.abs(emp.score) === 1 ? 'балл' : (Math.abs(emp.score) >= 2 && Math.abs(emp.score) <= 4) ? 'балла' : 'баллов';
             const crown = isHead ? `<span class="g-crown" title="Руководитель">👑</span>` : '';
             const medal = rank <= 3 ? `<span class="g-medal">${medals[i]}</span>` : '';
             return `
@@ -1166,14 +1203,46 @@
                   ${medal}
                 </div>
                 <div class="g-name">${formatNameTwoLines(emp.name)}</div>
-                <div class="g-score ${scoreClass}">${scoreSign}${emp.score}<span class="g-score-unit">${unit}</span></div>
+                <div class="g-score ${scoreClass}">${emp.score}</div>
                 <div class="g-meta">
                   <div class="g-meta-item"><span class="g-meta-val">${emp.tasks}</span><span class="g-meta-lbl">Задач</span></div>
                   <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
                   <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср.</span></div>
                 </div>
               </div>`;
           }).join('');
+
+          // 2. Losers Section
+          if (losers.length > 0) {
+            html += `
+              <div class="g-section-header g-losers-header">
+                <span class="g-section-emoji">💩</span> Лузеры
+                <div class="g-losers-crown">👑</div>
+              </div>
+            `;
+            html += losers.map((emp, i) => {
+              const rank = half + i + 1;
+              const scoreClass = emp.score > 0 ? 'g-score-pos' : emp.score < 0 ? 'g-score-neg' : 'g-score-zero';
+              return `
+                <div class="g-card">
+                  <span class="g-rank">#${rank}</span>
+                  <div class="g-ava-wrap">
+                    ${galleryAvatarMarkup(emp)}
+                  </div>
+                  <div class="g-name">${formatNameTwoLines(emp.name)}</div>
+                  <div class="g-score ${scoreClass}">${emp.score}</div>
+                  <div class="g-meta">
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.tasks}</span><span class="g-meta-lbl">Задач</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср.</span></div>
+                  </div>
+                </div>`;
+            }).join('');
+          }
+
+          ids.galleryWrap.innerHTML = html;
         }
 
         ids.galleryWrap.hidden = false;
