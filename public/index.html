@@ -682,14 +682,14 @@
         padding-top: 10px;
         border-top: 1px solid rgba(0,0,0,0.06);
         width: 100%;
-        display: flex;
-        justify-content: space-between;
-        gap: 3px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 6px;
       }
-      .g-meta-item { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+      .g-meta-item { display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center; }
       .g-meta-val { font-size: 13px; font-weight: 700; color: var(--text-dark); }
       .g-meta-val.danger { color: #ef4444; }
-      .g-meta-lbl { font-size: 7px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1px; color: var(--text-muted); white-space: nowrap; }
+      .g-meta-lbl { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1px; color: var(--text-muted); white-space: nowrap; }
       .g-card.g-top1 { border-color: rgba(255,193,7,0.75); background: linear-gradient(180deg, rgba(255,200,0,0.16), transparent 60%); }
       .g-card.g-top2 { border-color: rgba(160,160,168,0.7); background: linear-gradient(180deg, rgba(176,180,190,0.18), transparent 60%); }
       .g-card.g-top3 { border-color: rgba(205,127,50,0.7); background: linear-gradient(180deg, rgba(205,127,50,0.16), transparent 60%); }
