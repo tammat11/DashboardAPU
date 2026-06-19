@@ -2,10 +2,11 @@ import http from 'node:http';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import handler from '../api/task-report.js';
+import taskReportHandler from '../api/task-report.js';
+import aiAnalyzeHandler from '../api/ai-analyze.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Load .env variables manually since we don't have dotenv dependency
 try {
@@ -44,10 +45,25 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Route API
-  if (url.pathname === '/api/task-report') {
+  if (url.pathname === '/api/task-report' || url.pathname === '/api/ai-analyze') {
     // mock req.query
     req.query = Object.fromEntries(url.searchParams.entries());
-    
+
+    // Parse request body for POST
+    if (req.method === 'POST') {
+      let body = '';
+      await new Promise((resolve, reject) => {
+        req.on('data', chunk => { body += chunk; });
+        req.on('end', resolve);
+        req.on('error', reject);
+      });
+      try {
+        req.body = body ? JSON.parse(body) : {};
+      } catch {
+        req.body = {};
+      }
+    }
+
     // mock res.status, res.json, res.setHeader
     res.status = (code) => {
       res.statusCode = code;
@@ -58,6 +74,8 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify(data));
       return res;
     };
+
+    const handler = url.pathname === '/api/ai-analyze' ? aiAnalyzeHandler : taskReportHandler;
 
     try {
       await handler(req, res);
