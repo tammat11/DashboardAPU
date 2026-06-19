@@ -9,6 +9,6 @@
     "vercel-build": "node scripts/build.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.28.0"
+    "@google/generative-ai": "^0.24.1"
   }
 }

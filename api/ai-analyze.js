@@ -1,12 +1,11 @@
-import { Anthropic } from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export const config = {
   maxDuration: 120
 };
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 const ANALYSIS_PROMPT = `Ты — эксперт по оптимизации процессов компании. Проанализируй эту задачу и дай структурированную оценку на русском.
 
@@ -37,23 +36,14 @@ async function analyzeTask(task) {
       .replace("{deadline}", task.deadline || "—")
       .replace("{status}", task.status || "—");
 
-    const message = await client.messages.create({
-      model: "claude-opus-4-1-20250805",
-      max_tokens: 1024,
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ]
-    });
-
-    const content = message.content[0]?.type === "text" ? message.content[0].text : "";
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
 
     // Parse JSON from response
-    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new Error("Could not parse JSON from Claude response");
+      throw new Error("Could not parse JSON from Gemini response");
     }
 
     return JSON.parse(jsonMatch[0]);
@@ -83,8 +73,8 @@ export default async function handler(req, res) {
     return res.status(405).json({ ok: false, error: "Method not allowed" });
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(500).json({ ok: false, error: "ANTHROPIC_API_KEY not configured" });
+  if (!process.env.GOOGLE_API_KEY) {
+    return res.status(500).json({ ok: false, error: "GOOGLE_API_KEY not configured" });
   }
 
   try {
