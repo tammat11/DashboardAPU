@@ -1,4 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createClient } from "@supabase/supabase-js";
 
 export const config = {
   maxDuration: 120
@@ -6,6 +7,11 @@ export const config = {
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+
+// Initialize Supabase for caching
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_ANON_KEY;
+const supabase = supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 const ANALYSIS_PROMPT = `Ты — аналитик эффективности в казахской компании iC group. Оценивай задачи по их реальному влиянию на выживание и развитие компании.
 
@@ -44,9 +50,63 @@ const ANALYSIS_PROMPT = `Ты — аналитик эффективности в
 - Если РУТИНА + повторяется → 6, автоматизировать
 - Если БЕЗ ЦЕННОСТИ → 1-3, исключить`;
 
+async function getCachedAnalysis(taskId) {
+  if (!supabase) return null;
+  try {
+    const { data, error } = await supabase
+      .from('task_analyses')
+      .select('*')
+      .eq('task_id', taskId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error("Supabase fetch error:", error);
+      return null;
+    }
+    return data || null;
+  } catch (err) {
+    console.error("Cache fetch error:", err);
+    return null;
+  }
+}
+
+async function saveAnalysis(analysis) {
+  if (!supabase) return;
+  try {
+    await supabase
+      .from('task_analyses')
+      .upsert({
+        task_id: analysis.taskId,
+        title: analysis.title,
+        value: analysis.value,
+        is_routine: analysis.isRoutine,
+        recommendation: analysis.recommendation,
+        reasoning: analysis.reasoning,
+        protocol: analysis.protocol,
+        analyzed_at: new Date().toISOString()
+      }, { onConflict: 'task_id' });
+  } catch (err) {
+    console.error("Cache save error:", err);
+  }
+}
+
 async function analyzeTask(task) {
   let rawText = "";
   try {
+    // Check cache first
+    const cached = await getCachedAnalysis(task.id);
+    if (cached) {
+      console.log("Using cached analysis for task:", task.id);
+      return {
+        value: cached.value,
+        isRoutine: cached.is_routine,
+        recommendation: cached.recommendation,
+        reasoning: cached.reasoning,
+        protocol: cached.protocol,
+        cached: true
+      };
+    }
+
     const prompt = ANALYSIS_PROMPT
       .replace("{title}", task.title || "—")
       .replace("{description}", task.description || "—")
@@ -124,7 +184,17 @@ async function analyzeTask(task) {
       throw new Error("Missing required fields: value, recommendation, reasoning");
     }
 
-    return parsed;
+    // Add task info for cache
+    const result = {
+      taskId: task.id,
+      title: task.title,
+      ...parsed
+    };
+
+    // Save to cache asynchronously (don't await)
+    saveAnalysis(result).catch(err => console.error("Failed to save to cache:", err));
+
+    return result;
   } catch (error) {
     console.error("AI analysis error:", error);
     // Return detailed error for debugging
