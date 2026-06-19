@@ -810,7 +810,7 @@
         filteredRows: [],
         departments: [],
         refreshTimer: null,
-        refreshIntervalMs: 10 * 60 * 1000,
+        refreshIntervalMs: 5 * 60 * 1000,
         portalHost: null,
         searchQuery: '',
         viewMode: 'table1', // 'table1' | 'table2'
@@ -1849,6 +1849,62 @@
         renderTable();
       }
 
+      function isTvBrowser() {
+        const ua = String(navigator.userAgent || '');
+        return /SmartTV|Tizen|Web0S|WebOS|NetCast|HbbTV|TV\b/i.test(ua);
+      }
+
+      // Smart TV browsers are more stable with plain XHR than with fetch.
+      function requestReportXHR(method) {
+        return new Promise((resolve, reject) => {
+          try {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, `/api/task-report?t=${Date.now()}`, true);
+            xhr.timeout = 55000;
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.setRequestHeader('Cache-Control', 'no-store');
+            xhr.setRequestHeader('Pragma', 'no-cache');
+            xhr.onload = () => {
+              if (xhr.status < 200 || xhr.status >= 300) {
+                try {
+                  const errorPayload = JSON.parse(xhr.responseText || '{}');
+                  reject(new Error(errorPayload.error || `Ошибка сервера ${xhr.status}`));
+                } catch (e) {
+                  reject(new Error(`Ошибка сервера ${xhr.status}`));
+                }
+                return;
+              }
+              try {
+                const data = JSON.parse(xhr.responseText || '{}');
+                resolve(data);
+              } catch (e) {
+                reject(new Error('Некорректный ответ сервера'));
+              }
+            };
+            xhr.onerror = () => reject(new Error('Нет связи с сервером'));
+            xhr.ontimeout = () => reject(new Error('Превышено время ожидания'));
+            xhr.send();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+
+      // Prefer XHR on TVs, otherwise fall back to it when fetch breaks at network layer.
+      async function requestReport(method) {
+        if (isTvBrowser() || typeof fetch !== 'function') {
+          return requestReportXHR(method);
+        }
+
+        const url = `/api/task-report?t=${Date.now()}`;
+        try {
+          const response = await fetch(url, { method });
+          return await response.json();
+        } catch (e) {
+          return requestReportXHR(method);
+        }
+      }
+
       async function loadReport(method = 'GET') {
         ids.errorBox.hidden = true;
         
@@ -1864,17 +1920,8 @@
         if (ids.refreshBtn) ids.refreshBtn.disabled = true;
 
         try {
-          const response = await fetch(`/api/task-report?t=${Date.now()}`, {
-            method,
-            headers: {
-              'Cache-Control': 'no-store',
-              Pragma: 'no-cache'
-            },
-            cache: 'no-store'
-          });
-
-          const payload = await response.json();
-          if (!response.ok || !payload.ok) {
+          const payload = await requestReport(method);
+          if (!payload.ok) {
             throw new Error(payload.error || 'Не удалось загрузить отчет');
           }
 
