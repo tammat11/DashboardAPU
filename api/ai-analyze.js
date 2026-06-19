@@ -5,7 +5,7 @@ export const config = {
 };
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 const ANALYSIS_PROMPT = `Ты — аналитик эффективности в казахской компании iC group. Оценивай задачи по их реальному влиянию на выживание и развитие компании.
 
