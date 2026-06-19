@@ -693,12 +693,27 @@
       .g-card.g-top1 { border-color: rgba(255,193,7,0.75); background: linear-gradient(180deg, rgba(255,200,0,0.16), transparent 60%); }
       .g-card.g-top2 { border-color: rgba(160,160,168,0.7); background: linear-gradient(180deg, rgba(176,180,190,0.18), transparent 60%); }
       .g-card.g-top3 { border-color: rgba(205,127,50,0.7); background: linear-gradient(180deg, rgba(205,127,50,0.16), transparent 60%); }
+      .g-container {
+        display: flex;
+        gap: 24px;
+        width: 100%;
+        align-items: flex-start;
+      }
+      .g-col {
+        flex: 1;
+        min-width: 0;
+      }
+      @media (max-width: 768px) {
+        .g-container {
+          flex-direction: column;
+          gap: 16px;
+        }
+      }
       .g-section-header {
-        grid-column: 1 / -1;
         font-size: 20px;
         font-weight: 800;
         color: var(--text-dark);
-        margin: 24px 0 14px;
+        margin: 10px 0 14px;
         padding-bottom: 8px;
         border-bottom: 2px solid var(--border-color);
         display: flex;
@@ -708,7 +723,6 @@
       .g-losers-header {
         border-bottom-color: #ef4444;
         position: relative;
-        margin-top: 36px;
       }
       .g-losers-crown {
         font-size: 38px;
@@ -826,7 +840,7 @@
           </div>
         </div>
 
-        <div id="galleryWrap" class="gallery-grid" hidden></div>
+        <div id="galleryWrap" hidden></div>
       </div>
     </div>
 
@@ -1174,19 +1188,21 @@
         const topCls = ['g-top1', 'g-top2', 'g-top3'];
 
         if (sorted.length === 0) {
-          ids.galleryWrap.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:32px;">Нет данных</div>`;
+          ids.galleryWrap.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px;">Нет данных</div>`;
         } else {
           const half = Math.ceil(sorted.length / 2);
           const winners = sorted.slice(0, half);
           const losers = sorted.slice(half);
 
-          let html = '';
+          let html = '<div class="g-container">';
 
           // 1. Winners Section
           html += `
-            <div class="g-section-header">
-              <span class="g-section-emoji">🏆</span> Победители
-            </div>
+            <div class="g-col">
+              <div class="g-section-header">
+                <span class="g-section-emoji">🏆</span> Победители
+              </div>
+              <div class="gallery-grid">
           `;
           html += winners.map((emp, i) => {
             const rank = i + 1;
@@ -1212,14 +1228,17 @@
                 </div>
               </div>`;
           }).join('');
+          html += '</div></div>';
 
           // 2. Losers Section
           if (losers.length > 0) {
             html += `
-              <div class="g-section-header g-losers-header">
-                <span class="g-section-emoji">💩</span> Лузеры
-                <div class="g-losers-crown">👑</div>
-              </div>
+              <div class="g-col">
+                <div class="g-section-header g-losers-header">
+                  <span class="g-section-emoji">💩</span> Лузеры
+                  <div class="g-losers-crown">👑</div>
+                </div>
+                <div class="gallery-grid">
             `;
             html += losers.map((emp, i) => {
               const rank = half + i + 1;
@@ -1240,8 +1259,10 @@
                   </div>
                 </div>`;
             }).join('');
+            html += '</div></div>';
           }
 
+          html += '</div>';
           ids.galleryWrap.innerHTML = html;
         }
 
