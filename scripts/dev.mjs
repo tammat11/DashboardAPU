@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import handler from '../api/task-report.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Load .env variables manually since we don't have dotenv dependency
 try {
