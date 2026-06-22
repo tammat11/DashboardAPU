@@ -1360,7 +1360,8 @@
             const state_ = row['Состояние задачи'] || '';
             if (!state_.startsWith('Закрыта')) e.active++;
             e.overdue += parseInt(row['Просрочка, дней']) || 0;
-            e.score   += parseFloat(row['Баллы эффективности']) || 0;
+            // Балл = статус (0-5) + важность AI (0-5)
+            e.score   += (parseFloat(row['Баллы эффективности']) || 0) + (parseFloat(row['AI важность (0-5)']) || 0);
           }
 
           // Process accomplices (co-executors)
@@ -1390,7 +1391,8 @@
                   const state_ = row['Состояние задачи'] || '';
                   if (!state_.startsWith('Закрыта')) e.active++;
                   e.overdue += parseInt(row['Просрочка, дней']) || 0;
-                  e.score   += parseFloat(row['Баллы эффективности']) || 0;
+                  // Балл = статус (0-5) + важность AI (0-5)
+                  e.score   += (parseFloat(row['Баллы эффективности']) || 0) + (parseFloat(row['AI важность (0-5)']) || 0);
                 }
               });
             }
@@ -1424,8 +1426,8 @@
             if (creatorDept !== executorDept) {
               empMap[creatorName].assignedToOtherDepts++;
             }
-            // +3 балла постановщику за каждое поручение (делегирование)
-            empMap[creatorName].score += 3;
+            // +2 балла постановщику за каждое поручение (делегирование)
+            empMap[creatorName].score += 2;
           }
         });
 
@@ -2521,6 +2523,39 @@
         }
       }
 
+      // Normalize AI importance (value 1-10) to a 0-5 score added on top of status points
+      function normalizeImportance(value) {
+        const v = parseFloat(value);
+        if (!v || isNaN(v)) return 0;
+        if (v <= 3) return 0;       // нет ценности
+        if (v <= 6) return 2.5;     // средняя ценность
+        return 5;                   // критично/ценно
+      }
+
+      let aiScoresCache = null;
+      async function mergeAiScores() {
+        try {
+          if (!aiScoresCache) {
+            const resp = await fetch('/ai-scores.json', { cache: 'no-store' });
+            aiScoresCache = resp.ok ? await resp.json() : {};
+          }
+        } catch { aiScoresCache = {}; }
+
+        state.rows.forEach(row => {
+          const id = String(row['ID задачи']);
+          const ai = aiScoresCache[id];
+          if (ai && ai.value != null) {
+            row['AI важность'] = ai.value;
+            row['AI важность (0-5)'] = normalizeImportance(ai.value);
+            row['AI рекомендация'] = ai.recommendation || '';
+          } else {
+            row['AI важность'] = null;
+            row['AI важность (0-5)'] = 0;
+            row['AI рекомендация'] = '';
+          }
+        });
+      }
+
       async function loadReport(method = 'GET') {
         ids.errorBox.hidden = true;
         
@@ -2543,6 +2578,7 @@
 
           state.columns = payload.columns;
           state.rows = payload.rows;
+          await mergeAiScores();
           state.departments = payload.departments || [];
           state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
           state.portalHost = payload.portalHost || null;

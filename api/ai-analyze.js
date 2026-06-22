@@ -106,7 +106,7 @@ async function saveAnalysis(analysis) {
   }
 }
 
-async function analyzeTask(task) {
+export async function analyzeTask(task) {
   let rawText = "";
   try {
     // Check cache first
