@@ -1438,8 +1438,8 @@
             empMap[creatorName].assignedCount++;
             if (creatorDept !== executorDept) {
               empMap[creatorName].assignedToOtherDepts++;
-              // Поручение в другой отдел = +2 балла
-              empMap[creatorName].score += 2;
+              // Поручение в другой отдел = +0.5 × важность задачи (V)
+              empMap[creatorName].score += Math.round(0.5 * (parseFloat(row['AI важность']) || 0));
             } else {
               // Поручение внутри своего отдела = +1 балл
               empMap[creatorName].score += 1;
