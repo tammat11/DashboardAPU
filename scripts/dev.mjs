@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import taskReportHandler from '../api/task-report.js';
 import aiAnalyzeHandler from '../api/ai-analyze.js';
+import chatHandler from '../api/chat.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
@@ -45,7 +46,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Route API
-  if (url.pathname === '/api/task-report' || url.pathname === '/api/ai-analyze') {
+  if (url.pathname === '/api/task-report' || url.pathname === '/api/ai-analyze' || url.pathname === '/api/chat') {
     // mock req.query
     req.query = Object.fromEntries(url.searchParams.entries());
 
@@ -75,7 +76,9 @@ const server = http.createServer(async (req, res) => {
       return res;
     };
 
-    const handler = url.pathname === '/api/ai-analyze' ? aiAnalyzeHandler : taskReportHandler;
+    const handler = url.pathname === '/api/ai-analyze' ? aiAnalyzeHandler
+      : url.pathname === '/api/chat' ? chatHandler
+      : taskReportHandler;
 
     try {
       await handler(req, res);
