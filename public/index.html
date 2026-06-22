@@ -1753,14 +1753,16 @@
         chatState.history.push({ role: 'user', text: message });
         showChatTyping();
 
-        // Compact task payload for the AI
-        const tasks = state.rows.map(row => ({
+        // Compact task payload for the AI (filtered by current period to match the leaderboard)
+        const tasks = state.filteredRows.map(row => ({
           title: row['Название задачи'],
           executor: row['Исполнитель'],
           department: row['Отдел'],
+          creatorDept: row['Отдел постановщика'],
           creator: row['Постановщик'],
           status: row['Состояние задачи'],
-          score: row['Баллы эффективности'],
+          importance: row['AI важность'],            // V (1-10), оценка AI
+          points: taskExecutorScore(row),            // балл исполнителя за эту задачу
           deadline: row['Дедлайн']
         }));
 
