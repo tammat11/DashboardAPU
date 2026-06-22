@@ -2073,11 +2073,9 @@
             const deadline = parseDate('deadlineRaw', 'Дедлайн');
             const closed = parseDate('closedDateRaw', 'Дата закрытия');
 
-            const isCreatedIn = created && created >= start && created <= end;
             const isDeadlineIn = deadline && deadline >= start && deadline <= end;
-            const isClosedIn = closed && closed >= start && closed <= end;
 
-            return isCreatedIn || isDeadlineIn || isClosedIn;
+            return isDeadlineIn;
           });
         }
         
