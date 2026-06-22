@@ -1425,9 +1425,12 @@
             empMap[creatorName].assignedCount++;
             if (creatorDept !== executorDept) {
               empMap[creatorName].assignedToOtherDepts++;
+              // Поручение в другой отдел = +2 балла
+              empMap[creatorName].score += 2;
+            } else {
+              // Поручение внутри своего отдела = +1 балл
+              empMap[creatorName].score += 1;
             }
-            // +2 балла постановщику за каждое поручение (делегирование)
-            empMap[creatorName].score += 2;
           }
         });
 
@@ -2098,8 +2101,9 @@
           const taskTitle = row['Название задачи'] || 'Без названия';
           
           const overdue = parseInt(row['Просрочка, дней']) || 0;
-          const efficiency = parseFloat(row['Баллы эффективности']) || 0;
-          
+          // Балл за задачу = статус (0-5) + важность AI (0-5) — как в рейтинге
+          const efficiency = (parseFloat(row['Баллы эффективности']) || 0) + (parseFloat(row['AI важность (0-5)']) || 0);
+
           let subDept = null;
           if (dept !== 'Без отдела') {
             const resolved = getDeptGroupAndSub(dept);
