@@ -667,6 +667,7 @@
         justify-content: center;
       }
       .g-dept { font-size: 10.5px; color: var(--text-muted); font-weight: 500; margin-top: 3px; min-height: 13px; }
+      .g-position { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; min-height: 24px; line-height: 1.2; display: flex; align-items: center; justify-content: center; }
       .g-score {
         margin-top: 10px;
         font-size: 19px;
@@ -1308,7 +1309,7 @@
                   ${medal}
                 </div>
                 <div class="g-name">${formatNameTwoLines(emp.name)}</div>
-                ${emp.position ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">${escapeHtml(emp.position)}</div>` : ''}
+                ${emp.position ? `<div class="g-position">${escapeHtml(emp.position)}</div>` : ''}
                 <div class="g-score ${scoreClass}">${emp.score}</div>
                 <div class="g-meta">
                   <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
@@ -1340,7 +1341,7 @@
                     ${galleryAvatarMarkup(emp)}
                   </div>
                   <div class="g-name">${formatNameTwoLines(emp.name)}</div>
-                  ${emp.position ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">${escapeHtml(emp.position)}</div>` : ''}
+                  ${emp.position ? `<div class="g-position">${escapeHtml(emp.position)}</div>` : ''}
                   <div class="g-score ${scoreClass}">${emp.score}</div>
                   <div class="g-meta">
                     <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
