@@ -1332,6 +1332,19 @@
         return fallback(false);
       }
 
+      // Балл исполнителя за задачу = важность AI (V, 1-10) × доля за статус.
+      // Доли: закрыта в срок=1.0, с просрочкой=0.6, открыта в срок=0.4, без дедлайна=0.2, просрочена=0.
+      // Эти доли совпадают со старым статус-баллом (0-5), делённым на 5.
+      function taskExecutorScore(row) {
+        const V = parseFloat(row['AI важность']) || 0;
+        const statusPts = parseFloat(row['Баллы эффективности']) || 0; // 0,1,2,3,5
+        return Math.round(V * (statusPts / 5));
+      }
+      // Соисполнитель получает 0.8 от балла исполнителя (округляем)
+      function taskAccompliceScore(row) {
+        return Math.round(taskExecutorScore(row) * 0.8);
+      }
+
       // Aggregate filtered rows into sorted people (shared by Rating & Gallery)
       function aggregatePeople() {
         const empMap = {};
@@ -1360,8 +1373,8 @@
             const state_ = row['Состояние задачи'] || '';
             if (!state_.startsWith('Закрыта')) e.active++;
             e.overdue += parseInt(row['Просрочка, дней']) || 0;
-            // Балл = статус (0-5) + важность AI (0-5)
-            e.score   += (parseFloat(row['Баллы эффективности']) || 0) + (parseFloat(row['AI важность (0-5)']) || 0);
+            // Балл = важность AI × доля за статус
+            e.score   += taskExecutorScore(row);
           }
 
           // Process accomplices (co-executors)
@@ -1391,8 +1404,8 @@
                   const state_ = row['Состояние задачи'] || '';
                   if (!state_.startsWith('Закрыта')) e.active++;
                   e.overdue += parseInt(row['Просрочка, дней']) || 0;
-                  // Балл = статус (0-5) + важность AI (0-5)
-                  e.score   += (parseFloat(row['Баллы эффективности']) || 0) + (parseFloat(row['AI важность (0-5)']) || 0);
+                  // Соисполнитель = балл исполнителя × 0.8
+                  e.score   += taskAccompliceScore(row);
                 }
               });
             }
@@ -2101,8 +2114,8 @@
           const taskTitle = row['Название задачи'] || 'Без названия';
           
           const overdue = parseInt(row['Просрочка, дней']) || 0;
-          // Балл за задачу = статус (0-5) + важность AI (0-5) — как в рейтинге
-          const efficiency = (parseFloat(row['Баллы эффективности']) || 0) + (parseFloat(row['AI важность (0-5)']) || 0);
+          // Балл за задачу = важность AI × доля за статус — как в рейтинге
+          const efficiency = taskExecutorScore(row);
 
           let subDept = null;
           if (dept !== 'Без отдела') {
