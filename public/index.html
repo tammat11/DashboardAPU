@@ -1158,6 +1158,41 @@
             e.score   += parseFloat(row['Баллы эффективности']) || 0;
           }
 
+          // Process accomplices (co-executors)
+          try {
+            const accomplicesJson = row['Соисполнители'] || '[]';
+            const accomplices = typeof accomplicesJson === 'string' ? JSON.parse(accomplicesJson) : accomplicesJson;
+            if (Array.isArray(accomplices)) {
+              accomplices.forEach(acc => {
+                if (acc.name && acc.name !== 'Без исполнителя') {
+                  if (!empMap[acc.name]) {
+                    empMap[acc.name] = {
+                      name: acc.name,
+                      id: acc.id,
+                      dept: acc.dept,
+                      avatar: acc.avatar || '',
+                      tasks: 0,
+                      active: 0,
+                      overdue: 0,
+                      score: 0,
+                      assignedCount: 0,
+                      assignedToOtherDepts: 0
+                    };
+                  }
+                  const e = empMap[acc.name];
+                  if (!e.avatar && acc.avatar) e.avatar = acc.avatar;
+                  e.tasks++;
+                  const state_ = row['Состояние задачи'] || '';
+                  if (!state_.startsWith('Закрыта')) e.active++;
+                  e.overdue += parseInt(row['Просрочка, дней']) || 0;
+                  e.score   += parseFloat(row['Баллы эффективности']) || 0;
+                }
+              });
+            }
+          } catch (err) {
+            // Ignore accomplices parsing errors
+          }
+
           const creatorName = row['Постановщик'];
           const creatorId   = String(row['ID постановщика'] || '');
           const creatorDept = row['Отдел постановщика'] || 'Без отдела';
