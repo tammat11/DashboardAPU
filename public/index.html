@@ -1268,6 +1268,10 @@
 
       // ── Gallery (Table 3) ─────────────────────────────────────────────
       function renderGallery() {
+        ids.aiAnalysisWrap.hidden = true;
+        ids.galleryWrap.hidden = false;
+        ids.tableWrap.hidden = true;
+
         const sorted = aggregatePeople();
         const medals = ['🥇', '🥈', '🥉'];
         const topCls = ['g-top1', 'g-top2', 'g-top3'];
