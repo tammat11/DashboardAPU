@@ -1134,12 +1134,14 @@
           const name = row['Исполнитель'] || 'Без исполнителя';
           const id   = String(row['ID исполнителя'] || '');
           const dept = row['Отдел'] || '';
+          const position = row['Должность исполнителя'] || '';
           if (name && name !== 'Без исполнителя') {
             if (!empMap[name]) {
               empMap[name] = {
                 name,
                 id,
                 dept,
+                position,
                 avatar: row['Аватар'] || '',
                 tasks: 0,
                 active: 0,
@@ -1302,6 +1304,7 @@
                   ${medal}
                 </div>
                 <div class="g-name">${formatNameTwoLines(emp.name)}</div>
+                ${emp.position ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">${escapeHtml(emp.position)}</div>` : ''}
                 <div class="g-score ${scoreClass}">${emp.score}</div>
                 <div class="g-meta">
                   <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
@@ -1333,6 +1336,7 @@
                     ${galleryAvatarMarkup(emp)}
                   </div>
                   <div class="g-name">${formatNameTwoLines(emp.name)}</div>
+                  ${emp.position ? `<div style="font-size:11px;color:var(--text-muted);margin-bottom:4px;">${escapeHtml(emp.position)}</div>` : ''}
                   <div class="g-score ${scoreClass}">${emp.score}</div>
                   <div class="g-meta">
                     <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
