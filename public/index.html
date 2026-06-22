@@ -1746,11 +1746,23 @@
           deadline: row['Дедлайн']
         }));
 
+        // Authoritative aggregated leaderboard (same numbers shown on the dashboard)
+        const people = aggregatePeople().map((emp, i) => ({
+          rank: i + 1,
+          name: emp.name,
+          department: emp.dept,
+          totalScore: Math.round(emp.score * 10) / 10,
+          tasks: emp.tasks,
+          active: emp.active,
+          assigned: emp.assignedCount,
+          overdueDays: emp.overdue
+        }));
+
         try {
           const resp = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message, tasks, history: chatState.history.slice(0, -1) })
+            body: JSON.stringify({ message, tasks, people, history: chatState.history.slice(0, -1) })
           });
           const data = await resp.json();
           removeChatTyping();

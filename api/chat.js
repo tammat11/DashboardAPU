@@ -8,10 +8,18 @@ const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/
 const SYSTEM_CONTEXT = `Ты — AI-аналитик дашборда эффективности компании iC group (Казахстан: клининг + IT-разработка платформы ozym.kz/i1c).
 Ты помогаешь руководителю понять данные о задачах и сотрудниках.
 
-Отвечай на русском, кратко и по делу. Используй конкретные цифры из данных.
-Если спрашивают про эффективность — опирайся на баллы (0-10): чем выше балл, тем критичнее/ценнее задача.
-Можешь анализировать: кто перегружен, какие задачи стоит автоматизировать или исключить, кто отстаёт по срокам, распределение нагрузки по отделам.
-Если данных не хватает для ответа — честно скажи об этом. Не выдумывай.`;
+КАК СЧИТАЮТСЯ БАЛЛЫ (важно — не выдумывай свою формулу!):
+Балл сотрудника = сумма баллов за его задачи + бонус за поручения.
+- За каждую задачу-исполнителя начисляются баллы по статусу: закрыта в срок = 5, закрыта с просрочкой = 3, открыта в срок = 2, без дедлайна = 1, открыта просрочена = 0.
+- Соисполнители получают столько же, сколько исполнитель.
+- Постановщик получает +3 балла за КАЖДУЮ поручённую задачу (за делегирование).
+Итоговые баллы каждого человека УЖЕ ПОСЧИТАНЫ и переданы тебе в разделе "РЕЙТИНГ СОТРУДНИКОВ" (поле totalScore). Это единственный источник правды по баллам.
+
+ПРАВИЛА:
+- Когда спрашивают про баллы/рейтинг сотрудника — бери число строго из totalScore в РЕЙТИНГЕ. НИКОГДА не пересчитывай баллы сам по задачам.
+- Если просят разложить балл — объясни через формулу выше (баллы за статусы задач + 3 за каждое поручение), но итог должен совпадать с totalScore.
+- Отвечай на русском, кратко и по делу, с конкретными цифрами.
+- Если данных не хватает — честно скажи. Не выдумывай.`;
 
 async function callGemini(prompt) {
   const maxRetries = 4;
@@ -57,6 +65,15 @@ function buildContext(tasks) {
   return `Всего задач: ${tasks.length}.\n\nСписок задач:\n${lines.join("\n")}`;
 }
 
+// Authoritative per-person totals (already computed on the dashboard)
+function buildPeopleContext(people) {
+  if (!Array.isArray(people) || people.length === 0) return "";
+  const lines = people.map((p) =>
+    `#${p.rank} ${p.name} | отдел: ${p.department || "—"} | БАЛЛЫ: ${p.totalScore} | задач: ${p.tasks} | в работе: ${p.active} | поручил: ${p.assigned} | просрочка: ${p.overdueDays} дн.`
+  );
+  return `РЕЙТИНГ СОТРУДНИКОВ (готовые баллы — единственный источник правды, totalScore):\n${lines.join("\n")}`;
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -70,12 +87,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, tasks, history } = req.body || {};
+    const { message, tasks, people, history } = req.body || {};
     if (!message || typeof message !== "string") {
       return res.status(400).json({ ok: false, error: "message is required" });
     }
 
     const context = buildContext(tasks);
+    const peopleContext = buildPeopleContext(people);
 
     // Render prior turns (keep it short)
     let historyText = "";
@@ -87,7 +105,9 @@ export default async function handler(req, res) {
 
     const prompt = `${SYSTEM_CONTEXT}
 
-ДАННЫЕ ДАШБОРДА:
+${peopleContext}
+
+ДАННЫЕ ДАШБОРДА (задачи):
 ${context}
 ${historyText}
 
