@@ -185,16 +185,16 @@ async function analyzeTask(task) {
     }
 
     // Add task info for cache
-    const result = {
+    const analysisResult = {
       taskId: task.id,
       title: task.title,
       ...parsed
     };
 
     // Save to cache asynchronously (don't await)
-    saveAnalysis(result).catch(err => console.error("Failed to save to cache:", err));
+    saveAnalysis(analysisResult).catch(err => console.error("Failed to save to cache:", err));
 
-    return result;
+    return analysisResult;
   } catch (error) {
     console.error("AI analysis error:", error);
     // Return detailed error for debugging
