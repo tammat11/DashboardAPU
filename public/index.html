@@ -1219,6 +1219,7 @@
             if (creatorDept !== executorDept) {
               empMap[creatorName].assignedToOtherDepts++;
             }
+            empMap[creatorName].score += (parseFloat(row['Баллы эффективности']) || 0) * 0.5;
           }
         });
 
