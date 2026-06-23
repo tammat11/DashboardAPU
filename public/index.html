@@ -1293,6 +1293,24 @@
         return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">${unit}</span>`;
       }
 
+      // Importance V (1-10) cell with color: high=green, mid=neutral, low=muted
+      function formatImportance(v) {
+        const val = parseFloat(v);
+        if (!val || isNaN(val)) return '<span style="color:var(--text-muted);">—</span>';
+        let color = 'var(--text-muted)';
+        if (val >= 7) color = '#16a34a';
+        else if (val >= 5) color = 'var(--text-dark)';
+        return `<span style="font-weight:700;color:${color};">${val}</span><span style="font-size:9.5px;font-weight:500;opacity:0.6;margin-left:1px;">/10</span>`;
+      }
+
+      // Средняя важность по списку задач (для строк сотрудников)
+      function avgImportance(tasks) {
+        const vals = (tasks || []).map(t => parseFloat(t.importance)).filter(v => v && !isNaN(v));
+        if (!vals.length) return '<span style="color:var(--text-muted);">—</span>';
+        const avg = Math.round((vals.reduce((s, v) => s + v, 0) / vals.length) * 10) / 10;
+        return formatImportance(avg);
+      }
+
       // ── Leaderboard (Table 2) ─────────────────────────────────────────
       // Deterministic color for avatar fallback initials
       function avatarColor(seed) {
@@ -1978,6 +1996,7 @@
                 <td></td>
                 <td></td>
                 <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                <td>${formatImportance(task.importance)}</td>
                 <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${formatPoints(task.efficiency)}</td>
               </tr>
             `;
@@ -1992,6 +2011,7 @@
             empHtml += `
               <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${closedFolderKey}" style="font-weight: 600; background-color: rgba(200, 200, 200, 0.1); cursor: pointer; color: var(--text-muted);">
                 <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${closedFolderToggleIcon}</span> 📁 Закрытые задачи (${closedTasks.length})</td>
+                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -2029,6 +2049,7 @@
                     <td></td>
                     <td></td>
                     <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                    <td style="opacity: 0.8;">${formatImportance(task.importance)}</td>
                     <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}" style="opacity: 0.8;">${formatPoints(task.efficiency)}</td>
                   </tr>
                 `;
@@ -2143,6 +2164,7 @@
             title: taskTitle,
             overdue: overdue,
             efficiency: efficiency,
+            importance: row['AI важность'],
             creator: row['Постановщик'],
             priority: row['Приоритет'],
             deadline: row['Дедлайн'],
@@ -2194,14 +2216,14 @@
         });
 
         // Set columns headers
-        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'В работе', 'Просрочка, дн.', 'Баллы'];
+        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'В работе', 'Просрочка, дн.', 'Важность', 'Баллы'];
         ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
 
         let html = '';
         const depts = Object.keys(tree).sort();
         
         if (depts.length === 0) {
-          ids.tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных для группировки</td></tr>`;
+          ids.tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных для группировки</td></tr>`;
           return;
         }
         
@@ -2236,6 +2258,7 @@
               <td>${formatTasks(deptTasksCount)}</td>
               <td>${formatTasks(deptActiveCount)}</td>
               <td class="${dept.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(dept.overdueSum)}</td>
+              <td style="color:var(--text-muted);">—</td>
               <td class="${dept.efficiencySum < 0 ? 'color-danger' : (dept.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(dept.efficiencySum)}</td>
             </tr>
           `;
@@ -2266,6 +2289,7 @@
                     <td>${formatTasks(subTasksCount)}</td>
                     <td>${formatTasks(subActiveCount)}</td>
                     <td class="${subDept.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(subDept.overdueSum)}</td>
+                    <td style="color:var(--text-muted);">—</td>
                     <td class="${subDept.efficiencySum < 0 ? 'color-danger' : (subDept.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(subDept.efficiencySum)}</td>
                   </tr>
                 `;
@@ -2291,6 +2315,7 @@
                         <td>${formatTasks(empTasksCount)}</td>
                         <td>${formatTasks(empActiveCount)}</td>
                         <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
+                        <td>${avgImportance(emp.tasks)}</td>
                         <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
                       </tr>
                     `;
@@ -2324,6 +2349,7 @@
                   <td>${formatTasks(empTasksCount)}</td>
                   <td>${formatTasks(empActiveCount)}</td>
                   <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
+                  <td>${avgImportance(emp.tasks)}</td>
                   <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
                 </tr>
               `;
