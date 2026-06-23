@@ -1,0 +1,46 @@
+name: Daily importance re-scoring
+
+# Runs daily at 01:00 UTC = 06:00 Almaty (UTC+5).
+# Re-scores this week's / active tasks and commits the updated cache,
+# which triggers a Vercel redeploy of the dashboard.
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch: {}   # allow manual run from the Actions tab
+
+permissions:
+  contents: write          # needed to commit & push ai-scores.json
+
+jobs:
+  rescore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Re-score this week's tasks
+        env:
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          TASK_REPORT_WEBHOOK_URL: ${{ secrets.TASK_REPORT_WEBHOOK_URL }}
+        run: node scripts/analyze-week.mjs
+
+      - name: Commit & push if changed
+        run: |
+          if [[ -n "$(git status --porcelain public/ai-scores.json)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add public/ai-scores.json
+            git commit -m "data: daily re-scoring of this week's tasks [skip ci]"
+            git push
+            echo "Pushed updated ai-scores.json"
+          else
+            echo "No changes — nothing to push"
+          fi
