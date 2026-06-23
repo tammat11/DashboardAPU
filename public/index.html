@@ -2215,6 +2215,42 @@
           }
         });
 
+        // Second pass: add delegation bonus to the CREATOR's node (matches Rating/Gallery totals).
+        // Own department = +1 per task; another department = +round(0.5 * importance).
+        state.filteredRows.forEach((row) => {
+          const creatorName = row['Постановщик'];
+          if (!creatorName || creatorName === 'Без постановщика') return;
+          let cDept = row['Отдел постановщика'] || 'Без отдела';
+          const execDept = row['Отдел'] || 'Без отдела';
+          const V = parseFloat(row['AI важность']) || 0;
+          const bonus = (cDept !== execDept) ? Math.round(0.5 * V) : 1;
+          if (!bonus) return;
+
+          let cSub = null;
+          if (cDept !== 'Без отдела') {
+            const r = getDeptGroupAndSub(cDept);
+            cDept = r.dept;
+            cSub = r.subDept;
+          }
+          if (!tree[cDept]) {
+            tree[cDept] = { name: cDept, overdueSum: 0, efficiencySum: 0, employees: {}, subDepts: {} };
+          }
+          tree[cDept].efficiencySum += bonus;
+
+          const ensureEmp = (map) => {
+            if (!map[creatorName]) map[creatorName] = { name: creatorName, overdueSum: 0, efficiencySum: 0, tasks: [], delegationBonus: 0 };
+            map[creatorName].efficiencySum += bonus;
+            map[creatorName].delegationBonus = (map[creatorName].delegationBonus || 0) + bonus;
+          };
+          if (cSub) {
+            if (!tree[cDept].subDepts[cSub]) tree[cDept].subDepts[cSub] = { name: cSub, overdueSum: 0, efficiencySum: 0, employees: {} };
+            tree[cDept].subDepts[cSub].efficiencySum += bonus;
+            ensureEmp(tree[cDept].subDepts[cSub].employees);
+          } else {
+            ensureEmp(tree[cDept].employees);
+          }
+        });
+
         // Set columns headers
         const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'В работе', 'Просрочка, дн.', 'Важность', 'Баллы'];
         ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
