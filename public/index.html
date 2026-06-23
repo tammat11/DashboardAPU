@@ -1135,6 +1135,14 @@
       // Module-level set of department head user IDs (built in renderTable, used in renderLeaderboard too)
       let headUserIds = new Set();
 
+      // Сотрудники, которых не показываем в рейтинге/галерее/структуре (системные/исключённые)
+      const EXCLUDED_NAMES = ['Larion Lyan', 'Larion'];
+      function isExcludedPerson(name) {
+        if (!name) return false;
+        const n = String(name).toLowerCase();
+        return EXCLUDED_NAMES.some(ex => n.includes(ex.toLowerCase()));
+      }
+
       const ids = {
         host: document.getElementById('host'),
         fetchedAt: document.getElementById('fetchedAt'),
@@ -1466,7 +1474,7 @@
         });
 
         // Keep only real users — skip department/group "assignees" that have no valid user ID
-        const realPeople = Object.values(empMap).filter(emp => emp.id && /^\d+$/.test(emp.id) && emp.id !== '0');
+        const realPeople = Object.values(empMap).filter(emp => emp.id && /^\d+$/.test(emp.id) && emp.id !== '0' && !isExcludedPerson(emp.name));
 
         // Filter by name search query if any
         let displayPeople = realPeople;
@@ -2134,6 +2142,7 @@
         state.filteredRows.forEach((row) => {
           let dept = row['Отдел'] || 'Без отдела';
           const assignee = row['Исполнитель'] || 'Без исполнителя';
+          if (isExcludedPerson(assignee)) return;
           const taskTitle = row['Название задачи'] || 'Без названия';
           
           const overdue = parseInt(row['Просрочка, дней']) || 0;
@@ -2220,6 +2229,7 @@
         state.filteredRows.forEach((row) => {
           const creatorName = row['Постановщик'];
           if (!creatorName || creatorName === 'Без постановщика') return;
+          if (isExcludedPerson(creatorName)) return;
           let cDept = row['Отдел постановщика'] || 'Без отдела';
           const execDept = row['Отдел'] || 'Без отдела';
           const V = parseFloat(row['AI важность']) || 0;
