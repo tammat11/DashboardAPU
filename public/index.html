@@ -2064,6 +2064,88 @@
               });
             }
           }
+          // Render Delegated Tasks folder if there are any
+          const delegatedTasks = emp.delegatedTasks || [];
+          if (delegatedTasks.length > 0) {
+            const delegFolderKey = `delegated:${deptName}:${empName}`;
+            const isDelegFolderExpanded = state.expandedNodes.has(delegFolderKey);
+            const delegFolderToggleIcon = isDelegFolderExpanded ? '▼' : '▶';
+
+            empHtml += `
+              <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${delegFolderKey}" style="font-weight: 600; background-color: rgba(99, 152, 240, 0.07); cursor: pointer; color: var(--text-muted);">
+                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${delegFolderToggleIcon}</span> 📂 Порученные (${delegatedTasks.length})</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            `;
+
+            if (isDelegFolderExpanded) {
+              delegatedTasks.forEach((task) => {
+                const isClosed = task.state && task.state.startsWith('Закрыта');
+                const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
+                const taskIcon = isImportant ? '🔥' : '📋';
+                let taskTitleHtml = escapeHtml(task.title);
+                if (state.portalHost && task.id) {
+                  const idNum = String(task.id).replace('#', '').trim();
+                  const linkStyle = isClosed ? 'color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 500;' : '';
+                  taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="${linkStyle}">${taskTitleHtml}</a>`;
+                }
+
+                let projectPrefix = '';
+                if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+                  projectPrefix = `<span style="font-weight: 800; color: ${isClosed ? '#888' : 'var(--text-dark)'}; margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
+                }
+
+                let stateBadge = '';
+                if (isClosed) {
+                  stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span>`;
+                } else if (task.deadlineRaw) {
+                  const deadlineDate = new Date(task.deadlineRaw);
+                  if (!Number.isNaN(deadlineDate.getTime())) {
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const target = new Date(deadlineDate.getFullYear(), deadlineDate.getMonth(), deadlineDate.getDate());
+                    const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays < 0) {
+                      stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #ef4444; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Просрочено</span>`;
+                    } else if (diffDays === 0) {
+                      stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #ffedd5; color: #f97316; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Дедлайн сегодня</span>`;
+                    } else if (diffDays <= 3) {
+                      stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fef9c3; color: #ca8a04; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Скоро дедлайн</span>`;
+                    }
+                  }
+                }
+
+                const assigneeLabel = task.assignee ? `<span style="font-size: 10px; color: #6b9ef0; margin-left: 6px;">→ ${escapeHtml(formatShortName(task.assignee))}</span>` : '';
+                const rowStyle = isClosed ? 'background-color: rgba(240, 240, 240, 0.3); color: #888888;' : 'background-color: rgba(99, 152, 240, 0.04);';
+                const titleColor = isClosed ? 'color: #888888;' : 'color: #555555;';
+
+                empHtml += `
+                  <tr class="tree-row tree-level-4" style="${rowStyle}">
+                    <td style="padding-left: ${68 + indentOffset}px; ${titleColor}">${taskIcon} ${projectPrefix}<span>${taskTitleHtml}</span>${stateBadge}${assigneeLabel}</td>
+                    <td style="${isClosed ? 'color: #888888; white-space: normal; line-height: 1.25; font-size: 10.5px;' : ''}">
+                      ${isClosed
+                        ? `<div style="font-size: 9.5px; opacity: 0.8;">🏁 ${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</div><div style="font-weight: 600; margin-top: 1px;">✔️ ${escapeHtml(removeYear(task.closedDateRaw, task.closed))}</div>`
+                        : escapeHtml(removeYear(task.deadlineRaw, task.deadline))
+                      }
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="${isClosed ? 'opacity: 0.8;' : ''}">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                    <td style="${isClosed ? 'opacity: 0.8;' : ''}">${formatImportance(task.importance)}</td>
+                    <td></td>
+                  </tr>
+                `;
+              });
+            }
+          }
+
           return empHtml;
         };
 
@@ -2234,7 +2316,6 @@
           const execDept = row['Отдел'] || 'Без отдела';
           const V = parseFloat(row['AI важность']) || 0;
           const bonus = (cDept !== execDept) ? Math.round(0.5 * V) : 1;
-          if (!bonus) return;
 
           let cSub = null;
           if (cDept !== 'Без отдела') {
@@ -2245,16 +2326,36 @@
           if (!tree[cDept]) {
             tree[cDept] = { name: cDept, overdueSum: 0, efficiencySum: 0, employees: {}, subDepts: {} };
           }
-          tree[cDept].efficiencySum += bonus;
+          if (bonus) tree[cDept].efficiencySum += bonus;
+
+          const delegTaskData = {
+            id: row['ID задачи'],
+            title: row['Название задачи'] || 'Без названия',
+            assignee: row['Исполнитель'] || '',
+            assigneeDept: execDept,
+            state: row['Состояние задачи'],
+            deadline: row['Дедлайн'],
+            deadlineRaw: row['deadlineRaw'],
+            closed: row['Дата закрытия'],
+            closedDateRaw: row['closedDateRaw'],
+            importance: row['AI важность'],
+            overdue: parseInt(row['Просрочка, дней']) || 0,
+            project: row['Проект'],
+            priority: row['Приоритет'],
+          };
 
           const ensureEmp = (map) => {
-            if (!map[creatorName]) map[creatorName] = { name: creatorName, overdueSum: 0, efficiencySum: 0, tasks: [], delegationBonus: 0 };
-            map[creatorName].efficiencySum += bonus;
-            map[creatorName].delegationBonus = (map[creatorName].delegationBonus || 0) + bonus;
+            if (!map[creatorName]) map[creatorName] = { name: creatorName, overdueSum: 0, efficiencySum: 0, tasks: [], delegationBonus: 0, delegatedTasks: [] };
+            if (!map[creatorName].delegatedTasks) map[creatorName].delegatedTasks = [];
+            if (bonus) {
+              map[creatorName].efficiencySum += bonus;
+              map[creatorName].delegationBonus = (map[creatorName].delegationBonus || 0) + bonus;
+            }
+            map[creatorName].delegatedTasks.push(delegTaskData);
           };
           if (cSub) {
             if (!tree[cDept].subDepts[cSub]) tree[cDept].subDepts[cSub] = { name: cSub, overdueSum: 0, efficiencySum: 0, employees: {} };
-            tree[cDept].subDepts[cSub].efficiencySum += bonus;
+            if (bonus) tree[cDept].subDepts[cSub].efficiencySum += bonus;
             ensureEmp(tree[cDept].subDepts[cSub].employees);
           } else {
             ensureEmp(tree[cDept].employees);
