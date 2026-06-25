@@ -2064,8 +2064,8 @@
               });
             }
           }
-          // Render Delegated Tasks folder if there are any
-          const delegatedTasks = emp.delegatedTasks || [];
+          // Render Delegated Tasks folder — only tasks assigned to someone else
+          const delegatedTasks = (emp.delegatedTasks || []).filter(t => t.assignee !== empName);
           if (delegatedTasks.length > 0) {
             const delegFolderKey = `delegated:${deptName}:${empName}`;
             const isDelegFolderExpanded = state.expandedNodes.has(delegFolderKey);
