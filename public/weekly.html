@@ -237,7 +237,7 @@
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('zrs')">📊 ЗРС</button>
+    <button class="tab active" onclick="switchTab('zrs')">📊 ЗРС (отчёт)</button>
     <button class="tab" onclick="switchTab('task')">✅ Задача</button>
   </div>
 
@@ -246,29 +246,29 @@
     <div class="card">
       <div class="card-title">
         <div class="icon icon-zrs">📊</div>
-        Задача-Решение-Системно
+        Завершённая работа сотрудника
       </div>
 
       <div class="field">
         <label>Ситуация <span class="required-star">*</span></label>
-        <textarea id="zrs-situation" placeholder="Опишите текущую ситуацию или проблему..."></textarea>
+        <textarea id="zrs-situation" placeholder="Какая была ситуация или проблема до вашего вмешательства?"></textarea>
       </div>
       <div class="field">
         <label>Данные <span class="required-star">*</span></label>
-        <textarea id="zrs-data" placeholder="Факты, цифры, метрики, наблюдения..."></textarea>
+        <textarea id="zrs-data" placeholder="Факты, цифры, метрики до и после..."></textarea>
       </div>
       <div class="field">
         <label>Решение 1 <span class="required-star">*</span></label>
-        <textarea id="zrs-sol1" placeholder="Первый вариант решения..."></textarea>
+        <textarea id="zrs-sol1" placeholder="Что конкретно было сделано?"></textarea>
       </div>
       <div class="field">
         <label>Решение 2 <span class="required-star">*</span></label>
-        <textarea id="zrs-sol2" placeholder="Альтернативный вариант решения..."></textarea>
+        <textarea id="zrs-sol2" placeholder="Результат / что это дало компании?"></textarea>
       </div>
 
       <div class="divider"></div>
 
-      <button class="submit-btn" id="zrsbtn" onclick="submitZrs()">Создать ЗРС в Битрикс</button>
+      <button class="submit-btn" id="zrsbtn" onclick="submitZrs()">Отправить отчёт ЗРС</button>
     </div>
   </div>
 
@@ -472,17 +472,18 @@
     ].filter(Boolean).join('\n\n─────────────────\n\n');
 
     try {
-      await bxCall('tasks.task.add', {
+      const zrsResult = await bxCall('tasks.task.add', {
         fields: {
           TITLE: `ЗРС | ${wk} | ${who}`,
           DESCRIPTION: desc,
           DEADLINE: weekDeadlineISO(),
           RESPONSIBLE_ID: user?.ID,
-          TAGS: ['ЗРС', 'Недельное планирование'],
+          STATUS: 5, // 5 = завершена (completed)
+          TAGS: ['ЗРС'],
         }
       });
 
-      toast('✅ ЗРС создана в Битрикс!');
+      toast('✅ Отчёт ЗРС сохранён в Битрикс!');
       weekTaskCount++; loadWeekCount();
       ['zrs-situation','zrs-data','zrs-sol1','zrs-sol2'].forEach(id => {
         document.getElementById(id).value = '';
@@ -491,7 +492,7 @@
       toast('Ошибка: ' + e.message, 'error');
     }
 
-    btn.disabled = false; btn.textContent = 'Создать ЗРС в Битрикс';
+    btn.disabled = false; btn.textContent = 'Отправить отчёт ЗРС';
   }
 
   // ── Submit Task ───────────────────────────────────────────────────────────
