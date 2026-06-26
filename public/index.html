@@ -1485,7 +1485,9 @@
           const creatorId   = String(row['ID постановщика'] || '');
           const creatorDept = row['Отдел постановщика'] || 'Без отдела';
           const executorDept = row['Отдел'] || 'Без отдела';
-          if (creatorName && creatorName !== 'Без постановщика') {
+          // Нельзя «поручить» задачу самому себе — бонус постановщика не начисляем
+          const selfAssigned = creatorId && String(row['ID исполнителя'] || '') === creatorId;
+          if (creatorName && creatorName !== 'Без постановщика' && !selfAssigned) {
             if (!empMap[creatorName]) {
               empMap[creatorName] = {
                 name: creatorName,
@@ -2354,6 +2356,9 @@
           const creatorName = row['Постановщик'];
           if (!creatorName || creatorName === 'Без постановщика') return;
           if (isExcludedPerson(creatorName)) return;
+          // Нельзя «поручить» задачу самому себе — ни бонуса, ни папки «Порученные»
+          const creatorId = String(row['ID постановщика'] || '');
+          if (creatorId && String(row['ID исполнителя'] || '') === creatorId) return;
           let cDept = row['Отдел постановщика'] || 'Без отдела';
           const execDept = row['Отдел'] || 'Без отдела';
           const V = parseFloat(row['AI важность']) || 0;
