@@ -866,6 +866,20 @@
       .g-col {
         flex: 1;
         min-width: 0;
+        border-radius: 20px;
+        padding: 18px 18px 20px;
+        border: 1.5px solid var(--border-color);
+        background: var(--surface, #fff);
+      }
+      .g-col-winners {
+        border-color: rgba(138, 196, 63, 0.45);
+        background: linear-gradient(180deg, rgba(138, 196, 63, 0.07), rgba(138, 196, 63, 0.015) 220px, transparent);
+        box-shadow: 0 6px 24px rgba(138, 196, 63, 0.10);
+      }
+      .g-col-losers {
+        border-color: rgba(239, 68, 68, 0.40);
+        background: linear-gradient(180deg, rgba(239, 68, 68, 0.06), rgba(239, 68, 68, 0.015) 220px, transparent);
+        box-shadow: 0 6px 24px rgba(239, 68, 68, 0.08);
       }
       @media (max-width: 768px) {
         .g-container {
@@ -877,20 +891,23 @@
         font-size: 20px;
         font-weight: 800;
         color: var(--text-dark);
-        margin: 10px 0 14px;
-        padding-bottom: 8px;
-        border-bottom: 2px solid var(--border-color);
-        display: flex;
+        margin: 2px 0 16px;
+        padding: 6px 14px 6px 12px;
+        border-radius: 12px;
+        border-bottom: none;
+        display: inline-flex;
         align-items: center;
         gap: 8px;
       }
       .g-winners-header {
-        border-bottom-color: var(--brand-green);
+        color: #4d7a16;
+        background: rgba(138, 196, 63, 0.16);
       }
       .g-losers-header {
-        border-bottom-color: #ef4444;
+        color: #c0392b;
+        background: rgba(239, 68, 68, 0.13);
         position: relative;
-        padding-right: 48px;
+        padding-right: 52px;
       }
       .g-losers-crown {
         font-size: 38px;
@@ -1571,7 +1588,7 @@
 
           // 1. Winners Section
           html += `
-            <div class="g-col">
+            <div class="g-col g-col-winners">
               <div class="g-section-header g-winners-header">
                 Победители
               </div>
@@ -1606,7 +1623,7 @@
           // 2. Losers Section
           if (losers.length > 0) {
             html += `
-              <div class="g-col">
+              <div class="g-col g-col-losers">
                 <div class="g-section-header g-losers-header">
                   Лузеры
                   <div class="g-losers-crown">👑</div>
