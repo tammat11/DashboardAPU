@@ -872,14 +872,36 @@
         background: var(--surface, #fff);
       }
       .g-col-winners {
-        border-color: rgba(138, 196, 63, 0.45);
-        background: linear-gradient(180deg, rgba(138, 196, 63, 0.07), rgba(138, 196, 63, 0.015) 220px, transparent);
-        box-shadow: 0 6px 24px rgba(138, 196, 63, 0.10);
+        border-color: rgba(138, 196, 63, 0.55);
+        border-width: 2px;
+        background: linear-gradient(180deg, rgba(138, 196, 63, 0.10), rgba(138, 196, 63, 0.02) 300px, transparent);
+        box-shadow: 0 8px 32px rgba(138, 196, 63, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+      .g-col-winners::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #7ab828, #a8d840);
+        border-radius: 20px 20px 0 0;
       }
       .g-col-losers {
-        border-color: rgba(239, 68, 68, 0.40);
-        background: linear-gradient(180deg, rgba(239, 68, 68, 0.06), rgba(239, 68, 68, 0.015) 220px, transparent);
-        box-shadow: 0 6px 24px rgba(239, 68, 68, 0.08);
+        border-color: rgba(239, 68, 68, 0.50);
+        border-width: 2px;
+        background: linear-gradient(180deg, rgba(239, 68, 68, 0.09), rgba(239, 68, 68, 0.02) 300px, transparent);
+        box-shadow: 0 8px 32px rgba(239, 68, 68, 0.12);
+        position: relative;
+        overflow: hidden;
+      }
+      .g-col-losers::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #e53e3e, #fc8181);
+        border-radius: 20px 20px 0 0;
       }
       @media (max-width: 768px) {
         .g-container {
@@ -888,26 +910,29 @@
         }
       }
       .g-section-header {
-        font-size: 20px;
-        font-weight: 800;
-        color: var(--text-dark);
-        margin: 2px 0 16px;
-        padding: 6px 14px 6px 12px;
-        border-radius: 12px;
-        border-bottom: none;
-        display: inline-flex;
+        font-size: 22px;
+        font-weight: 900;
+        margin: 8px 0 20px;
+        padding: 12px 18px;
+        border-radius: 14px;
+        display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 10px;
+        letter-spacing: -0.3px;
+        width: 100%;
+        box-sizing: border-box;
       }
       .g-winners-header {
-        color: #4d7a16;
-        background: rgba(138, 196, 63, 0.16);
+        color: #2d6a00;
+        background: linear-gradient(90deg, rgba(138,196,63,0.28), rgba(138,196,63,0.10));
+        border: 1.5px solid rgba(138,196,63,0.35);
       }
       .g-losers-header {
-        color: #c0392b;
-        background: rgba(239, 68, 68, 0.13);
+        color: #b91c1c;
+        background: linear-gradient(90deg, rgba(239,68,68,0.22), rgba(239,68,68,0.08));
+        border: 1.5px solid rgba(239,68,68,0.30);
         position: relative;
-        padding-right: 52px;
+        padding-right: 56px;
       }
       .g-losers-crown {
         font-size: 38px;
