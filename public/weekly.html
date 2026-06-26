@@ -262,8 +262,8 @@
         <textarea id="zrs-sol1" placeholder="Первый вариант решения..."></textarea>
       </div>
       <div class="field">
-        <label>Решение 2</label>
-        <textarea id="zrs-sol2" placeholder="Альтернативный вариант решения (необязательно)..."></textarea>
+        <label>Решение 2 <span class="required-star">*</span></label>
+        <textarea id="zrs-sol2" placeholder="Альтернативный вариант решения..."></textarea>
       </div>
 
       <div class="divider"></div>
@@ -453,8 +453,8 @@
     const sol1 = document.getElementById('zrs-sol1').value.trim();
     const sol2 = document.getElementById('zrs-sol2').value.trim();
 
-    if (!sit || !data || !sol1) {
-      toast('Заполните Ситуацию, Данные и Решение 1', 'error'); return;
+    if (!sit || !data || !sol1 || !sol2) {
+      toast('Заполните все обязательные поля', 'error'); return;
     }
 
     const btn = document.getElementById('zrsbtn');
@@ -468,7 +468,7 @@
       `📌 СИТУАЦИЯ:\n${sit}`,
       `📊 ДАННЫЕ:\n${data}`,
       `💡 РЕШЕНИЕ 1:\n${sol1}`,
-      sol2 ? `💡 РЕШЕНИЕ 2:\n${sol2}` : ''
+      `💡 РЕШЕНИЕ 2:\n${sol2}`
     ].filter(Boolean).join('\n\n─────────────────\n\n');
 
     try {
