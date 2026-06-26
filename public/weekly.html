@@ -237,7 +237,7 @@
 
   <!-- Tabs -->
   <div class="tabs">
-    <button class="tab active" onclick="switchTab('zrs')">📊 ЗРС (отчёт)</button>
+    <button class="tab active" onclick="switchTab('zrs')">📊 ЗРС</button>
     <button class="tab" onclick="switchTab('task')">✅ Задача</button>
   </div>
 
@@ -293,7 +293,7 @@
         <input type="text" id="task-measure" placeholder="Например: +3 клиента, -15% затрат, 100% выполнено...">
       </div>
       <div class="field">
-        <label>Чек-лист</label>
+        <label>Чек-лист <span class="required-star">*</span></label>
         <div class="checklist-wrap" id="checklistWrap"></div>
         <button class="add-cl-btn" onclick="addItem()">＋ Добавить пункт</button>
       </div>
@@ -504,6 +504,9 @@
 
     if (!title || !benefit || !measure) {
       toast('Заполните Название, Пользу и Единицу измерения', 'error'); return;
+    }
+    if (items.length === 0) {
+      toast('Добавьте хотя бы один пункт чек-листа', 'error'); return;
     }
 
     const btn = document.getElementById('taskbtn');
