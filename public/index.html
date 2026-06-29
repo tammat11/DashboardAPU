@@ -1539,11 +1539,14 @@
         const medals = ['🥇', '🥈', '🥉'];
         const rowClasses = ['lb-row-1', 'lb-row-2', 'lb-row-3'];
 
-        const headers = ['#', 'Сотрудник', 'Задач', 'В работе', 'Поручил', 'Др. отделам', 'Просрочка, дн.', 'Баллы'];
-        ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+        const headers = ['#', 'Сотрудник', 'Задач', 'В работе', 'Поручил', 'Просрочка, дн.', 'Баллы'];
+        ids.tableHead.innerHTML = headers.map((h, i) => i === 4
+          ? `<th>${h} <span style="font-size:10px;font-weight:500;opacity:0.6;">(в отд. / вне отд.)</span></th>`
+          : `<th>${h}</th>`
+        ).join('');
 
         if (sorted.length === 0) {
-          ids.tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
+          ids.tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
         } else {
           ids.tableBody.innerHTML = sorted.map((emp, i) => {
             const rank = i + 1;
@@ -1562,8 +1565,7 @@
                 </td>
                 <td>${formatTasks(emp.tasks)}</td>
                 <td>${formatTasks(emp.active)}</td>
-                <td>${formatTasks(emp.assignedCount)}</td>
-                <td>${formatTasks(emp.assignedToOtherDepts)}</td>
+                <td>${formatTasks(emp.assignedCount - emp.assignedToOtherDepts)}/${formatTasks(emp.assignedToOtherDepts)}</td>
                 <td class="${emp.overdue > 0 ? 'color-danger' : ''}">${formatDays(emp.overdue)}</td>
                 <td class="${scoreClass}">${scoreSign}${emp.score} <span style="font-size:9.5px;font-weight:500;opacity:0.75;margin-left:2px;">${scoreSign}${Math.abs(emp.score) === 1 ? 'балл' : (Math.abs(emp.score) >= 2 && Math.abs(emp.score) <= 4) ? 'балла' : 'баллов'}</span></td>
               </tr>`;
