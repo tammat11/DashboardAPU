@@ -1642,7 +1642,7 @@
                 <div class="g-meta">
                   <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
                   <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
-                  <div class="g-meta-item"><span class="g-meta-val">${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.assignedCount - emp.assignedToOtherDepts}/${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
                   <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср.</span></div>
                 </div>
               </div>`;
@@ -1673,7 +1673,7 @@
                   <div class="g-meta">
                     <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
                     <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
-                    <div class="g-meta-item"><span class="g-meta-val">${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.assignedCount - emp.assignedToOtherDepts}/${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
                     <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср.</span></div>
                   </div>
                 </div>`;
