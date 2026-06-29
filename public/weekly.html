@@ -385,6 +385,20 @@
     setTimeout(() => el.classList.remove('show'), 3800);
   }
 
+  // ── Success card (AI off) ─────────────────────────────────────────────────
+  function successCard(taskId, resetFn) {
+    const bxBtn = taskId
+      ? `<div class="bx-link" onclick="try{BX24.openPath('/company/personal/user/0/tasks/task/view/${taskId}/');}catch(e){}">🔗 Открыть задачу в Битрикс #${taskId}</div>`
+      : '';
+    return `<div class="card" style="text-align:center;padding:32px 20px">
+      <div style="font-size:52px;margin-bottom:12px">✅</div>
+      <div style="font-size:19px;font-weight:900;margin-bottom:6px">Сохранено!</div>
+      <div style="font-size:13px;color:#64748b;margin-bottom:20px">Задача создана в Битрикс24</div>
+      ${bxBtn}
+      <button class="again-btn" style="margin-top:10px" onclick="${resetFn}">← Создать ещё</button>
+    </div>`;
+  }
+
   // ── AI Result render ──────────────────────────────────────────────────────
   const labelNames = {
     situation:'Ситуация', data:'Данные', solution:'Решение', result:'Результат',
@@ -434,7 +448,7 @@
 
     const btn = document.getElementById('zrsbtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>AI анализирует...';
+    btn.innerHTML = '<span class="spinner"></span>Сохраняется...';
 
     const userName = user ? [user.NAME, user.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник';
 
@@ -447,8 +461,10 @@
       if (!json.ok) throw new Error(json.error);
 
       document.getElementById('zrs-form').style.display = 'none';
-      renderResult('zrs-result', json.analysis, json.taskId, 'resetZrs()');
+      document.getElementById('zrs-result').innerHTML = successCard(json.taskId, 'resetZrs()');
+      document.getElementById('zrs-result').classList.add('show');
       weekTaskCount++; loadWeekCount();
+      if (bx24Ready) BX24.fitWindow();
     } catch(e) {
       toast('Ошибка: ' + e.message, 'error');
       btn.disabled = false; btn.textContent = 'Отправить отчёт ЗРС';
@@ -475,7 +491,7 @@
 
     const btn = document.getElementById('taskbtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>AI анализирует...';
+    btn.innerHTML = '<span class="spinner"></span>Сохраняется...';
 
     const userName = user ? [user.NAME, user.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник';
 
@@ -488,8 +504,10 @@
       if (!json.ok) throw new Error(json.error);
 
       document.getElementById('task-form').style.display = 'none';
-      renderResult('task-result', json.analysis, json.taskId, 'resetTask()');
+      document.getElementById('task-result').innerHTML = successCard(json.taskId, 'resetTask()');
+      document.getElementById('task-result').classList.add('show');
       weekTaskCount++; loadWeekCount();
+      if (bx24Ready) BX24.fitWindow();
     } catch(e) {
       toast('Ошибка: ' + e.message, 'error');
       btn.disabled = false; btn.textContent = 'Создать задачу в Битрикс';

@@ -77,10 +77,8 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: 'Все поля обязательны' });
 
   try {
-    const analysis = await analyzeZRS({ situation, data, solution1, solution2 });
     const wk = weekLabel();
     const who = userName || 'Сотрудник';
-    const verdictIcon = analysis.verdict === 'отлично' ? '🟢' : analysis.verdict === 'хорошо' ? '🟡' : '🔴';
 
     const desc =
 `📌 СИТУАЦИЯ:
@@ -93,13 +91,7 @@ ${data}
 ${solution1}
 
 ✅ РЕШЕНИЕ 2 (результат):
-${solution2}
-
-─────────────────
-🤖 AI ОЦЕНКА: ${analysis.total}/10 ${verdictIcon} ${analysis.verdict.toUpperCase()}
-Ситуация: ${analysis.scores.situation}/10 | Данные: ${analysis.scores.data}/10 | Решение: ${analysis.scores.solution}/10 | Результат: ${analysis.scores.result}/10
-
-${analysis.feedback}`;
+${solution2}`;
 
     const taskRes = await bitrix('tasks.task.add', {
       fields: {
@@ -112,7 +104,7 @@ ${analysis.feedback}`;
       }
     });
 
-    res.json({ ok: true, analysis, taskId: taskRes.result?.task?.id });
+    res.json({ ok: true, taskId: taskRes.result?.task?.id });
   } catch (e) {
     console.error('weekly-zrs error:', e);
     res.status(500).json({ ok: false, error: e.message });

@@ -68,21 +68,12 @@ export default async function handler(req, res) {
     return res.status(400).json({ ok: false, error: 'Все поля обязательны' });
 
   try {
-    const analysis = await analyzeTask({ title, benefit, measure, checklist });
-    const verdictIcon = analysis.verdict === 'отлично' ? '🟢' : analysis.verdict === 'хорошо' ? '🟡' : '🔴';
-
     const desc =
 `📌 ПОЛЬЗА ДЛЯ КОМПАНИИ:
 ${benefit}
 
 📏 ЕДИНИЦА ИЗМЕРЕНИЯ:
-${measure}
-
-─────────────────
-🤖 AI ОЦЕНКА: ${analysis.total}/10 ${verdictIcon} ${analysis.verdict.toUpperCase()}
-Конкретность: ${analysis.scores.clarity}/10 | Ценность: ${analysis.scores.value}/10 | Измеримость: ${analysis.scores.measurability}/10 | Чек-лист: ${analysis.scores.checklist}/10
-
-${analysis.feedback}`;
+${measure}`;
 
     const taskRes = await bitrix('tasks.task.add', {
       fields: {
@@ -101,7 +92,7 @@ ${analysis.feedback}`;
       }
     }
 
-    res.json({ ok: true, analysis, taskId });
+    res.json({ ok: true, taskId });
   } catch (e) {
     console.error('weekly-task error:', e);
     res.status(500).json({ ok: false, error: e.message });
