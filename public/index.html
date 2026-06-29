@@ -2448,7 +2448,7 @@
           // Render Department row
           html += `
             <tr class="tree-row tree-level-1" data-key="${deptKey}" style="font-weight: 700; background-color: rgba(138, 196, 63, 0.08); cursor: pointer;">
-              <td><span class="tree-toggle">${deptIcon}</span> 📁 ${escapeHtml(deptName)}${formatDeptCrossAssignments(deptName)}</td>
+              <td><span class="tree-toggle">${deptIcon}</span> 📁 ${escapeHtml(deptName)}<span style="display:inline-block;margin-left:8px;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:800;background:rgba(138,196,63,0.15);color:#4a8a10;">${dept.efficiencySum > 0 ? '+' : ''}${dept.efficiencySum} б.</span>${formatDeptCrossAssignments(deptName)}</td>
               <td></td>
               <td></td>
               <td>${formatTasks(deptTasksCount)}</td>
@@ -2479,7 +2479,7 @@
                 // Render Sub-department row (Level 1.5, uses tree-level-2 styling)
                 html += `
                   <tr class="tree-row tree-level-2" data-key="${subDeptKey}" style="font-weight: 800; background-color: rgba(138, 196, 63, 0.04); cursor: pointer;">
-                    <td style="padding-left: 28px;"><span class="tree-toggle">${subIcon}</span> 📁 ${escapeHtml(subDeptName)}</td>
+                    <td style="padding-left: 28px;"><span class="tree-toggle">${subIcon}</span> 📁 ${escapeHtml(subDeptName)}<span style="display:inline-block;margin-left:8px;padding:1px 8px;border-radius:10px;font-size:11px;font-weight:800;background:rgba(138,196,63,0.15);color:#4a8a10;">${subDept.efficiencySum > 0 ? '+' : ''}${subDept.efficiencySum} б.</span></td>
                     <td></td>
                     <td></td>
                     <td>${formatTasks(subTasksCount)}</td>
