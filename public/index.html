@@ -2061,10 +2061,12 @@
             const closedFolderKey = `closed:${deptName}:${empName}`;
             const isClosedFolderExpanded = state.expandedNodes.has(closedFolderKey);
             const closedFolderToggleIcon = isClosedFolderExpanded ? '▼' : '▶';
-            
+            const closedScore = closedTasks.reduce((s, t) => s + (t.efficiency || 0), 0);
+            const closedScoreBadge = `<span style="display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:800;background:rgba(100,100,100,0.1);color:#64748b;">${closedScore > 0 ? '+' : ''}${closedScore} б.</span>`;
+
             empHtml += `
               <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${closedFolderKey}" style="font-weight: 600; background-color: rgba(200, 200, 200, 0.1); cursor: pointer; color: var(--text-muted);">
-                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${closedFolderToggleIcon}</span> 📁 Закрытые задачи (${closedTasks.length})</td>
+                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${closedFolderToggleIcon}</span> 📁 Закрытые задачи (${closedTasks.length})${closedScoreBadge}</td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -2116,10 +2118,12 @@
             const delegFolderKey = `delegated:${deptName}:${empName}`;
             const isDelegFolderExpanded = state.expandedNodes.has(delegFolderKey);
             const delegFolderToggleIcon = isDelegFolderExpanded ? '▼' : '▶';
+            const delegScore = delegatedTasks.reduce((s, t) => s + (t.efficiency || 0), 0);
+            const delegScoreBadge = `<span style="display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:800;background:rgba(99,152,240,0.12);color:#3b6fd4;">${delegScore > 0 ? '+' : ''}${delegScore} б.</span>`;
 
             empHtml += `
               <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${delegFolderKey}" style="font-weight: 600; background-color: rgba(99, 152, 240, 0.07); cursor: pointer; color: var(--text-muted);">
-                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${delegFolderToggleIcon}</span> 📂 Порученные (${delegatedTasks.length})</td>
+                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${delegFolderToggleIcon}</span> 📂 Порученные (${delegatedTasks.length})${delegScoreBadge}</td>
                 <td></td>
                 <td></td>
                 <td></td>
