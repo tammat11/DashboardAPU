@@ -72,7 +72,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ ok: false, error: 'Method not allowed' });
 
-  const { situation, data, solution1, solution2, userName, userId } = req.body || {};
+  const { situation, data, solution1, solution2, userName, userId, managerId } = req.body || {};
   if (!situation || !data || !solution1 || !solution2)
     return res.status(400).json({ ok: false, error: 'Все поля обязательны' });
 
@@ -84,30 +84,48 @@ export default async function handler(req, res) {
 
     const verdictIcon = analysis.verdict === 'отлично' ? '🟢' : analysis.verdict === 'хорошо' ? '🟡' : '🔴';
     const desc =
-`📌 СИТУАЦИЯ:
+`ЗРС от сотрудника: ${who}
+Неделя: ${wk}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📌 СИТУАЦИЯ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${situation}
 
-📊 ДАННЫЕ:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 ДАННЫЕ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${data}
 
-💡 РЕШЕНИЕ 1 (что сделано):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+💡 РЕШЕНИЕ 1 — что было сделано
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${solution1}
 
-✅ РЕШЕНИЕ 2 (результат):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ РЕШЕНИЕ 2 — результат для компании
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ${solution2}
 
-─────────────────
-🤖 AI ОЦЕНКА: ${analysis.total}/10 ${verdictIcon} ${analysis.verdict.toUpperCase()}
-Ситуация: ${analysis.scores.situation}/10 | Данные: ${analysis.scores.data}/10 | Решение: ${analysis.scores.solution}/10 | Результат: ${analysis.scores.result}/10
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 AI АНАЛИЗ: ${analysis.total}/10 ${verdictIcon} ${analysis.verdict.toUpperCase()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+• Ситуация:  ${analysis.scores.situation}/10
+• Данные:    ${analysis.scores.data}/10
+• Решение:   ${analysis.scores.solution}/10
+• Результат: ${analysis.scores.result}/10
 
 ${analysis.feedback}`;
 
+    // Задача ставится руководителю, сотрудник — постановщик (CREATED_BY)
+    const responsibleId = managerId || userId;
     const taskRes = await bitrix('tasks.task.add', {
       fields: {
         TITLE: `ЗРС | ${wk} | ${who}`,
         DESCRIPTION: desc,
         DEADLINE: weekDeadline(),
-        ...(userId ? { RESPONSIBLE_ID: userId } : {}),
+        ...(responsibleId ? { RESPONSIBLE_ID: responsibleId } : {}),
+        ...(userId ? { CREATED_BY: userId } : {}),
         STATUS: 5,
         TAGS: ['ЗРС'],
       }

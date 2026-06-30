@@ -251,7 +251,7 @@
         <textarea id="zrs-sol2" placeholder="Результат / что это дало компании?"></textarea>
       </div>
       <div class="divider"></div>
-      <button class="submit-btn" id="zrsbtn" onclick="submitZrs()">Отправить отчёт ЗРС</button>
+      <button class="submit-btn" id="zrsbtn" onclick="submitZrs()">🤖 Анализ ИИ</button>
     </div>
     <div class="ai-result" id="zrs-result"></div>
   </div>
@@ -294,6 +294,7 @@
   let user = null;
   let bx24Ready = false;
   let weekTaskCount = 0;
+  let managerId = null;
 
   // ── Init ──────────────────────────────────────────────────────────────────
   try { BX24.fitWindow(); } catch(e) {}
@@ -309,6 +310,17 @@
           document.getElementById('userAvatar').textContent = initials;
           document.getElementById('userName').textContent =
             [user.NAME, user.LAST_NAME].filter(Boolean).join(' ');
+
+          // Получаем руководителя через отдел
+          const deptIds = user.UF_DEPARTMENT || [];
+          if (deptIds.length) {
+            BX24.callMethod('department.get', { ID: deptIds[0] }, (dr) => {
+              if (!dr.error()) {
+                const dept = dr.data();
+                managerId = dept[0]?.UF_HEAD || null;
+              }
+            });
+          }
         }
       });
       loadWeekCount();
@@ -457,7 +469,7 @@
     try {
       const res = await fetch('/api/weekly-zrs', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ situation, data: data, solution1: sol1, solution2: sol2, userName, userId: user?.ID })
+        body: JSON.stringify({ situation, data: data, solution1: sol1, solution2: sol2, userName, userId: user?.ID, managerId })
       });
       const json = await res.json();
       if (!json.ok) throw new Error(json.error);
@@ -473,7 +485,7 @@
       if (bx24Ready) BX24.fitWindow();
     } catch(e) {
       toast('Ошибка: ' + e.message, 'error');
-      btn.disabled = false; btn.textContent = 'Отправить отчёт ЗРС';
+      btn.disabled = false; btn.textContent = '🤖 Анализ ИИ';
     }
   }
 
@@ -482,7 +494,7 @@
     document.getElementById('zrs-form').style.display = '';
     document.getElementById('zrs-result').classList.remove('show');
     document.getElementById('zrsbtn').disabled = false;
-    document.getElementById('zrsbtn').textContent = 'Отправить отчёт ЗРС';
+    document.getElementById('zrsbtn').textContent = '🤖 Анализ ИИ';
     if (bx24Ready) BX24.fitWindow();
   }
 
