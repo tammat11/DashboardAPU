@@ -1048,6 +1048,7 @@
             <button id="viewBtn1" class="view-btn">🏗️ Структура</button>
             <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
             <button id="viewBtn3" class="view-btn active">🖼️ Галерея</button>
+            <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
             <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
           </span>
         </div>
@@ -1114,6 +1115,7 @@
         </div>
 
         <div id="galleryWrap" hidden></div>
+        <div id="zrsWrap" hidden></div>
 
         <div id="aiAnalysisWrap" hidden>
           <div id="aiAnalysisLoading" class="loading-panel">
@@ -1208,6 +1210,8 @@
         viewBtn2: document.getElementById('viewBtn2'),
         viewBtn3: document.getElementById('viewBtn3'),
         viewBtn4: document.getElementById('viewBtn4'),
+        viewBtn5: document.getElementById('viewBtn5'),
+        zrsWrap: document.getElementById('zrsWrap'),
         aiAnalysisWrap: document.getElementById('aiAnalysisWrap'),
         aiAnalysisLoading: document.getElementById('aiAnalysisLoading'),
         aiAnalysisContent: document.getElementById('aiAnalysisContent'),
@@ -1599,6 +1603,7 @@
       // ── Gallery (Table 3) ─────────────────────────────────────────────
       function renderGallery() {
         ids.aiAnalysisWrap.hidden = true;
+        ids.zrsWrap.hidden = true;
         ids.galleryWrap.hidden = false;
         ids.tableWrap.hidden = true;
 
@@ -1687,6 +1692,167 @@
 
         ids.galleryWrap.hidden = false;
         ids.tableWrap.hidden = true;
+        renderStats(state.filteredRows);
+      }
+
+      // ── ZRS Gallery (Table 5) ─────────────────────────────────────────────
+      function renderZRSGallery() {
+        ids.galleryWrap.hidden = true;
+        ids.aiAnalysisWrap.hidden = true;
+        ids.tableWrap.hidden = true;
+        ids.zrsWrap.hidden = false;
+
+        // Build allowed АУП dept names (ID 157 and descendants)
+        const allowedDeptNames = new Set();
+        if (state.departments && state.departments.length > 0) {
+          const allowedIds = new Set(['157']);
+          let added = true;
+          while (added) {
+            added = false;
+            state.departments.forEach(d => {
+              const pid = String(d.PARENT || '');
+              const id = String(d.ID);
+              if (pid && allowedIds.has(pid) && !allowedIds.has(id)) { allowedIds.add(id); added = true; }
+            });
+          }
+          state.departments.forEach(d => { if (allowedIds.has(String(d.ID))) allowedDeptNames.add(d.NAME); });
+        }
+
+        // Parse AI score from task description: "🤖 AI АНАЛИЗ: X/10"
+        function parseAIScore(desc) {
+          const m = (desc || '').match(/AI АНАЛИЗ[:\s]+(\d+)\/10/);
+          return m ? parseInt(m[1]) : null;
+        }
+
+        // Collect ALL unique АУП employees from full dataset (state.rows)
+        const empMap = {};
+        const sourceRows = allowedDeptNames.size > 0 ? state.rows : state.filteredRows;
+        for (const row of sourceRows) {
+          const dept = row['Отдел'] || '';
+          if (allowedDeptNames.size > 0 && !allowedDeptNames.has(dept)) continue;
+          const name = row['Исполнитель'];
+          if (!name || isExcludedPerson(name)) continue;
+          const id = String(row['ID исполнителя'] || '');
+          if (!empMap[name]) empMap[name] = { name, id, avatar: row['Аватар'] || '', dept, zrsEntries: [] };
+          if (!empMap[name].avatar && row['Аватар']) empMap[name].avatar = row['Аватар'];
+        }
+
+        // Match ZRS submissions (from filteredRows) to employees by Постановщик
+        const zrsRows = state.filteredRows.filter(r => (r['Название задачи'] || '').startsWith('ЗРС |'));
+        for (const row of zrsRows) {
+          const creator = row['Постановщик'] || '';
+          if (!creator) continue;
+          // Find matching employee by name (exact or partial)
+          const matched = empMap[creator] || Object.values(empMap).find(e => e.name === creator);
+          if (matched) {
+            matched.zrsEntries.push(row);
+          } else {
+            // Creator not in empMap yet (might be outside current period rows) — add them
+            if (!isExcludedPerson(creator)) {
+              empMap[creator] = {
+                name: creator,
+                id: String(row['ID постановщика'] || ''),
+                avatar: row['Аватар постановщика'] || '',
+                dept: '',
+                zrsEntries: [row]
+              };
+            }
+          }
+        }
+
+        // Build employee cards
+        const employees = Object.values(empMap).map(emp => {
+          const scores = emp.zrsEntries.map(r => parseAIScore(r['Описание'])).filter(s => s !== null);
+          const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+          const submitted = emp.zrsEntries.length > 0;
+          return { ...emp, count: emp.zrsEntries.length, avgScore, submitted };
+        });
+
+        // Sort: submitted first by score desc, then non-submitted alphabetically
+        employees.sort((a, b) => {
+          if (a.submitted && !b.submitted) return -1;
+          if (!a.submitted && b.submitted) return 1;
+          if (a.submitted && b.submitted) {
+            if (a.avgScore === null && b.avgScore === null) return 0;
+            if (a.avgScore === null) return 1;
+            if (b.avgScore === null) return -1;
+            return b.avgScore - a.avgScore;
+          }
+          return a.name.localeCompare(b.name, 'ru');
+        });
+
+        const submittedCount = employees.filter(e => e.submitted).length;
+
+        function scoreColor(s) {
+          if (s === null) return 'var(--text-muted)';
+          if (s >= 8) return '#22a06b';
+          if (s >= 6) return '#f59e0b';
+          return '#ef4444';
+        }
+
+        function verdictLabel(s) {
+          if (s === null) return '—';
+          if (s >= 8) return 'отлично';
+          if (s >= 6) return 'хорошо';
+          return 'нужно улучшить';
+        }
+
+        function avatarMarkup(emp, size = 72) {
+          if (emp.avatar) return `<img src="${emp.avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;">`;
+          const initials = emp.name.split(' ').slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+          const colors = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6'];
+          const color = colors[(emp.name.charCodeAt(0) || 0) % colors.length];
+          return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.3)}px;font-weight:700;color:#fff;">${initials}</div>`;
+        }
+
+        let rankCounter = 0;
+        let html = `<div style="padding:16px 8px;">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;padding:0 4px;">
+            Сдали ЗРС: <b style="color:#22a06b">${submittedCount}</b> · Не сдали: <b style="color:#ef4444">${employees.length - submittedCount}</b> · Всего: <b>${employees.length}</b>
+          </div>`;
+
+        // Submitted section
+        const submitted = employees.filter(e => e.submitted);
+        const notSubmitted = employees.filter(e => !e.submitted);
+
+        if (submitted.length) {
+          html += `<div style="font-size:12px;font-weight:700;color:#22a06b;margin-bottom:8px;letter-spacing:.5px;">✅ СДАЛИ ЗРС</div>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">`;
+          submitted.forEach((emp, i) => {
+            rankCounter++;
+            const sc = emp.avgScore;
+            const col = scoreColor(sc);
+            const label = verdictLabel(sc);
+            const medal = rankCounter === 1 ? '🥇' : rankCounter === 2 ? '🥈' : rankCounter === 3 ? '🥉' : '';
+            html += `
+              <div style="position:relative;background:var(--card-bg,#fff);border:1.5px solid #d1fae5;border-radius:14px;padding:16px 12px 12px;width:136px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
+                <span style="position:absolute;top:7px;left:9px;font-size:11px;color:var(--text-muted);font-weight:600;">#${rankCounter}${medal}</span>
+                ${avatarMarkup(emp)}
+                <div style="font-size:12px;font-weight:600;text-align:center;line-height:1.3;color:var(--text,#111);margin-top:2px;">${emp.name.split(' ').slice(0,2).join('<br>')}</div>
+                <div style="font-size:26px;font-weight:800;color:${col};line-height:1;">${sc !== null ? sc : '—'}<span style="font-size:12px;font-weight:500;color:var(--text-muted);">/10</span></div>
+                <div style="font-size:11px;color:${col};font-weight:500;">${label}</div>
+              </div>`;
+          });
+          html += '</div>';
+        }
+
+        // Not submitted section
+        if (notSubmitted.length) {
+          html += `<div style="font-size:12px;font-weight:700;color:#ef4444;margin-bottom:8px;letter-spacing:.5px;">❌ НЕ СДАЛИ</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;">`;
+          notSubmitted.forEach(emp => {
+            html += `
+              <div style="position:relative;background:var(--card-bg,#fff);border:1.5px solid #fee2e2;border-radius:14px;padding:14px 10px 10px;width:120px;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.85;">
+                ${avatarMarkup(emp, 56)}
+                <div style="font-size:11px;font-weight:600;text-align:center;line-height:1.3;color:var(--text,#111);margin-top:2px;">${emp.name.split(' ').slice(0,2).join('<br>')}</div>
+                <div style="font-size:11px;color:#ef4444;font-weight:600;">Не сдал</div>
+              </div>`;
+          });
+          html += '</div>';
+        }
+
+        html += '</div>';
+        ids.zrsWrap.innerHTML = html;
         renderStats(state.filteredRows);
       }
 
@@ -1893,9 +2059,11 @@
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3');
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
+        if (state.viewMode === 'table5') { renderZRSGallery(); return; }
         if (state.viewMode === 'table3') { renderGallery(); return; }
         ids.aiAnalysisWrap.hidden = true;
         ids.galleryWrap.hidden = true;
+        ids.zrsWrap.hidden = true;
         if (state.viewMode === 'table2') { renderLeaderboard(); return; }
 
         const tree = {};
@@ -2913,12 +3081,14 @@
         ids.viewBtn2.classList.toggle('active', mode === 'table2');
         ids.viewBtn3.classList.toggle('active', mode === 'table3');
         ids.viewBtn4.classList.toggle('active', mode === 'table4');
+        if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
         renderTable();
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
       if (ids.viewBtn2) ids.viewBtn2.addEventListener('click', () => setView('table2'));
       if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
       if (ids.viewBtn4) ids.viewBtn4.addEventListener('click', () => setView('table4'));
+      if (ids.viewBtn5) ids.viewBtn5.addEventListener('click', () => setView('table5'));
 
       loadReport('GET');
 
