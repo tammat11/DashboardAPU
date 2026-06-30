@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Недельное планирование | iC Group</title>
-  <script src="//api.bitrix24.com/api/v1/"></script>
+  <script src="https://api.bitrix24.com/api/v1/"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -296,6 +296,8 @@
   let weekTaskCount = 0;
 
   // ── Init ──────────────────────────────────────────────────────────────────
+  try { BX24.fitWindow(); } catch(e) {}
+
   try {
     BX24.init(async () => {
       bx24Ready = true;
