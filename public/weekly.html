@@ -448,7 +448,7 @@
 
     const btn = document.getElementById('zrsbtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Сохраняется...';
+    btn.innerHTML = '<span class="spinner"></span>AI анализирует...';
 
     const userName = user ? [user.NAME, user.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник';
 
@@ -461,8 +461,12 @@
       if (!json.ok) throw new Error(json.error);
 
       document.getElementById('zrs-form').style.display = 'none';
-      document.getElementById('zrs-result').innerHTML = successCard(json.taskId, 'resetZrs()');
-      document.getElementById('zrs-result').classList.add('show');
+      if (json.analysis) {
+        renderResult('zrs-result', json.analysis, json.taskId, 'resetZrs()');
+      } else {
+        document.getElementById('zrs-result').innerHTML = successCard(json.taskId, 'resetZrs()');
+        document.getElementById('zrs-result').classList.add('show');
+      }
       weekTaskCount++; loadWeekCount();
       if (bx24Ready) BX24.fitWindow();
     } catch(e) {
@@ -491,7 +495,7 @@
 
     const btn = document.getElementById('taskbtn');
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner"></span>Сохраняется...';
+    btn.innerHTML = '<span class="spinner"></span>AI анализирует...';
 
     const userName = user ? [user.NAME, user.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник';
 
@@ -504,8 +508,12 @@
       if (!json.ok) throw new Error(json.error);
 
       document.getElementById('task-form').style.display = 'none';
-      document.getElementById('task-result').innerHTML = successCard(json.taskId, 'resetTask()');
-      document.getElementById('task-result').classList.add('show');
+      if (json.analysis) {
+        renderResult('task-result', json.analysis, json.taskId, 'resetTask()');
+      } else {
+        document.getElementById('task-result').innerHTML = successCard(json.taskId, 'resetTask()');
+        document.getElementById('task-result').classList.add('show');
+      }
       weekTaskCount++; loadWeekCount();
       if (bx24Ready) BX24.fitWindow();
     } catch(e) {
