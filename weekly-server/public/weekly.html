@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Недельное планирование | iC Group</title>
+  <script src="//api.bitrix24.com/api/v1/"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a1a2e; min-height: 100vh; }
+    .app { max-width: 700px; margin: 0 auto; padding: 28px 16px 60px; }
+
+    .header { text-align: center; margin-bottom: 24px; }
+    .header h1 { font-size: 23px; font-weight: 900; letter-spacing: -0.5px; }
+    .header h1 span { color: #7ab828; }
+    .week-badge { display: inline-block; margin-top: 8px; background: white; border: 1.5px solid #d4e8b0; color: #4a7a1e; font-size: 13px; font-weight: 700; padding: 5px 14px; border-radius: 20px; }
+
+    .user-chip { display: flex; align-items: center; gap: 8px; background: #f0f7e6; border: 1.5px solid #c8e89a; border-radius: 12px; padding: 9px 14px; margin-bottom: 20px; }
+    .user-avatar { width: 28px; height: 28px; background: linear-gradient(135deg, #8ac43f, #5a9a20); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; font-weight: 800; flex-shrink: 0; }
+    .user-name { font-size: 13px; font-weight: 700; color: #3a6a10; }
+    .user-sub  { font-size: 11px; color: #7aaa40; margin-left: auto; }
+
+    .tabs { display: flex; gap: 6px; background: #e2e8f0; padding: 5px; border-radius: 16px; margin-bottom: 20px; }
+    .tab { flex: 1; padding: 11px 8px; border: none; background: transparent; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; transition: all 0.2s; color: #64748b; }
+    .tab.active { background: white; color: #1a1a2e; box-shadow: 0 2px 10px rgba(0,0,0,0.10); }
+
+    .card { background: white; border-radius: 22px; padding: 26px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); }
+    .card-title { font-size: 17px; font-weight: 900; margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+    .card-icon { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+    .field { margin-bottom: 18px; }
+    .field label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #94a3b8; margin-bottom: 7px; }
+    .req { color: #ef4444; margin-left: 2px; }
+    .field input, .field textarea { width: 100%; padding: 12px 14px; border: 1.5px solid #e2e8f0; border-radius: 12px; font-size: 14px; font-family: inherit; color: #1a1a2e; transition: border-color 0.2s, box-shadow 0.2s; resize: vertical; background: #fafbfc; }
+    .field input:focus, .field textarea:focus { outline: none; border-color: #8ac43f; box-shadow: 0 0 0 3px rgba(138,196,63,0.12); background: white; }
+    .field textarea { min-height: 90px; line-height: 1.5; }
+
+    .cl-wrap { display: flex; flex-direction: column; gap: 8px; }
+    .cl-item { display: flex; gap: 8px; align-items: center; }
+    .cl-num { width: 22px; height: 22px; flex-shrink: 0; background: #f1f5f9; border-radius: 50%; font-size: 11px; font-weight: 800; color: #94a3b8; display: flex; align-items: center; justify-content: center; }
+    .cl-item input { flex: 1; }
+    .del-btn { width: 30px; height: 30px; flex-shrink: 0; border: none; background: #fee2e2; color: #ef4444; border-radius: 8px; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; }
+    .add-cl-btn { margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 9px; background: none; border: 1.5px dashed #cbd5e1; border-radius: 10px; cursor: pointer; color: #94a3b8; font-size: 13px; font-weight: 700; transition: all 0.2s; }
+    .add-cl-btn:hover { border-color: #8ac43f; color: #5a8a1e; }
+
+    .divider { height: 1px; background: #f1f5f9; margin: 20px 0; }
+
+    .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #8ac43f, #6aaa28); border: none; border-radius: 14px; color: white; font-size: 15px; font-weight: 900; cursor: pointer; transition: all 0.2s; }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(106,170,40,0.35); }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    /* ── AI Result ── */
+    .ai-result { display: none; margin-top: 20px; }
+    .ai-result.show { display: block; }
+
+    .score-banner {
+      border-radius: 18px; padding: 20px 22px;
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 14px;
+    }
+    .score-banner.excellent { background: linear-gradient(135deg, #f0fdf4, #dcfce7); border: 2px solid #86efac; }
+    .score-banner.good      { background: linear-gradient(135deg, #fefce8, #fef9c3); border: 2px solid #fde047; }
+    .score-banner.improve   { background: linear-gradient(135deg, #fff1f2, #ffe4e6); border: 2px solid #fda4af; }
+
+    .score-circle {
+      width: 64px; height: 64px; flex-shrink: 0;
+      border-radius: 50%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      font-weight: 900; box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    }
+    .score-circle .num { font-size: 22px; line-height: 1; }
+    .score-circle .den { font-size: 11px; opacity: 0.7; }
+    .excellent .score-circle { background: #16a34a; color: white; }
+    .good      .score-circle { background: #ca8a04; color: white; }
+    .improve   .score-circle { background: #dc2626; color: white; }
+
+    .score-info { flex: 1; }
+    .score-verdict { font-size: 16px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .excellent .score-verdict { color: #15803d; }
+    .good      .score-verdict { color: #a16207; }
+    .improve   .score-verdict { color: #b91c1c; }
+    .score-feedback { font-size: 13px; line-height: 1.5; color: #475569; }
+
+    .criteria-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .crit-card { background: #f8fafc; border-radius: 12px; padding: 12px 14px; border: 1.5px solid #e2e8f0; }
+    .crit-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #94a3b8; margin-bottom: 6px; }
+    .crit-bar-wrap { background: #e2e8f0; border-radius: 4px; height: 6px; overflow: hidden; margin-bottom: 4px; }
+    .crit-bar { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+    .crit-bar.hi  { background: #16a34a; }
+    .crit-bar.mid { background: #ca8a04; }
+    .crit-bar.lo  { background: #dc2626; }
+    .crit-score { font-size: 13px; font-weight: 800; color: #1a1a2e; }
+    .crit-comment { font-size: 11px; color: #64748b; margin-top: 5px; line-height: 1.4; }
+    .criteria-grid { grid-template-columns: 1fr; }
+    .crit-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .crit-row .crit-bar-wrap { flex: 1; margin-bottom: 0; }
+
+    .bitrix-link { display: flex; align-items: center; gap: 8px; background: #f0f7e6; border: 1.5px solid #c8e89a; border-radius: 12px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: #3a6a10; text-decoration: none; }
+    .bitrix-link:hover { background: #e0f0d0; }
+
+    .again-btn { width: 100%; margin-top: 10px; padding: 12px; background: #f1f5f9; border: none; border-radius: 12px; font-size: 14px; font-weight: 700; color: #475569; cursor: pointer; }
+    .again-btn:hover { background: #e2e8f0; }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(10px); padding: 12px 22px; border-radius: 12px; font-weight: 800; font-size: 14px; color: white; z-index: 9999; opacity: 0; transition: opacity 0.3s, transform 0.3s; pointer-events: none; box-shadow: 0 8px 24px rgba(0,0,0,0.18); }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.success { background: #16a34a; }
+    .toast.error   { background: #dc2626; }
+
+    .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.4); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>📋 Недельное <span>планирование</span></h1>
+    <div class="week-badge" id="weekBadge">—</div>
+  </div>
+
+  <div class="user-chip">
+    <div class="user-avatar" id="userAvatar">?</div>
+    <div class="user-name" id="userName">Загрузка...</div>
+    <div class="user-sub" id="weekCount">задач на неделе: —</div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('zrs')">📊 ЗРС</button>
+    <button class="tab"        onclick="switchTab('task')">✅ Задача</button>
+  </div>
+
+  <!-- ══ ZRS ══ -->
+  <div class="panel active" id="panel-zrs">
+    <div class="card" id="zrs-form">
+      <div class="card-title"><div class="card-icon">📊</div>Завершённая работа</div>
+
+      <div class="field">
+        <label>Ситуация <span class="req">*</span></label>
+        <textarea id="zrs-situation" placeholder="Какая была ситуация или проблема до вашего вмешательства?"></textarea>
+      </div>
+      <div class="field">
+        <label>Данные <span class="req">*</span></label>
+        <textarea id="zrs-data" placeholder="Факты, цифры, метрики до и после..."></textarea>
+      </div>
+      <div class="field">
+        <label>Решение 1 — что сделано <span class="req">*</span></label>
+        <textarea id="zrs-sol1" placeholder="Что конкретно было сделано?"></textarea>
+      </div>
+      <div class="field">
+        <label>Решение 2 — результат <span class="req">*</span></label>
+        <textarea id="zrs-sol2" placeholder="Какой конкретный результат это дало компании?"></textarea>
+      </div>
+
+      <div class="divider"></div>
+      <button class="submit-btn" id="zrs-btn" onclick="submitZRS()">Отправить отчёт ЗРС</button>
+    </div>
+
+    <!-- AI Result -->
+    <div class="ai-result" id="zrs-result"></div>
+  </div>
+
+  <!-- ══ TASK ══ -->
+  <div class="panel" id="panel-task">
+    <div class="card" id="task-form">
+      <div class="card-title"><div class="card-icon">✅</div>Недельная задача</div>
+
+      <div class="field">
+        <label>Название задачи <span class="req">*</span></label>
+        <input type="text" id="task-title" placeholder="Что конкретно нужно сделать?">
+      </div>
+      <div class="field">
+        <label>Польза для компании <span class="req">*</span></label>
+        <textarea id="task-benefit" placeholder="Зачем это компании? Какой результат даёт?"></textarea>
+      </div>
+      <div class="field">
+        <label>Единица измерения результата <span class="req">*</span></label>
+        <input type="text" id="task-measure" placeholder="Например: +3 клиента, -15% затрат, 100% выполнено...">
+      </div>
+      <div class="field">
+        <label>Чек-лист <span class="req">*</span></label>
+        <div class="cl-wrap" id="cl-wrap"></div>
+        <button class="add-cl-btn" onclick="addItem()">＋ Добавить пункт</button>
+      </div>
+
+      <div class="divider"></div>
+      <button class="submit-btn" id="task-btn" onclick="submitTask()">Создать задачу</button>
+    </div>
+
+    <!-- AI Result -->
+    <div class="ai-result" id="task-result"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────────────────────
+  const SERVER = ''; // same-origin; change to 'http://185.98.7.103' if cross-origin
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  let currentUser = null;
+  let managerId = window.__BX_MANAGER_ID__ || null;
+
+  // Используем данные вшитые сервером (Серверный тип Битрикс24)
+  if (window.__BX_USER_ID__) {
+    currentUser = { ID: window.__BX_USER_ID__, NAME: window.__BX_USER_NAME__ || 'Сотрудник' };
+    document.getElementById('userAvatar').textContent = (window.__BX_USER_NAME__ || '?')[0].toUpperCase();
+    document.getElementById('userName').textContent = window.__BX_USER_NAME__ || 'Сотрудник';
+  }
+
+  // ── Init ──────────────────────────────────────────────────────────────────
+  setWeekBadge();
+  addItem();
+
+  try {
+    BX24.init(() => {
+      BX24.fitWindow();
+      BX24.callMethod('user.current', {}, r => {
+        if (!r.error()) {
+          currentUser = r.data();
+          const name = [currentUser.NAME, currentUser.LAST_NAME].filter(Boolean).join(' ');
+          document.getElementById('userAvatar').textContent = (currentUser.NAME||'?')[0].toUpperCase();
+          document.getElementById('userName').textContent = name;
+          loadWeekCount();
+
+          // Получаем руководителя через отдел сотрудника
+          const deptIds = currentUser.UF_DEPARTMENT || [];
+          if (deptIds.length) {
+            BX24.callMethod('department.get', { ID: deptIds[0] }, dr => {
+              if (!dr.error()) {
+                const head = (dr.data() || [])[0]?.UF_HEAD || null;
+                if (head) managerId = head; // перезаписываем серверное значение если получили
+              }
+            });
+          }
+        }
+      });
+    });
+  } catch(e) {
+    document.getElementById('userName').textContent = 'Вне Битрикс — тест';
+    document.getElementById('userAvatar').textContent = '👤';
+  }
+
+  // ── Week ──────────────────────────────────────────────────────────────────
+  function weekBounds() {
+    const now = new Date(), d = (now.getDay()+6)%7;
+    const mon = new Date(now); mon.setDate(now.getDate()-d); mon.setHours(0,0,0,0);
+    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+    return { mon, sun };
+  }
+  function fmt(d) { return d.toLocaleDateString('ru-RU',{day:'numeric',month:'long'}); }
+  function setWeekBadge() {
+    const {mon,sun} = weekBounds();
+    document.getElementById('weekBadge').textContent = `Неделя: ${fmt(mon)} — ${fmt(sun)}`;
+  }
+  function loadWeekCount() {
+    if (!currentUser) return;
+    const {mon,sun} = weekBounds();
+    BX24.callMethod('tasks.task.list',{
+      filter:{ RESPONSIBLE_ID: currentUser.ID, '>=CREATED_DATE': mon.toISOString().slice(0,10), '<=CREATED_DATE': sun.toISOString().slice(0,10) },
+      select:['ID']
+    }, r => {
+      if (!r.error()) {
+        const n = (r.data().tasks||[]).length;
+        document.getElementById('weekCount').textContent =
+          n >= 5 ? `✅ ${n}/5 выполнено` : `задач на неделе: ${n}/5`;
+      }
+    });
+  }
+
+  // ── Tabs ──────────────────────────────────────────────────────────────────
+  function switchTab(t) {
+    document.querySelectorAll('.tab').forEach((b,i) => b.classList.toggle('active',(t==='zrs'&&i===0)||(t==='task'&&i===1)));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-'+t).classList.add('active');
+    try { BX24.fitWindow(); } catch(e){}
+  }
+
+  // ── Checklist ─────────────────────────────────────────────────────────────
+  function addItem(v='') {
+    const w = document.getElementById('cl-wrap');
+    const n = w.children.length+1;
+    const d = document.createElement('div'); d.className='cl-item';
+    d.innerHTML=`<div class="cl-num">${n}</div><input type="text" placeholder="Пункт ${n}..." value="${v.replace(/"/g,'&quot;')}"><button class="del-btn" onclick="this.closest('.cl-item').remove();renum()">×</button>`;
+    w.appendChild(d);
+    if (!v) d.querySelector('input').focus();
+    renum();
+  }
+  function renum() {
+    document.querySelectorAll('.cl-item').forEach((el,i)=>{
+      el.querySelector('.cl-num').textContent=i+1;
+      el.querySelector('input').placeholder=`Пункт ${i+1}...`;
+    });
+  }
+  function getItems() {
+    return [...document.querySelectorAll('.cl-item input')].map(i=>i.value.trim()).filter(Boolean);
+  }
+
+  // ── Toast ─────────────────────────────────────────────────────────────────
+  function toast(msg, type='success') {
+    const el=document.getElementById('toast');
+    el.textContent=msg; el.className=`toast ${type} show`;
+    setTimeout(()=>el.classList.remove('show'),3800);
+  }
+
+  // ── Последние данные форм (для редактирования) ───────────────────────────
+  let lastZRS = null;   // { situation, data, solution1, solution2 }
+  let lastTask = null;  // { title, benefit, measure, checklist }
+  let editingZrsTaskId = null;   // ID задачи в Битрикс (обновлять, не создавать)
+  let editingTaskTaskId = null;
+
+  // ── AI Result Render ──────────────────────────────────────────────────────
+  function renderResult(containerId, analysis, taskId, editFn, resetFn) {
+    const cls = analysis.verdict==='отлично'?'excellent': analysis.verdict==='хорошо'?'good':'improve';
+    const icon = cls==='excellent'?'🟢': cls==='good'?'🟡':'🔴';
+    const labels = Object.keys(analysis.scores);
+    const labelNames = {
+      situation:'Ситуация', data:'Данные', solution:'Решение', result:'Результат',
+      clarity:'Конкретность', value:'Ценность', measurability:'Измеримость', checklist:'Чек-лист'
+    };
+
+    const crits = labels.map(k => {
+      const v = analysis.scores[k];
+      const barCls = v>=7?'hi': v>=5?'mid':'lo';
+      const comment = analysis.comments?.[k] || '';
+      return `<div class="crit-card">
+        <div class="crit-label">${labelNames[k]||k}</div>
+        <div class="crit-row">
+          <div class="crit-bar-wrap"><div class="crit-bar ${barCls}" style="width:${v*10}%"></div></div>
+          <div class="crit-score">${v}/10</div>
+        </div>
+        ${comment ? `<div class="crit-comment">${comment}</div>` : ''}
+      </div>`;
+    }).join('');
+
+    const bitrixBtn = taskId
+      ? `<a class="bitrix-link" href="javascript:void(0)" onclick="try{BX24.openPath('/company/personal/user/0/tasks/task/view/${taskId}/');}catch(e){}">🔗 Открыть в Битрикс → задача #${taskId}</a>`
+      : '';
+
+    document.getElementById(containerId).innerHTML = `
+      <div class="score-banner ${cls}">
+        <div class="score-circle"><div class="num">${analysis.total}</div><div class="den">/10</div></div>
+        <div class="score-info">
+          <div class="score-verdict">${icon} ${analysis.verdict}</div>
+          <div class="score-feedback">${analysis.feedback}</div>
+        </div>
+      </div>
+      <div class="criteria-grid">${crits}</div>
+      ${bitrixBtn}
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="again-btn" style="flex:1;background:#e0f0ff;color:#1e6aaa" onclick="${editFn}">✏️ Редактировать</button>
+        <button class="again-btn" style="flex:1" onclick="${resetFn}">＋ Создать ещё</button>
+      </div>
+    `;
+    document.getElementById(containerId).classList.add('show');
+    try { BX24.fitWindow(); } catch(e){}
+  }
+
+  // ── Submit ZRS ────────────────────────────────────────────────────────────
+  async function submitZRS() {
+    const situation = document.getElementById('zrs-situation').value.trim();
+    const data      = document.getElementById('zrs-data').value.trim();
+    const solution1 = document.getElementById('zrs-sol1').value.trim();
+    const solution2 = document.getElementById('zrs-sol2').value.trim();
+    if (!situation||!data||!solution1||!solution2) { toast('Заполните все поля','error'); return; }
+
+    lastZRS = { situation, data, solution1, solution2 };
+
+    const btn = document.getElementById('zrs-btn');
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>AI анализирует...';
+
+    try {
+      const res = await fetch(SERVER+'/api/zrs', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          situation, data, solution1, solution2,
+          userName: currentUser ? [currentUser.NAME,currentUser.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник',
+          userId: currentUser?.ID,
+          managerId,
+          taskId: editingZrsTaskId
+        })
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error);
+
+      editingZrsTaskId = json.taskId || null;
+      document.getElementById('zrs-form').style.display='none';
+      renderResult('zrs-result', json.analysis, json.taskId, 'editZRS()', 'resetZRS()');
+      document.getElementById('zrs-btn').textContent = editingZrsTaskId ? '🤖 Обновить анализ' : '🤖 Анализ ИИ';
+    } catch(e) {
+      toast('Ошибка: '+e.message,'error');
+      btn.disabled=false; btn.textContent='🤖 Анализ ИИ';
+    }
+  }
+
+  function editZRS() {
+    if (lastZRS) {
+      document.getElementById('zrs-situation').value = lastZRS.situation;
+      document.getElementById('zrs-data').value      = lastZRS.data;
+      document.getElementById('zrs-sol1').value      = lastZRS.solution1;
+      document.getElementById('zrs-sol2').value      = lastZRS.solution2;
+    }
+    document.getElementById('zrs-form').style.display='';
+    document.getElementById('zrs-result').classList.remove('show');
+    document.getElementById('zrs-btn').disabled=false;
+    document.getElementById('zrs-btn').textContent='🤖 Анализ ИИ';
+    try{BX24.fitWindow();}catch(e){}
+  }
+
+  function resetZRS() {
+    lastZRS = null; editingZrsTaskId = null;
+    ['zrs-situation','zrs-data','zrs-sol1','zrs-sol2'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('zrs-form').style.display='';
+    document.getElementById('zrs-result').classList.remove('show');
+    document.getElementById('zrs-btn').disabled=false;
+    document.getElementById('zrs-btn').textContent='🤖 Анализ ИИ';
+    try{BX24.fitWindow();}catch(e){}
+  }
+
+  // ── Submit Task ───────────────────────────────────────────────────────────
+  async function submitTask() {
+    const title   = document.getElementById('task-title').value.trim();
+    const benefit = document.getElementById('task-benefit').value.trim();
+    const measure = document.getElementById('task-measure').value.trim();
+    const checklist = getItems();
+    if (!title||!benefit||!measure) { toast('Заполните Название, Пользу и Единицу измерения','error'); return; }
+    if (!checklist.length) { toast('Добавьте хотя бы один пункт чек-листа','error'); return; }
+
+    lastTask = { title, benefit, measure, checklist };
+
+    const btn = document.getElementById('task-btn');
+    btn.disabled=true; btn.innerHTML='<span class="spinner"></span>AI анализирует...';
+
+    try {
+      const res = await fetch(SERVER+'/api/task', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({
+          title, benefit, measure, checklist,
+          userName: currentUser ? [currentUser.NAME,currentUser.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник',
+          userId: currentUser?.ID,
+          managerId,
+          taskId: editingTaskTaskId
+        })
+      });
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error);
+
+      editingTaskTaskId = json.taskId || null;
+      document.getElementById('task-form').style.display='none';
+      renderResult('task-result', json.analysis, json.taskId, 'editTask()', 'resetTask()');
+    } catch(e) {
+      toast('Ошибка: '+e.message,'error');
+      btn.disabled=false; btn.textContent='Создать задачу';
+    }
+  }
+
+  function editTask() {
+    if (lastTask) {
+      document.getElementById('task-title').value   = lastTask.title;
+      document.getElementById('task-benefit').value = lastTask.benefit;
+      document.getElementById('task-measure').value = lastTask.measure;
+      document.getElementById('cl-wrap').innerHTML = '';
+      lastTask.checklist.forEach(v => addItem(v));
+    }
+    document.getElementById('task-form').style.display='';
+    document.getElementById('task-result').classList.remove('show');
+    document.getElementById('task-btn').disabled=false;
+    document.getElementById('task-btn').textContent='Создать задачу';
+    try{BX24.fitWindow();}catch(e){}
+  }
+
+  function resetTask() {
+    lastTask = null; editingTaskTaskId = null;
+    document.getElementById('task-title').value='';
+    document.getElementById('task-benefit').value='';
+    document.getElementById('task-measure').value='';
+    document.getElementById('cl-wrap').innerHTML=''; addItem();
+    document.getElementById('task-form').style.display='';
+    document.getElementById('task-result').classList.remove('show');
+    document.getElementById('task-btn').disabled=false;
+    document.getElementById('task-btn').textContent='Создать задачу';
+    try{BX24.fitWindow();}catch(e){}
+  }
+</script>
+</body>
+</html>
