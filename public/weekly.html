@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Недельное планирование | iC Group</title>
-  <script src="https://api.bitrix24.com/api/v1/"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -296,11 +295,15 @@
   let weekTaskCount = 0;
   let managerId = null;
 
-  // ── Init ──────────────────────────────────────────────────────────────────
-  try { BX24.fitWindow(); } catch(e) {}
-
-  try {
-    BX24.init(async () => {
+  // ── Init — загружаем BX24.js динамически чтобы не блокировать рендер ──────
+  function initBX24() {
+    if (typeof BX24 === 'undefined') {
+      document.getElementById('userName').textContent = 'Предпросмотр (вне Битрикс)';
+      document.getElementById('userAvatar').textContent = '👤';
+      return;
+    }
+    try { BX24.fitWindow(); } catch(e) {}
+    BX24.init(() => {
       bx24Ready = true;
       BX24.fitWindow();
       BX24.callMethod('user.current', {}, (res) => {
@@ -310,25 +313,27 @@
           document.getElementById('userAvatar').textContent = initials;
           document.getElementById('userName').textContent =
             [user.NAME, user.LAST_NAME].filter(Boolean).join(' ');
-
-          // Получаем руководителя через отдел
           const deptIds = user.UF_DEPARTMENT || [];
           if (deptIds.length) {
             BX24.callMethod('department.get', { ID: deptIds[0] }, (dr) => {
-              if (!dr.error()) {
-                const dept = dr.data();
-                managerId = dept[0]?.UF_HEAD || null;
-              }
+              if (!dr.error()) managerId = (dr.data()||[])[0]?.UF_HEAD || null;
             });
           }
         }
       });
       loadWeekCount();
     });
-  } catch(e) {
+  }
+
+  // Загружаем BX24.js после рендера страницы
+  const bx24Script = document.createElement('script');
+  bx24Script.src = 'https://api.bitrix24.com/api/v1/';
+  bx24Script.onload = initBX24;
+  bx24Script.onerror = () => {
     document.getElementById('userName').textContent = 'Предпросмотр (вне Битрикс)';
     document.getElementById('userAvatar').textContent = '👤';
-  }
+  };
+  document.body.appendChild(bx24Script);
 
   setWeekBadge();
   addItem();
