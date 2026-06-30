@@ -1702,6 +1702,8 @@
         ids.tableWrap.hidden = true;
         ids.zrsWrap.hidden = false;
 
+        const ZRS_REQUIRED = 2;
+
         // Build allowed АУП dept names (ID 157 and descendants)
         const allowedDeptNames = new Set();
         if (state.departments && state.departments.length > 0) {
@@ -1718,61 +1720,92 @@
           state.departments.forEach(d => { if (allowedIds.has(String(d.ID))) allowedDeptNames.add(d.NAME); });
         }
 
+        // Compute period bounds (mirrors applyFilters logic)
+        const period = ids.periodSelect ? ids.periodSelect.value : 'week';
+        const now = new Date();
+        let periodStart = null, periodEnd = null;
+        if (period !== 'all') {
+          const day = now.getDay();
+          const diffToMon = now.getDate() - day + (day === 0 ? -6 : 1);
+          const startWeek = new Date(now.getFullYear(), now.getMonth(), diffToMon, 0, 0, 0, 0);
+          const endWeek   = new Date(startWeek.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
+          if (period === 'today') {
+            periodStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+            periodEnd   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+          } else if (period === 'week') {
+            periodStart = startWeek; periodEnd = endWeek;
+          } else if (period === 'month') {
+            periodStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+            periodEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+          } else if (period === 'lastMonth') {
+            periodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+            periodEnd   = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+          }
+        }
+
         // Parse AI score from task description: "🤖 AI АНАЛИЗ: X/10"
         function parseAIScore(desc) {
           const m = (desc || '').match(/AI АНАЛИЗ[:\s]+(\d+)\/10/);
           return m ? parseInt(m[1]) : null;
         }
 
+        // Find ZRS tasks in ALL rows (no dept filter — executor is manager, not employee)
+        const zrsRows = state.rows.filter(r => {
+          if (!(r['Название задачи'] || '').startsWith('ЗРС |')) return false;
+          if (periodStart && periodEnd) {
+            const dl = r['deadlineRaw'] ? new Date(r['deadlineRaw']) : parseDateStr(r['Дедлайн']);
+            if (!dl || dl < periodStart || dl > periodEnd) return false;
+          }
+          return true;
+        });
+
+        // Group ZRS by Постановщик (the employee who filed it)
+        const zrsByEmployee = {};
+        for (const row of zrsRows) {
+          const name = row['Постановщик'] || '';
+          if (!name || isExcludedPerson(name)) continue;
+          if (!zrsByEmployee[name]) zrsByEmployee[name] = { avatar: row['Аватар постановщика'] || '', entries: [] };
+          zrsByEmployee[name].entries.push(row);
+        }
+
         // Collect ALL unique АУП employees from full dataset (state.rows)
         const empMap = {};
-        const sourceRows = allowedDeptNames.size > 0 ? state.rows : state.filteredRows;
-        for (const row of sourceRows) {
+        for (const row of state.rows) {
           const dept = row['Отдел'] || '';
           if (allowedDeptNames.size > 0 && !allowedDeptNames.has(dept)) continue;
           const name = row['Исполнитель'];
           if (!name || isExcludedPerson(name)) continue;
-          const id = String(row['ID исполнителя'] || '');
-          if (!empMap[name]) empMap[name] = { name, id, avatar: row['Аватар'] || '', dept, zrsEntries: [] };
+          if (!empMap[name]) empMap[name] = { name, id: String(row['ID исполнителя'] || ''), avatar: row['Аватар'] || '', dept };
           if (!empMap[name].avatar && row['Аватар']) empMap[name].avatar = row['Аватар'];
         }
 
-        // Match ZRS submissions (from filteredRows) to employees by Постановщик
-        const zrsRows = state.filteredRows.filter(r => (r['Название задачи'] || '').startsWith('ЗРС |'));
-        for (const row of zrsRows) {
-          const creator = row['Постановщик'] || '';
-          if (!creator) continue;
-          // Find matching employee by name (exact or partial)
-          const matched = empMap[creator] || Object.values(empMap).find(e => e.name === creator);
-          if (matched) {
-            matched.zrsEntries.push(row);
-          } else {
-            // Creator not in empMap yet (might be outside current period rows) — add them
-            if (!isExcludedPerson(creator)) {
-              empMap[creator] = {
-                name: creator,
-                id: String(row['ID постановщика'] || ''),
-                avatar: row['Аватар постановщика'] || '',
-                dept: '',
-                zrsEntries: [row]
-              };
-            }
+        // Also add anyone who filed ZRS but wasn't in empMap
+        for (const [name, data] of Object.entries(zrsByEmployee)) {
+          if (!empMap[name] && !isExcludedPerson(name)) {
+            empMap[name] = { name, id: '', avatar: data.avatar, dept: '' };
           }
         }
 
         // Build employee cards
         const employees = Object.values(empMap).map(emp => {
-          const scores = emp.zrsEntries.map(r => parseAIScore(r['Описание'])).filter(s => s !== null);
+          const zrs = zrsByEmployee[emp.name];
+          const entries = zrs ? zrs.entries : [];
+          const scores = entries.map(r => parseAIScore(r['Описание'])).filter(s => s !== null);
           const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
-          const submitted = emp.zrsEntries.length > 0;
-          return { ...emp, count: emp.zrsEntries.length, avgScore, submitted };
+          // Use avatar from ZRS entry if better
+          const avatar = emp.avatar || (zrs ? zrs.avatar : '');
+          return { ...emp, avatar, count: entries.length, avgScore, submitted: entries.length > 0 };
         });
 
-        // Sort: submitted first by score desc, then non-submitted alphabetically
+        // Sort: full submitters first (count >= ZRS_REQUIRED) by score, partial next, non-submitted last
         employees.sort((a, b) => {
-          if (a.submitted && !b.submitted) return -1;
-          if (!a.submitted && b.submitted) return 1;
-          if (a.submitted && b.submitted) {
+          const aFull = a.count >= ZRS_REQUIRED, bFull = b.count >= ZRS_REQUIRED;
+          const aAny = a.submitted, bAny = b.submitted;
+          if (aFull && !bFull) return -1;
+          if (!aFull && bFull) return 1;
+          if (aAny && !bAny) return -1;
+          if (!aAny && bAny) return 1;
+          if (aAny && bAny) {
             if (a.avgScore === null && b.avgScore === null) return 0;
             if (a.avgScore === null) return 1;
             if (b.avgScore === null) return -1;
@@ -1781,7 +1814,9 @@
           return a.name.localeCompare(b.name, 'ru');
         });
 
-        const submittedCount = employees.filter(e => e.submitted).length;
+        const fullCount    = employees.filter(e => e.count >= ZRS_REQUIRED).length;
+        const partialCount = employees.filter(e => e.submitted && e.count < ZRS_REQUIRED).length;
+        const noneCount    = employees.filter(e => !e.submitted).length;
 
         function scoreColor(s) {
           if (s === null) return 'var(--text-muted)';
@@ -1805,51 +1840,53 @@
           return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.3)}px;font-weight:700;color:#fff;">${initials}</div>`;
         }
 
+        function counterBadge(count) {
+          const color = count >= ZRS_REQUIRED ? '#22a06b' : count > 0 ? '#f59e0b' : '#ef4444';
+          return `<div style="font-size:12px;font-weight:700;color:${color};">${count}/${ZRS_REQUIRED} ЗРС</div>`;
+        }
+
         let rankCounter = 0;
         let html = `<div style="padding:16px 8px;">
           <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;padding:0 4px;">
-            Сдали ЗРС: <b style="color:#22a06b">${submittedCount}</b> · Не сдали: <b style="color:#ef4444">${employees.length - submittedCount}</b> · Всего: <b>${employees.length}</b>
+            ✅ Сдали все: <b style="color:#22a06b">${fullCount}</b>
+            · ⚠️ Частично: <b style="color:#f59e0b">${partialCount}</b>
+            · ❌ Не сдали: <b style="color:#ef4444">${noneCount}</b>
+            · Всего: <b>${employees.length}</b>
           </div>`;
 
-        // Submitted section
-        const submitted = employees.filter(e => e.submitted);
-        const notSubmitted = employees.filter(e => !e.submitted);
+        const fullGroup    = employees.filter(e => e.count >= ZRS_REQUIRED);
+        const partialGroup = employees.filter(e => e.submitted && e.count < ZRS_REQUIRED);
+        const noneGroup    = employees.filter(e => !e.submitted);
 
-        if (submitted.length) {
-          html += `<div style="font-size:12px;font-weight:700;color:#22a06b;margin-bottom:8px;letter-spacing:.5px;">✅ СДАЛИ ЗРС</div>
+        function renderGroup(group, borderColor, label, labelColor) {
+          if (!group.length) return '';
+          let h = `<div style="font-size:12px;font-weight:700;color:${labelColor};margin-bottom:8px;letter-spacing:.5px;">${label}</div>
             <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">`;
-          submitted.forEach((emp, i) => {
-            rankCounter++;
+          group.forEach(emp => {
+            const isScored = emp.submitted;
             const sc = emp.avgScore;
             const col = scoreColor(sc);
-            const label = verdictLabel(sc);
-            const medal = rankCounter === 1 ? '🥇' : rankCounter === 2 ? '🥈' : rankCounter === 3 ? '🥉' : '';
-            html += `
-              <div style="position:relative;background:var(--card-bg,#fff);border:1.5px solid #d1fae5;border-radius:14px;padding:16px 12px 12px;width:136px;display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:0 1px 4px rgba(0,0,0,.06);">
-                <span style="position:absolute;top:7px;left:9px;font-size:11px;color:var(--text-muted);font-weight:600;">#${rankCounter}${medal}</span>
-                ${avatarMarkup(emp)}
-                <div style="font-size:12px;font-weight:600;text-align:center;line-height:1.3;color:var(--text,#111);margin-top:2px;">${emp.name.split(' ').slice(0,2).join('<br>')}</div>
-                <div style="font-size:26px;font-weight:800;color:${col};line-height:1;">${sc !== null ? sc : '—'}<span style="font-size:12px;font-weight:500;color:var(--text-muted);">/10</span></div>
-                <div style="font-size:11px;color:${col};font-weight:500;">${label}</div>
+            const verdict = isScored ? verdictLabel(sc) : '';
+            const size = emp.count >= ZRS_REQUIRED ? 72 : 60;
+            if (emp.count >= ZRS_REQUIRED) rankCounter++;
+            const medal = emp.count >= ZRS_REQUIRED ? (rankCounter === 1 ? '🥇' : rankCounter === 2 ? '🥈' : rankCounter === 3 ? '🥉' : '') : '';
+            h += `
+              <div style="position:relative;background:var(--card-bg,#fff);border:1.5px solid ${borderColor};border-radius:14px;padding:14px 10px 10px;width:${size === 72 ? 136 : 116}px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 1px 4px rgba(0,0,0,.05);">
+                ${emp.count >= ZRS_REQUIRED && medal ? `<span style="position:absolute;top:6px;left:8px;font-size:11px;">${medal}</span>` : ''}
+                ${avatarMarkup(emp, size)}
+                <div style="font-size:${size === 72 ? 12 : 11}px;font-weight:600;text-align:center;line-height:1.3;color:var(--text,#111);margin-top:2px;">${emp.name.split(' ').slice(0,2).join('<br>')}</div>
+                ${counterBadge(emp.count)}
+                ${isScored && sc !== null ? `<div style="font-size:22px;font-weight:800;color:${col};line-height:1;">${sc}<span style="font-size:11px;font-weight:500;color:var(--text-muted);">/10</span></div>
+                <div style="font-size:10px;color:${col};font-weight:500;">${verdict}</div>` : ''}
               </div>`;
           });
-          html += '</div>';
+          h += '</div>';
+          return h;
         }
 
-        // Not submitted section
-        if (notSubmitted.length) {
-          html += `<div style="font-size:12px;font-weight:700;color:#ef4444;margin-bottom:8px;letter-spacing:.5px;">❌ НЕ СДАЛИ</div>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;">`;
-          notSubmitted.forEach(emp => {
-            html += `
-              <div style="position:relative;background:var(--card-bg,#fff);border:1.5px solid #fee2e2;border-radius:14px;padding:14px 10px 10px;width:120px;display:flex;flex-direction:column;align-items:center;gap:4px;opacity:.85;">
-                ${avatarMarkup(emp, 56)}
-                <div style="font-size:11px;font-weight:600;text-align:center;line-height:1.3;color:var(--text,#111);margin-top:2px;">${emp.name.split(' ').slice(0,2).join('<br>')}</div>
-                <div style="font-size:11px;color:#ef4444;font-weight:600;">Не сдал</div>
-              </div>`;
-          });
-          html += '</div>';
-        }
+        html += renderGroup(fullGroup,    '#d1fae5', '✅ СДАЛИ ВСЕ ЗРС',    '#22a06b');
+        html += renderGroup(partialGroup, '#fef3c7', '⚠️ СДАЛИ ЧАСТИЧНО',   '#d97706');
+        html += renderGroup(noneGroup,    '#fee2e2', '❌ НЕ СДАЛИ',          '#ef4444');
 
         html += '</div>';
         ids.zrsWrap.innerHTML = html;
