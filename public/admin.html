@@ -1,0 +1,3135 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Efficiency Report — iC group Dashboard</title>
+    <meta name="robots" content="noindex,nofollow,noarchive" />
+    
+    <!-- Google Fonts: Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #fdfefe;
+        --surface: #ffffff;
+        --text-dark: #1a1a1a;
+        --text-muted: #777777;
+        --brand-green: #8ac43f;
+        --brand-green-hover: #7cb342;
+        --brand-green-light: rgba(138, 196, 63, 0.1);
+        --brand-black: #1a1a1a;
+        --border-color: rgba(233, 235, 232, 0.8);
+        --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.01);
+        --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.03);
+      }
+
+      * { 
+        box-sizing: border-box; 
+      }
+      
+      [hidden] {
+        display: none !important;
+      }
+      
+      body {
+        margin: 0;
+        font-family: 'Montserrat', "Segoe UI", Arial, sans-serif;
+        background-color: var(--bg);
+        color: var(--text-dark);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        padding-bottom: 24px;
+      }
+
+      .wrap {
+        max-width: 1500px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      body.gallery-active .wrap {
+        max-width: none;
+        padding: 0 28px;
+      }
+
+      /* Hero Section & TV Metadata */
+      .hero {
+        text-align: center;
+        margin-bottom: 16px;
+      }
+
+      .page-title {
+        font-size: 24px;
+        font-weight: 900;
+        color: var(--text-dark);
+        margin: 0;
+        letter-spacing: -0.5px;
+        text-transform: uppercase;
+      }
+
+      .text-green {
+        color: var(--brand-green);
+      }
+
+      .tv-meta {
+        font-size: 10px;
+        color: var(--text-muted);
+        font-weight: 800;
+        margin-top: 16px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        padding: 6px 16px;
+        border-radius: 30px;
+        box-shadow: var(--shadow-soft);
+      }
+      
+      .tv-meta strong {
+        color: var(--text-dark);
+      }
+      
+      .tv-meta .divider {
+        width: 1px;
+        height: 12px;
+        background-color: var(--border-color);
+        display: inline-block;
+      }
+      
+      .tv-meta .host-text {
+        color: var(--brand-green);
+      }
+
+      .refresh-link {
+        background: transparent;
+        border: none;
+        color: var(--text-dark);
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        padding: 4px 10px;
+        border-radius: 20px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+      }
+      
+      .refresh-link:hover {
+        color: var(--brand-green);
+        background: rgba(0, 0, 0, 0.04);
+      }
+      
+      .refresh-link svg {
+        transition: transform 0.3s ease;
+      }
+      
+      .refresh-link:hover svg {
+        transform: rotate(45deg);
+      }
+      
+      .refresh-link:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .period-selector {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+      }
+
+      /* Search input in toolbar */
+      .search-wrap {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        position: relative;
+      }
+      .search-input {
+        background: transparent;
+        border: none;
+        border-bottom: 1.5px solid var(--border-color);
+        color: var(--text-dark);
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        padding: 3px 18px 3px 2px;
+        width: 120px;
+        outline: none;
+        transition: border-color 0.2s, width 0.25s ease;
+        border-radius: 0;
+      }
+      .search-input::placeholder { color: var(--text-muted); font-weight: 600; }
+      .search-input:focus { border-color: var(--brand-green); width: 160px; }
+      .search-clear {
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--text-muted);
+        font-size: 12px;
+        line-height: 1;
+        padding: 0 2px;
+        display: none;
+      }
+      .search-clear.visible { display: block; }
+      .search-clear:hover { color: var(--text-dark); }
+
+      .compact-select {
+        background: transparent;
+        border: none;
+        color: var(--text-dark);
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 8px;
+        border-radius: 20px;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.2s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        padding-right: 22px;
+      }
+      
+      .compact-select:hover, .compact-select:focus {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+      
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 10px 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        box-shadow: var(--shadow-soft);
+      }
+      
+      .stat-icon-wrap {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      
+      .stat-icon {
+        width: 18px;
+        height: 18px;
+      }
+      
+      .overdue-bg { background: #fee2e2; color: #ef4444; }
+      .intime-bg { background: #dcfce7; color: #22c55e; }
+      .closed-late-bg { background: #ffedd5; color: #f97316; }
+      .closed-intime-bg { background: #e0f2fe; color: #3b82f6; }
+
+      .stat-content {
+        display: flex;
+        flex-direction: column;
+      }
+      
+      .stat-label {
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.5px;
+      }
+      
+      .stat-number {
+        font-size: 24px;
+        font-weight: 900;
+        margin-top: 2px;
+        line-height: 1;
+        color: var(--text-dark);
+      }
+
+      /* Report/Table Container */
+      .report-container {
+        margin-bottom: 24px;
+      }
+      
+      .error-panel {
+        background: #fef2f2;
+        border: 1px solid #fee2e2;
+        color: #ef4444;
+        border-radius: 16px;
+        padding: 12px 20px;
+        margin-bottom: 16px;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      
+      .loading-panel {
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 40px;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        color: var(--text-muted);
+        font-weight: 700;
+        box-shadow: var(--shadow-soft);
+      }
+      
+      .sync-indicator {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        background: rgba(26, 26, 26, 0.9);
+        color: #ffffff;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        animation: fadeIn 0.3s ease;
+      }
+      
+      .sync-spinner {
+        width: 10px;
+        height: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-top-color: var(--brand-green);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      
+      .spinner {
+        width: 32px;
+        height: 32px;
+        border: 4px solid rgba(138, 196, 63, 0.15);
+        border-top-color: var(--brand-green);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .table-card {
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: var(--shadow-soft);
+      }
+      
+      .table-scroller {
+        overflow-x: auto;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+        font-size: 12px;
+        text-align: left;
+      }
+      
+      th {
+        background: #fcfdfc;
+        color: #555555;
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.5px;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        white-space: nowrap;
+      }
+      
+      td {
+        padding: 8px 16px;
+        border-bottom: 1px solid rgba(233, 235, 232, 0.6);
+        color: #333333;
+        vertical-align: middle;
+        font-weight: 500;
+        line-height: 1.3;
+      }
+      
+      td:not(:first-child) {
+        white-space: nowrap;
+      }
+      
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      
+      tbody tr:nth-child(even) {
+        background-color: #fafbfa;
+      }
+
+      /* Bitrix Link */
+      .task-link {
+        color: var(--text-dark);
+        text-decoration: none;
+        font-weight: 500;
+        border-bottom: 1px dashed rgba(26, 26, 26, 0.3);
+      }
+      
+      .task-link:hover {
+        color: var(--brand-green);
+        border-bottom-color: var(--brand-green);
+      }
+
+      /* Tree Grid Styles */
+      .tree-row {
+        user-select: none;
+      }
+      
+      .tree-toggle {
+        display: inline-block;
+        width: 12px;
+        font-size: 9px;
+        margin-right: 6px;
+        color: var(--text-muted);
+        text-align: center;
+      }
+      
+      .tree-level-1 {
+        font-size: 13px;
+      }
+      .tree-level-1 td {
+        font-weight: 800;
+      }
+      
+      .tree-level-2 {
+        font-size: 12px;
+      }
+      .tree-level-2 td {
+        font-weight: 800;
+      }
+      
+      .tree-level-3 {
+        font-size: 11.5px;
+      }
+      
+      .tree-level-4 {
+        font-size: 11px;
+      }
+      
+      .color-success {
+        color: #16a34a !important;
+        font-weight: 800;
+      }
+      
+      .color-danger {
+        color: #ef4444 !important;
+        font-weight: 800;
+      }
+
+      /* Crown badge for department heads */
+      .head-badge {
+        display: inline-flex;
+        align-items: center;
+        font-size: 12px;
+        margin-left: 5px;
+        vertical-align: middle;
+        opacity: 0.85;
+        cursor: default;
+        filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+      }
+
+
+      .row-overdue {
+        background-color: rgba(239, 68, 68, 0.08) !important;
+      }
+      .row-today {
+        background-color: rgba(249, 115, 22, 0.1) !important;
+      }
+      .row-soon {
+        background-color: rgba(234, 179, 8, 0.06) !important;
+      }
+
+      /* Grid formatting on medium/small viewports */
+      @media (max-width: 1024px) {
+        .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      }
+
+      @media (max-width: 640px) {
+        .wrap { padding: 0 8px; }
+        .stats-grid { grid-template-columns: 1fr; }
+      }
+
+      .hide-task-details th:nth-child(2),
+      .hide-task-details td:nth-child(2),
+      .hide-task-details th:nth-child(3),
+      .hide-task-details td:nth-child(3) {
+        display: none !important;
+      }
+
+      /* View Switcher Island */
+      .view-switcher {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(0,0,0,0.04);
+        border-radius: 20px;
+        padding: 3px;
+        gap: 2px;
+      }
+      .view-btn {
+        background: transparent;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        padding: 4px 12px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+      .view-btn.active {
+        background: var(--surface);
+        color: var(--text-dark);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+      }
+      .view-btn:not(.active):hover { color: var(--text-dark); }
+
+      /* Floating chat widget */
+      .chat-fab {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
+        border: none;
+        background: var(--brand-green);
+        color: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 6px 20px rgba(138,196,63,0.45);
+        z-index: 1000;
+        transition: transform 0.18s ease, background 0.18s ease;
+      }
+      .chat-fab:hover { background: var(--brand-green-hover); transform: scale(1.06); }
+      .chat-fab.hidden-fab { transform: scale(0); opacity: 0; pointer-events: none; }
+
+      .chat-widget {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        width: 400px;
+        max-width: calc(100vw - 32px);
+        z-index: 1001;
+        animation: chatPop 0.2s ease;
+      }
+      @keyframes chatPop {
+        from { opacity: 0; transform: translateY(16px) scale(0.96); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .chat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border-color);
+        background: var(--brand-green);
+        color: #fff;
+      }
+      .chat-header-title { font-size: 13.5px; font-weight: 800; letter-spacing: 0.3px; }
+      .chat-close {
+        background: rgba(255,255,255,0.18);
+        border: none;
+        color: #fff;
+        width: 28px; height: 28px;
+        border-radius: 8px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease;
+      }
+      .chat-close:hover { background: rgba(255,255,255,0.32); }
+
+      .chat-panel {
+        display: flex;
+        flex-direction: column;
+        height: 70vh;
+        min-height: 420px;
+        max-height: 600px;
+        background: var(--surface);
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+        overflow: hidden;
+      }
+      .chat-messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .chat-msg { display: flex; }
+      .chat-msg-user { justify-content: flex-end; }
+      .chat-msg-bot { justify-content: flex-start; }
+      .chat-bubble {
+        max-width: 78%;
+        padding: 12px 16px;
+        border-radius: 16px;
+        font-size: 13.5px;
+        line-height: 1.55;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+      .chat-msg-user .chat-bubble {
+        background: var(--brand-green);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+      }
+      .chat-msg-bot .chat-bubble {
+        background: rgba(0,0,0,0.04);
+        color: var(--text-dark);
+        border-bottom-left-radius: 4px;
+      }
+      .chat-suggestions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .chat-chip {
+        background: var(--brand-green-light);
+        color: var(--brand-green-hover);
+        border: 1px solid rgba(138,196,63,0.3);
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11.5px;
+        font-weight: 700;
+        padding: 6px 12px;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .chat-chip:hover { background: var(--brand-green); color: #fff; }
+      .chat-typing { display: inline-flex; gap: 4px; align-items: center; }
+      .chat-typing span {
+        width: 6px; height: 6px; border-radius: 50%;
+        background: var(--text-muted);
+        animation: chatBlink 1.2s infinite ease-in-out;
+      }
+      .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+      .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes chatBlink { 0%,80%,100% { opacity: 0.25; } 40% { opacity: 1; } }
+      .chat-input-row {
+        display: flex;
+        gap: 10px;
+        padding: 14px 16px;
+        border-top: 1px solid var(--border-color);
+        background: var(--surface);
+      }
+      .chat-input {
+        flex: 1;
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        padding: 11px 16px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 13.5px;
+        color: var(--text-dark);
+        outline: none;
+        transition: border-color 0.15s ease;
+      }
+      .chat-input:focus { border-color: var(--brand-green); }
+      .chat-send {
+        flex-shrink: 0;
+        width: 44px; height: 44px;
+        border: none;
+        border-radius: 14px;
+        background: var(--brand-green);
+        color: #fff;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.15s ease;
+      }
+      .chat-send:hover { background: var(--brand-green-hover); }
+      .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      /* Leaderboard Table */
+      .lb-rank {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-muted);
+        min-width: 36px;
+        text-align: center;
+      }
+      .lb-medal { font-size: 18px; line-height: 1; }
+      .lb-name { font-weight: 500; font-size: 13px; }
+      .lb-dept { font-size: 10px; color: var(--text-muted); font-weight: 500; margin-top: 1px; }
+      .lb-score-pos { color: #16a34a; font-weight: 600; font-size: 15px; }
+      .lb-score-neg { color: #ef4444; font-weight: 600; font-size: 15px; }
+      .lb-score-zero { color: var(--text-muted); font-weight: 500; font-size: 15px; }
+      .lb-row-1 { background: linear-gradient(90deg, rgba(255,215,0,0.08) 0%, transparent 60%) !important; }
+      .lb-row-2 { background: linear-gradient(90deg, rgba(192,192,192,0.08) 0%, transparent 60%) !important; }
+      .lb-row-3 { background: linear-gradient(90deg, rgba(205,127,50,0.08) 0%, transparent 60%) !important; }
+
+      /* Avatars */
+      .lb-person { display: flex; align-items: center; gap: 10px; }
+      .lb-ava-wrap { display: inline-flex; flex-shrink: 0; }
+      .lb-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        object-fit: cover;
+        flex-shrink: 0;
+        background: var(--surface-muted, #eef0f4);
+        border: 1.5px solid rgba(0,0,0,0.06);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+      }
+      .lb-avatar-fallback {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        border: 1.5px solid rgba(0,0,0,0.06);
+        box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+      }
+      tr.lb-row-1 .lb-avatar, tr.lb-row-1 .lb-avatar-fallback { width: 42px; height: 42px; border-color: rgba(255,193,7,0.55); }
+      tr.lb-row-2 .lb-avatar, tr.lb-row-2 .lb-avatar-fallback { width: 38px; height: 38px; }
+      tr.lb-row-3 .lb-avatar, tr.lb-row-3 .lb-avatar-fallback { width: 38px; height: 38px; }
+
+      /* Gallery view */
+      .gallery-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(138px, 1fr));
+        gap: 10px;
+        padding: 4px;
+      }
+      .g-card {
+        position: relative;
+        background: var(--surface, #fff);
+        border: 1px solid rgba(0,0,0,0.06);
+        border-radius: 16px;
+        padding: 15px 10px 11px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+      }
+      .g-card:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.10); }
+      .g-rank {
+        position: absolute;
+        top: 10px;
+        left: 12px;
+        font-size: 12px;
+        font-weight: 800;
+        color: var(--text-muted);
+      }
+      .g-ava-wrap { position: relative; width: 80px; height: 80px; margin-bottom: 9px; }
+      .g-avatar, .g-avatar-fallback {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.14);
+      }
+      .g-avatar-fallback {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        font-weight: 700;
+        color: #fff;
+      }
+      .g-crown {
+        position: absolute;
+        top: -16px;
+        left: 50%;
+        transform: translateX(-50%) rotate(-8deg);
+        font-size: 26px;
+        line-height: 1;
+        filter: drop-shadow(0 2px 2px rgba(0,0,0,0.25));
+        pointer-events: none;
+      }
+      .g-medal {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        font-size: 22px;
+        line-height: 1;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+      }
+      .g-name {
+        font-weight: 600;
+        font-size: 13.5px;
+        color: var(--text-dark);
+        line-height: 1.35;
+        min-height: 37px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .g-dept { font-size: 10.5px; color: var(--text-muted); font-weight: 500; margin-top: 3px; min-height: 13px; }
+      .g-score {
+        margin-top: 10px;
+        font-size: 19px;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .g-score-unit { font-size: 10px; font-weight: 600; opacity: 0.7; margin-left: 2px; }
+      .g-score-pos { color: #16a34a; }
+      .g-score-neg { color: #ef4444; }
+      .g-score-zero { color: var(--text-muted); }
+      .g-meta {
+        margin-top: 11px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(0,0,0,0.06);
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px 6px;
+      }
+      .g-meta-item { display: flex; flex-direction: column; gap: 2px; align-items: center; text-align: center; }
+      .g-meta-val { font-size: 13px; font-weight: 700; color: var(--text-dark); }
+      .g-meta-val.danger { color: #ef4444; }
+      .g-meta-lbl { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1px; color: var(--text-muted); white-space: nowrap; }
+      .g-card.g-top1 { border-color: rgba(255,193,7,0.75); background: linear-gradient(180deg, rgba(255,200,0,0.16), transparent 60%); }
+      .g-card.g-top2 { border-color: rgba(160,160,168,0.7); background: linear-gradient(180deg, rgba(176,180,190,0.18), transparent 60%); }
+      .g-card.g-top3 { border-color: rgba(205,127,50,0.7); background: linear-gradient(180deg, rgba(205,127,50,0.16), transparent 60%); }
+      .g-container {
+        display: flex;
+        gap: 24px;
+        width: 100%;
+        align-items: flex-start;
+      }
+      .g-col {
+        flex: 1;
+        min-width: 0;
+        border-radius: 20px;
+        padding: 18px 18px 20px;
+        border: 1.5px solid var(--border-color);
+        background: var(--surface, #fff);
+      }
+      .g-col-winners {
+        border-color: rgba(138, 196, 63, 0.55);
+        border-width: 2px;
+        background: linear-gradient(180deg, rgba(138, 196, 63, 0.10), rgba(138, 196, 63, 0.02) 300px, transparent);
+        box-shadow: 0 8px 32px rgba(138, 196, 63, 0.15);
+        position: relative;
+        overflow: hidden;
+      }
+      .g-col-winners::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #7ab828, #a8d840);
+        border-radius: 20px 20px 0 0;
+      }
+      .g-col-losers {
+        border-color: rgba(239, 68, 68, 0.50);
+        border-width: 2px;
+        background: linear-gradient(180deg, rgba(239, 68, 68, 0.09), rgba(239, 68, 68, 0.02) 300px, transparent);
+        box-shadow: 0 8px 32px rgba(239, 68, 68, 0.12);
+        position: relative;
+        overflow: hidden;
+      }
+      .g-col-losers::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 5px;
+        background: linear-gradient(90deg, #e53e3e, #fc8181);
+        border-radius: 20px 20px 0 0;
+      }
+      @media (max-width: 768px) {
+        .g-container {
+          flex-direction: column;
+          gap: 16px;
+        }
+      }
+      .g-section-header {
+        font-size: 22px;
+        font-weight: 900;
+        margin: 8px 0 20px;
+        padding: 12px 18px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.3px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .g-winners-header {
+        color: #2d6a00;
+        background: linear-gradient(90deg, rgba(138,196,63,0.28), rgba(138,196,63,0.10));
+        border: 1.5px solid rgba(138,196,63,0.35);
+      }
+      .g-losers-header {
+        color: #b91c1c;
+        background: linear-gradient(90deg, rgba(239,68,68,0.22), rgba(239,68,68,0.08));
+        border: 1.5px solid rgba(239,68,68,0.30);
+        position: relative;
+        padding-right: 56px;
+      }
+      .g-losers-crown {
+        font-size: 38px;
+        filter: drop-shadow(0 2px 8px rgba(250, 204, 21, 0.45));
+        animation: float-crown 3s ease-in-out infinite;
+        position: absolute;
+        right: 0;
+        top: -14px;
+      }
+      @keyframes float-crown {
+        0%, 100% { transform: translateY(0) rotate(-6deg); }
+        50% { transform: translateY(-5px) rotate(6deg); }
+      }
+
+      /* AI Analysis */
+      .ai-analysis-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 14px;
+        padding: 4px;
+      }
+      .ai-card {
+        background: var(--surface, #fff);
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+      }
+      .ai-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.10); }
+      .ai-card-title { font-weight: 600; font-size: 13px; color: var(--text-dark); margin-bottom: 10px; word-break: break-word; }
+      .ai-card-value {
+        font-size: 32px;
+        font-weight: 800;
+        text-align: center;
+        margin: 12px 0;
+      }
+      .ai-value-1, .ai-value-2, .ai-value-3 { color: #ef4444; }
+      .ai-value-4, .ai-value-5, .ai-value-6 { color: #f59e0b; }
+      .ai-value-7, .ai-value-8 { color: #10b981; }
+      .ai-value-9, .ai-value-10 { color: #059669; }
+      .ai-card-rec {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-block;
+        margin-bottom: 8px;
+      }
+      .ai-rec-do { background: #dcfce7; color: #166534; }
+      .ai-rec-delegate { background: #dbeafe; color: #1e40af; }
+      .ai-rec-automate { background: #fef3c7; color: #92400e; }
+      .ai-rec-exclude { background: #fee2e2; color: #991b1b; }
+      .ai-card-routine {
+        font-size: 10px;
+        color: var(--text-muted);
+        padding-top: 8px;
+        border-top: 1px solid rgba(0,0,0,0.06);
+        margin-top: 8px;
+      }
+      .ai-card-protocol {
+        font-size: 10px;
+        color: var(--text-muted);
+        margin-top: 8px;
+        padding: 8px;
+        background: rgba(0,0,0,0.02);
+        border-radius: 6px;
+        max-height: 60px;
+        overflow-y: auto;
+        line-height: 1.4;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="syncIndicator" class="sync-indicator" hidden>
+      <span class="sync-spinner"></span>
+      Синхронизация…
+    </div>
+    <div class="wrap">
+      <!-- Main Title & TV Metadata (No Navbar) -->
+      <section class="hero" style="margin-top: 4px;">
+        <div class="tv-meta">
+          <span id="rowCount" hidden></span>
+          <span id="fetchedAt" hidden></span>
+          <span id="host" class="host-text" hidden></span>
+          
+          <button id="refreshBtn" class="refresh-link">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+            Обновить
+          </button>
+          <span class="divider"></span>
+          <span class="period-selector">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
+            Период:
+            <select id="periodSelect" class="compact-select">
+              <option value="all">Все время</option>
+              <option value="today">Сегодня</option>
+              <option value="week">Текущая неделя</option>
+              <option value="month" selected>Текущий месяц</option>
+              <option value="lastMonth">Прошлый месяц</option>
+            </select>
+          </span>
+          <span class="divider"></span>
+          <span class="search-wrap" title="Поиск по имени исполнителя">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input id="searchInput" class="search-input" type="text" placeholder="Имя исполнителя…" autocomplete="off" spellcheck="false">
+            <button id="searchClear" class="search-clear" tabindex="-1" title="Очистить">✕</button>
+          </span>
+          <span class="divider"></span>
+          <span class="view-switcher">
+            <button id="viewBtn1" class="view-btn">🏗️ Структура</button>
+            <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
+            <button id="viewBtn3" class="view-btn active">🖼️ Галерея</button>
+            <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
+            <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
+          </span>
+        </div>
+      </section>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon-wrap overdue-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Просрочено (в работе)</span>
+            <strong id="statOverdueOpen" class="stat-number">0</strong>
+          </div>
+        </div>
+        
+        <div class="stat-card">
+          <div class="stat-icon-wrap intime-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">В работе</span>
+            <strong id="statOpenInTime" class="stat-number">0</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap closed-late-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Выполнено с опозданием</span>
+            <strong id="statClosedLate" class="stat-number">0</strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-wrap closed-intime-bg">
+            <svg class="stat-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          </div>
+          <div class="stat-content">
+            <span class="stat-label">Выполнено вовремя</span>
+            <strong id="statClosedInTime" class="stat-number">0</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- Report Table Section -->
+      <div class="report-container">
+        <div id="errorBox" class="error-panel" hidden></div>
+        <div id="loadingBox" class="loading-panel">
+          <div class="spinner"></div>
+          <span>Синхронизация с базой данных…</span>
+        </div>
+
+        <div class="table-card" id="tableWrap" hidden>
+          <div class="table-scroller">
+            <table>
+              <thead><tr id="tableHead"></tr></thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="galleryWrap" hidden></div>
+        <div id="zrsWrap" hidden></div>
+
+        <div id="aiAnalysisWrap" hidden>
+          <div id="aiAnalysisLoading" class="loading-panel">
+            <div class="spinner"></div>
+            <span>Анализ задач AI…</span>
+          </div>
+          <div id="aiAnalysisContent" class="ai-analysis-container"></div>
+          <div id="aiAnalysisError" class="error-panel" hidden></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Floating AI chat widget -->
+    <button id="chatFab" class="chat-fab" title="AI-аналитик">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></svg>
+    </button>
+    <div id="chatWrap" class="chat-widget" hidden>
+      <div class="chat-panel">
+        <div class="chat-header">
+          <span class="chat-header-title">🤖 AI-аналитик</span>
+          <button id="chatClose" class="chat-close" title="Закрыть">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+        <div id="chatMessages" class="chat-messages">
+          <div class="chat-msg chat-msg-bot">
+            <div class="chat-bubble">👋 Привет! Я AI-аналитик дашборда. Спроси меня про задачи и сотрудников — например:
+              <div class="chat-suggestions">
+                <button class="chat-chip" data-q="Кто из сотрудников перегружен задачами?">Кто перегружен?</button>
+                <button class="chat-chip" data-q="Какие задачи стоит автоматизировать?">Что автоматизировать?</button>
+                <button class="chat-chip" data-q="У кого больше всего просроченных задач?">Кто срывает сроки?</button>
+                <button class="chat-chip" data-q="Как распределена нагрузка по отделам?">Нагрузка по отделам</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <form id="chatForm" class="chat-input-row">
+          <input id="chatInput" type="text" class="chat-input" placeholder="Спроси про задачи или сотрудников…" autocomplete="off" />
+          <button type="submit" id="chatSend" class="chat-send" title="Отправить">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      const state = {
+        columns: [],
+        rows: [],
+        filteredRows: [],
+        departments: [],
+        refreshTimer: null,
+        refreshIntervalMs: 5 * 60 * 1000,
+        portalHost: null,
+        searchQuery: '',
+        viewMode: 'table3', // 'table1' | 'table2' | 'table3'
+        expandedNodes: new Set()
+      };
+
+      // Module-level set of department head user IDs (built in renderTable, used in renderLeaderboard too)
+      let headUserIds = new Set();
+
+      // Сотрудники, которых не показываем в рейтинге/галерее/структуре (системные/исключённые)
+      const EXCLUDED_NAMES = ['Larion Lyan', 'Larion'];
+      function isExcludedPerson(name) {
+        if (!name) return false;
+        const n = String(name).toLowerCase();
+        return EXCLUDED_NAMES.some(ex => n.includes(ex.toLowerCase()));
+      }
+
+      const ids = {
+        host: document.getElementById('host'),
+        fetchedAt: document.getElementById('fetchedAt'),
+        rowCount: document.getElementById('rowCount'),
+        tableHead: document.getElementById('tableHead'),
+        tableBody: document.getElementById('tableBody'),
+        tableWrap: document.getElementById('tableWrap'),
+        galleryWrap: document.getElementById('galleryWrap'),
+        errorBox: document.getElementById('errorBox'),
+        loadingBox: document.getElementById('loadingBox'),
+        syncIndicator: document.getElementById('syncIndicator'),
+        statOverdueOpen: document.getElementById('statOverdueOpen'),
+        statOpenInTime: document.getElementById('statOpenInTime'),
+        statClosedLate: document.getElementById('statClosedLate'),
+        statClosedInTime: document.getElementById('statClosedInTime'),
+        refreshBtn: document.getElementById('refreshBtn'),
+        periodSelect: document.getElementById('periodSelect'),
+        searchInput: document.getElementById('searchInput'),
+        searchClear: document.getElementById('searchClear'),
+        viewBtn1: document.getElementById('viewBtn1'),
+        viewBtn2: document.getElementById('viewBtn2'),
+        viewBtn3: document.getElementById('viewBtn3'),
+        viewBtn4: document.getElementById('viewBtn4'),
+        viewBtn5: document.getElementById('viewBtn5'),
+        zrsWrap: document.getElementById('zrsWrap'),
+        aiAnalysisWrap: document.getElementById('aiAnalysisWrap'),
+        aiAnalysisLoading: document.getElementById('aiAnalysisLoading'),
+        aiAnalysisContent: document.getElementById('aiAnalysisContent'),
+        aiAnalysisError: document.getElementById('aiAnalysisError'),
+        chatFab: document.getElementById('chatFab'),
+        chatClose: document.getElementById('chatClose'),
+        chatWrap: document.getElementById('chatWrap'),
+        chatMessages: document.getElementById('chatMessages'),
+        chatForm: document.getElementById('chatForm'),
+        chatInput: document.getElementById('chatInput'),
+        chatSend: document.getElementById('chatSend')
+      };
+
+      ids.host.textContent = window.location.host;
+
+
+      function normalize(value) {
+        return String(value ?? '').toLowerCase().trim();
+      }
+
+      function formatDate(value) {
+        if (!value) return '—';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return value;
+        
+        const datePart = new Intl.DateTimeFormat('ru-RU', {
+          day: 'numeric',
+          month: 'long'
+        }).format(date);
+        
+        const timePart = new Intl.DateTimeFormat('ru-RU', {
+          timeStyle: 'medium'
+        }).format(date);
+        
+        return `${datePart}, ${timePart}`;
+      }
+
+      function removeYear(rawDate, formattedFallback) {
+        const val = rawDate || formattedFallback;
+        if (!val || val === '—') return '—';
+        const date = new Date(val);
+        if (Number.isNaN(date.getTime())) {
+          return String(val).replace(/\.\d{4}/g, '').replace(' ', ' | ');
+        }
+        
+        const datePart = new Intl.DateTimeFormat('ru-RU', {
+          day: 'numeric',
+          month: 'long'
+        }).format(date);
+        
+        const pad = (n) => String(n).padStart(2, '0');
+        const timePart = `${pad(date.getHours())}:${pad(date.getMinutes())}`;
+        
+        return `${datePart} | ${timePart}`;
+      }
+
+      function formatShortName(fullName) {
+        if (!fullName || fullName === '—') return '—';
+        const parts = fullName.trim().split(/\s+/);
+        if (parts.length === 1) return parts[0];
+        if (parts.length >= 2) {
+          const firstName = parts[0];
+          const lastName = parts[1];
+          return `${firstName} ${lastName.charAt(0)}.`;
+        }
+        return fullName;
+      }
+
+      function parseDateStr(str) {
+        if (!str || str === '—') return null;
+        const parts = str.split(' ');
+        if (parts.length < 1) return null;
+        const dateParts = parts[0].split('.');
+        if (dateParts.length < 3) return null;
+        
+        const day = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10) - 1;
+        const year = parseInt(dateParts[2], 10);
+        
+        let hour = 0;
+        let minute = 0;
+        if (parts.length > 1) {
+          const timeParts = parts[1].split(':');
+          if (timeParts.length >= 2) {
+            hour = parseInt(timeParts[0], 10);
+            minute = parseInt(timeParts[1], 10);
+          }
+        }
+        return new Date(year, month, day, hour, minute);
+      }
+
+      function renderStats(rows) {
+        const counts = {
+          'Открыта просрочена': 0,
+          'Открыта в срок': 0,
+          'Закрыта с просрочкой': 0,
+          'Закрыта в срок': 0
+        };
+
+        rows.forEach((row) => {
+          let key = row['Состояние задачи'];
+          if (key === 'Без дедлайна') {
+            key = 'Открыта в срок';
+          }
+          if (Object.prototype.hasOwnProperty.call(counts, key)) {
+            counts[key] += 1;
+          }
+        });
+
+        ids.statOverdueOpen.textContent = counts['Открыта просрочена'];
+        ids.statOpenInTime.textContent = counts['Открыта в срок'] + counts['Открыта просрочена'];
+        ids.statClosedLate.textContent = counts['Закрыта с просрочкой'];
+        ids.statClosedInTime.textContent = counts['Закрыта в срок'];
+      }
+
+      // ── Shared formatters (used by both views) ───────────────────────
+      function formatTasks(count) {
+        return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">шт.</span>`;
+      }
+      function formatDays(count) {
+        return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">дн.</span>`;
+      }
+      function formatPoints(count) {
+        const abs = Math.abs(count);
+        let unit = 'баллов';
+        if (abs % 1 !== 0) {
+          unit = 'балла';
+        } else if (abs % 100 < 11 || abs % 100 > 19) {
+          const lastDigit = abs % 10;
+          if (lastDigit === 1) unit = 'балл';
+          else if (lastDigit >= 2 && lastDigit <= 4) unit = 'балла';
+        }
+        return `${count} <span style="font-size: 9.5px; font-weight: 500; opacity: 0.75; margin-left: 2px;">${unit}</span>`;
+      }
+
+      // Importance V (1-10) cell with color: high=green, mid=neutral, low=muted
+      function formatImportance(v) {
+        const val = parseFloat(v);
+        if (!val || isNaN(val)) return '<span style="color:var(--text-muted);">—</span>';
+        let color = 'var(--text-muted)';
+        if (val >= 7) color = '#16a34a';
+        else if (val >= 5) color = 'var(--text-dark)';
+        return `<span style="font-weight:700;color:${color};">${val}</span><span style="font-size:9.5px;font-weight:500;opacity:0.6;margin-left:1px;">/10</span>`;
+      }
+
+      // Средняя важность по списку задач (для строк сотрудников)
+      function avgImportance(tasks) {
+        const vals = (tasks || []).map(t => parseFloat(t.importance)).filter(v => v && !isNaN(v));
+        if (!vals.length) return '<span style="color:var(--text-muted);">—</span>';
+        const avg = Math.round((vals.reduce((s, v) => s + v, 0) / vals.length) * 10) / 10;
+        return formatImportance(avg);
+      }
+
+      // ── Leaderboard (Table 2) ─────────────────────────────────────────
+      // Deterministic color for avatar fallback initials
+      function avatarColor(seed) {
+        let hash = 0;
+        const str = String(seed || '');
+        for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+        const hue = Math.abs(hash) % 360;
+        return `hsl(${hue}, 55%, 52%)`;
+      }
+
+      // First word on line 1, the rest on line 2
+      function formatNameTwoLines(name) {
+        const parts = String(name || '').trim().split(/\s+/).filter(Boolean);
+        if (parts.length <= 1) return escapeHtml(parts[0] || '');
+        return `${escapeHtml(parts[0])}<br>${escapeHtml(parts.slice(1).join(' '))}`;
+      }
+
+      function getInitials(name) {
+        const parts = String(name || '').trim().split(/\s+/);
+        if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return (parts[0] || '?').slice(0, 2).toUpperCase();
+      }
+
+      function avatarMarkup(emp) {
+        const initials = escapeHtml(getInitials(emp.name));
+        const color = avatarColor(emp.id || emp.name);
+        const fallback = (hidden) =>
+          `<div class="lb-avatar-fallback" style="${hidden ? 'display:none;' : ''}background:${color};">${initials}</div>`;
+        if (emp.avatar) {
+          const safeUrl = escapeHtml(emp.avatar);
+          return `<span class="lb-ava-wrap">` +
+            `<img class="lb-avatar" src="${safeUrl}" alt="${escapeHtml(emp.name)}" loading="lazy" referrerpolicy="no-referrer" ` +
+            `onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` +
+            fallback(true) +
+            `</span>`;
+        }
+        return fallback(false);
+      }
+
+      // Балл исполнителя за задачу = важность AI (V, 1-10) × доля за статус.
+      // Доли: закрыта в срок=1.0, с просрочкой=0.6, открыта в срок=0.4, без дедлайна=0.2, просрочена=0.
+      // Эти доли совпадают со старым статус-баллом (0-5), делённым на 5.
+      function taskExecutorScore(row) {
+        const V = parseFloat(row['AI важность']) || 0;
+        const statusPts = parseFloat(row['Баллы эффективности']) || 0; // 0,1,2,3,5
+        return Math.round(V * (statusPts / 5));
+      }
+      // Соисполнитель получает 0.8 от балла исполнителя (округляем)
+      function taskAccompliceScore(row) {
+        return Math.round(taskExecutorScore(row) * 0.8);
+      }
+
+      // Aggregate filtered rows into sorted people (shared by Rating & Gallery)
+      function aggregatePeople() {
+        const empMap = {};
+        state.filteredRows.forEach(row => {
+          const name = row['Исполнитель'] || 'Без исполнителя';
+          const id   = String(row['ID исполнителя'] || '');
+          const dept = row['Отдел'] || '';
+          if (name && name !== 'Без исполнителя') {
+            if (!empMap[name]) {
+              empMap[name] = {
+                name,
+                id,
+                dept,
+                avatar: row['Аватар'] || '',
+                tasks: 0,
+                active: 0,
+                overdue: 0,
+                score: 0,
+                assignedCount: 0,
+                assignedToOtherDepts: 0
+              };
+            }
+            const e = empMap[name];
+            if (!e.avatar && row['Аватар']) e.avatar = row['Аватар'];
+            e.tasks++;
+            const state_ = row['Состояние задачи'] || '';
+            if (!state_.startsWith('Закрыта')) e.active++;
+            e.overdue += parseInt(row['Просрочка, дней']) || 0;
+            // Балл = важность AI × доля за статус
+            e.score   += taskExecutorScore(row);
+          }
+
+          // Process accomplices (co-executors)
+          try {
+            const accomplicesJson = row['Соисполнители'] || '[]';
+            const accomplices = typeof accomplicesJson === 'string' ? JSON.parse(accomplicesJson) : accomplicesJson;
+            if (Array.isArray(accomplices)) {
+              accomplices.forEach(acc => {
+                if (acc.name && acc.name !== 'Без исполнителя') {
+                  if (!empMap[acc.name]) {
+                    empMap[acc.name] = {
+                      name: acc.name,
+                      id: acc.id,
+                      dept: acc.dept,
+                      avatar: acc.avatar || '',
+                      tasks: 0,
+                      active: 0,
+                      overdue: 0,
+                      score: 0,
+                      assignedCount: 0,
+                      assignedToOtherDepts: 0
+                    };
+                  }
+                  const e = empMap[acc.name];
+                  if (!e.avatar && acc.avatar) e.avatar = acc.avatar;
+                  e.tasks++;
+                  const state_ = row['Состояние задачи'] || '';
+                  if (!state_.startsWith('Закрыта')) e.active++;
+                  e.overdue += parseInt(row['Просрочка, дней']) || 0;
+                  // Соисполнитель = балл исполнителя × 0.8
+                  e.score   += taskAccompliceScore(row);
+                }
+              });
+            }
+          } catch (err) {
+            // Ignore accomplices parsing errors
+          }
+
+          const creatorName = row['Постановщик'];
+          const creatorId   = String(row['ID постановщика'] || '');
+          const creatorDept = row['Отдел постановщика'] || 'Без отдела';
+          const executorDept = row['Отдел'] || 'Без отдела';
+          // Нельзя «поручить» задачу самому себе — бонус постановщика не начисляем
+          const selfAssigned = creatorId && String(row['ID исполнителя'] || '') === creatorId;
+          if (creatorName && creatorName !== 'Без постановщика' && !selfAssigned) {
+            if (!empMap[creatorName]) {
+              empMap[creatorName] = {
+                name: creatorName,
+                id: creatorId,
+                dept: creatorDept,
+                avatar: row['Аватар постановщика'] || '',
+                tasks: 0,
+                active: 0,
+                overdue: 0,
+                score: 0,
+                assignedCount: 0,
+                assignedToOtherDepts: 0
+              };
+            }
+            if (!empMap[creatorName].avatar && row['Аватар постановщика']) {
+              empMap[creatorName].avatar = row['Аватар постановщика'];
+            }
+            empMap[creatorName].assignedCount++;
+            if (creatorDept !== executorDept) {
+              empMap[creatorName].assignedToOtherDepts++;
+              // Поручение в другой отдел = +0.5 × важность задачи (V)
+              empMap[creatorName].score += Math.round(0.5 * (parseFloat(row['AI важность']) || 0));
+            } else {
+              // Поручение внутри своего отдела = +1 балл
+              empMap[creatorName].score += 1;
+            }
+          }
+        });
+
+        // Keep only real users — skip department/group "assignees" that have no valid user ID
+        const realPeople = Object.values(empMap).filter(emp => emp.id && /^\d+$/.test(emp.id) && emp.id !== '0' && !isExcludedPerson(emp.name));
+
+        // Filter by name search query if any
+        let displayPeople = realPeople;
+        const q = state.searchQuery.toLowerCase().trim();
+        if (q) {
+          displayPeople = realPeople.filter(emp => emp.name.toLowerCase().includes(q));
+        }
+
+        // Sort by score desc, then by name asc
+        return displayPeople.sort((a, b) =>
+          b.score !== a.score ? b.score - a.score : a.name.localeCompare(b.name, 'ru')
+        );
+      }
+
+      function renderLeaderboard() {
+        const sorted = aggregatePeople();
+
+        const medals = ['🥇', '🥈', '🥉'];
+        const rowClasses = ['lb-row-1', 'lb-row-2', 'lb-row-3'];
+
+        const headers = ['#', 'Сотрудник', 'Задач', 'В работе', 'Поручил', 'Просрочка, дн.', 'Баллы'];
+        ids.tableHead.innerHTML = headers.map((h, i) => i === 4
+          ? `<th>${h} <span style="font-size:10px;font-weight:500;opacity:0.6;">(в отд. / вне отд.)</span></th>`
+          : `<th>${h}</th>`
+        ).join('');
+
+        if (sorted.length === 0) {
+          ids.tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных</td></tr>`;
+        } else {
+          ids.tableBody.innerHTML = sorted.map((emp, i) => {
+            const rank = i + 1;
+            const rowCls = rowClasses[i] || '';
+            const rankCell = rank <= 3
+              ? `<td class="lb-rank"><span class="lb-medal">${medals[i]}</span></td>`
+              : `<td class="lb-rank">${rank}</td>`;
+            const headIcon = ' 👤';
+            const scoreClass = emp.score > 0 ? 'lb-score-pos' : emp.score < 0 ? 'lb-score-neg' : 'lb-score-zero';
+            const scoreSign = emp.score > 0 ? '+' : '';
+            return `
+              <tr class="${rowCls}">
+                ${rankCell}
+                <td>
+                  <div class="lb-name">${headIcon} ${escapeHtml(emp.name)}</div>
+                </td>
+                <td>${formatTasks(emp.tasks)}</td>
+                <td>${formatTasks(emp.active)}</td>
+                <td>${formatTasks(emp.assignedCount - emp.assignedToOtherDepts)}/${formatTasks(emp.assignedToOtherDepts)}</td>
+                <td class="${emp.overdue > 0 ? 'color-danger' : ''}">${formatDays(emp.overdue)}</td>
+                <td class="${scoreClass}">${scoreSign}${emp.score} <span style="font-size:9.5px;font-weight:500;opacity:0.75;margin-left:2px;">${scoreSign}${Math.abs(emp.score) === 1 ? 'балл' : (Math.abs(emp.score) >= 2 && Math.abs(emp.score) <= 4) ? 'балла' : 'баллов'}</span></td>
+              </tr>`;
+          }).join('');
+        }
+
+        ids.tableWrap.hidden = false;
+        renderStats(state.filteredRows);
+
+        const table = document.querySelector('table');
+        if (table) {
+          table.classList.remove('hide-task-details');
+        }
+      }
+
+      // Large avatar for gallery cards
+      function galleryAvatarMarkup(emp) {
+        const initials = escapeHtml(getInitials(emp.name));
+        const color = avatarColor(emp.id || emp.name);
+        const fallback = (hidden) =>
+          `<div class="g-avatar-fallback" style="${hidden ? 'display:none;' : ''}background:${color};">${initials}</div>`;
+        if (emp.avatar) {
+          const safeUrl = escapeHtml(emp.avatar);
+          return `<img class="g-avatar" src="${safeUrl}" alt="${escapeHtml(emp.name)}" loading="lazy" referrerpolicy="no-referrer" ` +
+            `onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">` +
+            fallback(true);
+        }
+        return fallback(false);
+      }
+
+      // ── Gallery (Table 3) ─────────────────────────────────────────────
+      function renderGallery() {
+        ids.aiAnalysisWrap.hidden = true;
+        ids.zrsWrap.hidden = true;
+        ids.galleryWrap.hidden = false;
+        ids.tableWrap.hidden = true;
+
+        const sorted = aggregatePeople();
+        const medals = ['🥇', '🥈', '🥉'];
+        const topCls = ['g-top1', 'g-top2', 'g-top3'];
+
+        if (sorted.length === 0) {
+          ids.galleryWrap.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px;">Нет данных</div>`;
+        } else {
+          const half = Math.ceil(sorted.length / 2);
+          const winners = sorted.slice(0, half);
+          const losers = sorted.slice(half);
+
+          let html = '<div class="g-container">';
+
+          // 1. Winners Section
+          html += `
+            <div class="g-col g-col-winners">
+              <div class="g-section-header g-winners-header">
+                Победители
+              </div>
+              <div class="gallery-grid">
+          `;
+          html += winners.map((emp, i) => {
+            const rank = i + 1;
+            const isHead = headUserIds && headUserIds.has(emp.id);
+            const scoreClass = emp.score > 0 ? 'g-score-pos' : emp.score < 0 ? 'g-score-neg' : 'g-score-zero';
+            const crown = '';
+            const medal = rank <= 3 ? `<span class="g-medal">${medals[i]}</span>` : '';
+            return `
+              <div class="g-card ${topCls[i] || ''}">
+                <span class="g-rank">#${rank}</span>
+                <div class="g-ava-wrap">
+                  ${galleryAvatarMarkup(emp)}
+                  ${crown}
+                  ${medal}
+                </div>
+                <div class="g-name">${formatNameTwoLines(emp.name)}</div>
+                <div class="g-score ${scoreClass}">${emp.score}</div>
+                <div class="g-meta">
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val">${emp.assignedCount - emp.assignedToOtherDepts}/${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
+                  <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср. дн.</span></div>
+                </div>
+              </div>`;
+          }).join('');
+          html += '</div></div>';
+
+          // 2. Losers Section
+          if (losers.length > 0) {
+            html += `
+              <div class="g-col g-col-losers">
+                <div class="g-section-header g-losers-header">
+                  Лузеры
+                  <div class="g-losers-crown">👑</div>
+                </div>
+                <div class="gallery-grid">
+            `;
+            html += losers.map((emp, i) => {
+              const rank = half + i + 1;
+              const scoreClass = emp.score > 0 ? 'g-score-pos' : emp.score < 0 ? 'g-score-neg' : 'g-score-zero';
+              return `
+                <div class="g-card">
+                  <span class="g-rank">#${rank}</span>
+                  <div class="g-ava-wrap">
+                    ${galleryAvatarMarkup(emp)}
+                  </div>
+                  <div class="g-name">${formatNameTwoLines(emp.name)}</div>
+                  <div class="g-score ${scoreClass}">${emp.score}</div>
+                  <div class="g-meta">
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.score < 0 ? `${emp.tasks - emp.active}/${emp.active}` : emp.tasks}</span><span class="g-meta-lbl">${emp.score < 0 ? 'вып/не вып' : 'Задач'}</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.active}</span><span class="g-meta-lbl">В работе</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val">${emp.assignedCount - emp.assignedToOtherDepts}/${emp.assignedToOtherDepts}</span><span class="g-meta-lbl">Поручил</span></div>
+                    <div class="g-meta-item"><span class="g-meta-val ${emp.overdue > 0 ? 'danger' : ''}">${emp.overdue}</span><span class="g-meta-lbl">Проср. дн.</span></div>
+                  </div>
+                </div>`;
+            }).join('');
+            html += '</div></div>';
+          }
+
+          html += '</div>';
+          ids.galleryWrap.innerHTML = html;
+        }
+
+        ids.galleryWrap.hidden = false;
+        ids.tableWrap.hidden = true;
+        renderStats(state.filteredRows);
+      }
+
+      // ── ZRS Gallery (Table 5) ─────────────────────────────────────────────
+      function renderZRSGallery() {
+        ids.galleryWrap.hidden = true;
+        ids.aiAnalysisWrap.hidden = true;
+        ids.tableWrap.hidden = true;
+        ids.zrsWrap.hidden = false;
+
+        const ZRS_REQUIRED = 2;
+
+        // Build allowed АУП dept names (ID 157 and descendants)
+        const allowedDeptNames = new Set();
+        if (state.departments && state.departments.length > 0) {
+          const allowedIds = new Set(['157']);
+          let added = true;
+          while (added) {
+            added = false;
+            state.departments.forEach(d => {
+              const pid = String(d.PARENT || '');
+              const id = String(d.ID);
+              if (pid && allowedIds.has(pid) && !allowedIds.has(id)) { allowedIds.add(id); added = true; }
+            });
+          }
+          state.departments.forEach(d => { if (allowedIds.has(String(d.ID))) allowedDeptNames.add(d.NAME); });
+        }
+
+        // Compute period bounds (mirrors applyFilters logic)
+        const period = ids.periodSelect ? ids.periodSelect.value : 'week';
+        const now = new Date();
+        let periodStart = null, periodEnd = null;
+        if (period !== 'all') {
+          const day = now.getDay();
+          const diffToMon = now.getDate() - day + (day === 0 ? -6 : 1);
+          const startWeek = new Date(now.getFullYear(), now.getMonth(), diffToMon, 0, 0, 0, 0);
+          const endWeek   = new Date(startWeek.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
+          if (period === 'today') {
+            periodStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+            periodEnd   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+          } else if (period === 'week') {
+            periodStart = startWeek; periodEnd = endWeek;
+          } else if (period === 'month') {
+            periodStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+            periodEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+          } else if (period === 'lastMonth') {
+            periodStart = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+            periodEnd   = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+          }
+        }
+
+        // Parse AI score from task description: "🤖 AI АНАЛИЗ: X/10"
+        function parseAIScore(desc) {
+          const m = (desc || '').match(/AI АНАЛИЗ[:\s]+(\d+)\/10/);
+          return m ? parseInt(m[1]) : null;
+        }
+
+        // Find ZRS tasks in ALL rows (no dept filter — executor is manager, not employee)
+        const zrsRows = state.rows.filter(r => {
+          if (!(r['Название задачи'] || '').startsWith('ЗРС |')) return false;
+          if (periodStart && periodEnd) {
+            const dl = r['deadlineRaw'] ? new Date(r['deadlineRaw']) : parseDateStr(r['Дедлайн']);
+            if (!dl || dl < periodStart || dl > periodEnd) return false;
+          }
+          return true;
+        });
+
+        // Group ZRS by Постановщик (the employee who filed it)
+        const zrsByEmployee = {};
+        for (const row of zrsRows) {
+          const name = row['Постановщик'] || '';
+          if (!name || isExcludedPerson(name)) continue;
+          if (!zrsByEmployee[name]) zrsByEmployee[name] = { avatar: row['Аватар постановщика'] || '', entries: [] };
+          zrsByEmployee[name].entries.push(row);
+        }
+
+        // Collect ALL unique АУП employees from full dataset (state.rows)
+        const empMap = {};
+        for (const row of state.rows) {
+          const dept = row['Отдел'] || '';
+          if (allowedDeptNames.size > 0 && !allowedDeptNames.has(dept)) continue;
+          const name = row['Исполнитель'];
+          if (!name || isExcludedPerson(name)) continue;
+          if (!empMap[name]) empMap[name] = { name, id: String(row['ID исполнителя'] || ''), avatar: row['Аватар'] || '', dept };
+          if (!empMap[name].avatar && row['Аватар']) empMap[name].avatar = row['Аватар'];
+        }
+
+        // Also add anyone who filed ZRS but wasn't in empMap
+        for (const [name, data] of Object.entries(zrsByEmployee)) {
+          if (!empMap[name] && !isExcludedPerson(name)) {
+            empMap[name] = { name, id: '', avatar: data.avatar, dept: '' };
+          }
+        }
+
+        // Build employee cards
+        const employees = Object.values(empMap).map(emp => {
+          const zrs = zrsByEmployee[emp.name];
+          const entries = zrs ? zrs.entries : [];
+          const scores = entries.map(r => parseAIScore(r['Описание'])).filter(s => s !== null);
+          const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+          // Use avatar from ZRS entry if better
+          const avatar = emp.avatar || (zrs ? zrs.avatar : '');
+          return { ...emp, avatar, count: entries.length, avgScore, submitted: entries.length > 0 };
+        });
+
+        // Sort: full submitters first (count >= ZRS_REQUIRED) by score, partial next, non-submitted last
+        employees.sort((a, b) => {
+          const aFull = a.count >= ZRS_REQUIRED, bFull = b.count >= ZRS_REQUIRED;
+          const aAny = a.submitted, bAny = b.submitted;
+          if (aFull && !bFull) return -1;
+          if (!aFull && bFull) return 1;
+          if (aAny && !bAny) return -1;
+          if (!aAny && bAny) return 1;
+          if (aAny && bAny) {
+            if (a.avgScore === null && b.avgScore === null) return 0;
+            if (a.avgScore === null) return 1;
+            if (b.avgScore === null) return -1;
+            return b.avgScore - a.avgScore;
+          }
+          return a.name.localeCompare(b.name, 'ru');
+        });
+
+        const fullCount    = employees.filter(e => e.count >= ZRS_REQUIRED).length;
+        const partialCount = employees.filter(e => e.submitted && e.count < ZRS_REQUIRED).length;
+        const noneCount    = employees.filter(e => !e.submitted).length;
+
+        function scoreColor(s) {
+          if (s === null) return 'var(--text-muted)';
+          if (s >= 8) return '#22a06b';
+          if (s >= 6) return '#f59e0b';
+          return '#ef4444';
+        }
+
+        function verdictLabel(s) {
+          if (s === null) return '—';
+          if (s >= 8) return 'отлично';
+          if (s >= 6) return 'хорошо';
+          return 'нужно улучшить';
+        }
+
+        function avatarMarkup(emp, size = 72) {
+          if (emp.avatar) return `<img src="${emp.avatar}" style="width:${size}px;height:${size}px;border-radius:50%;object-fit:cover;">`;
+          const initials = emp.name.split(' ').slice(0, 2).map(w => w[0] || '').join('').toUpperCase();
+          const colors = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6'];
+          const color = colors[(emp.name.charCodeAt(0) || 0) % colors.length];
+          return `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.3)}px;font-weight:700;color:#fff;">${initials}</div>`;
+        }
+
+        function counterBadge(count) {
+          const color = count >= ZRS_REQUIRED ? '#22a06b' : count > 0 ? '#f59e0b' : '#ef4444';
+          return `<div style="font-size:12px;font-weight:700;color:${color};">${count}/${ZRS_REQUIRED} ЗРС</div>`;
+        }
+
+        let rankCounter = 0;
+        let html = `<div style="padding:16px 8px;">
+          <div style="font-size:13px;color:var(--text-muted);margin-bottom:16px;padding:0 4px;">
+            ✅ Сдали все: <b style="color:#22a06b">${fullCount}</b>
+            · ⚠️ Частично: <b style="color:#f59e0b">${partialCount}</b>
+            · ❌ Не сдали: <b style="color:#ef4444">${noneCount}</b>
+            · Всего: <b>${employees.length}</b>
+          </div>`;
+
+        const fullGroup    = employees.filter(e => e.count >= ZRS_REQUIRED);
+        const partialGroup = employees.filter(e => e.submitted && e.count < ZRS_REQUIRED);
+        const noneGroup    = employees.filter(e => !e.submitted);
+
+        function renderGroup(group, borderColor, label, labelColor) {
+          if (!group.length) return '';
+          let h = `<div style="font-size:12px;font-weight:700;color:${labelColor};margin-bottom:8px;letter-spacing:.5px;">${label}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:20px;">`;
+          group.forEach(emp => {
+            const isScored = emp.submitted;
+            const sc = emp.avgScore;
+            const col = scoreColor(sc);
+            const verdict = isScored ? verdictLabel(sc) : '';
+            const size = emp.count >= ZRS_REQUIRED ? 72 : 60;
+            if (emp.count >= ZRS_REQUIRED) rankCounter++;
+            const medal = emp.count >= ZRS_REQUIRED ? (rankCounter === 1 ? '🥇' : rankCounter === 2 ? '🥈' : rankCounter === 3 ? '🥉' : '') : '';
+            h += `
+              <div style="position:relative;background:var(--card-bg,#fff);border:1.5px solid ${borderColor};border-radius:14px;padding:14px 10px 10px;width:${size === 72 ? 136 : 116}px;display:flex;flex-direction:column;align-items:center;gap:4px;box-shadow:0 1px 4px rgba(0,0,0,.05);">
+                ${emp.count >= ZRS_REQUIRED && medal ? `<span style="position:absolute;top:6px;left:8px;font-size:11px;">${medal}</span>` : ''}
+                ${avatarMarkup(emp, size)}
+                <div style="font-size:${size === 72 ? 12 : 11}px;font-weight:600;text-align:center;line-height:1.3;color:var(--text,#111);margin-top:2px;">${emp.name.split(' ').slice(0,2).join('<br>')}</div>
+                ${counterBadge(emp.count)}
+                ${isScored && sc !== null ? `<div style="font-size:22px;font-weight:800;color:${col};line-height:1;">${sc}<span style="font-size:11px;font-weight:500;color:var(--text-muted);">/10</span></div>
+                <div style="font-size:10px;color:${col};font-weight:500;">${verdict}</div>` : ''}
+              </div>`;
+          });
+          h += '</div>';
+          return h;
+        }
+
+        html += renderGroup(fullGroup,    '#d1fae5', '✅ СДАЛИ ВСЕ ЗРС',    '#22a06b');
+        html += renderGroup(partialGroup, '#fef3c7', '⚠️ СДАЛИ ЧАСТИЧНО',   '#d97706');
+        html += renderGroup(noneGroup,    '#fee2e2', '❌ НЕ СДАЛИ',          '#ef4444');
+
+        html += '</div>';
+        ids.zrsWrap.innerHTML = html;
+        renderStats(state.filteredRows);
+      }
+
+      // ── AI Analysis (Table 4) ───────────────────────────────────────────
+      async function renderAIAnalysis() {
+        ids.aiAnalysisWrap.hidden = false;
+        ids.tableWrap.hidden = true;
+        ids.galleryWrap.hidden = true;
+        ids.aiAnalysisLoading.hidden = false;
+        ids.aiAnalysisContent.innerHTML = '';
+        ids.aiAnalysisError.hidden = true;
+
+        try {
+          // Prepare tasks for analysis
+          const tasks = state.filteredRows.map(row => ({
+            id: row['ID задачи'],
+            title: row['Название задачи'],
+            description: row['Описание'],
+            executor: row['Исполнитель'],
+            department: row['Отдел'],
+            deadline: row['Дедлайн'],
+            status: row['Состояние задачи']
+          }));
+
+          if (tasks.length === 0) {
+            ids.aiAnalysisLoading.hidden = true;
+            ids.aiAnalysisContent.innerHTML = '<div style="text-align:center;color:var(--text-muted);padding:32px;">Нет задач для анализа</div>';
+            return;
+          }
+
+          // Call AI analysis API
+          const response = await fetch('/api/ai-analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tasks })
+          });
+
+          if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error || 'AI analysis failed');
+          }
+
+          const result = await response.json();
+          if (!result.ok) {
+            throw new Error(result.error || 'Analysis returned error');
+          }
+
+          // Render analysis cards
+          const html = result.analyses.map((analysis) => {
+            const recClass = `ai-rec-${analysis.recommendation === 'делать' ? 'do' : analysis.recommendation === 'делегировать' ? 'delegate' : analysis.recommendation === 'автоматизировать' ? 'automate' : 'exclude'}`;
+            const valueClass = `ai-value-${analysis.value}`;
+            const routineText = analysis.isRoutine ? 'Типовая задача' : 'Уникальная задача';
+            return `
+              <div class="ai-card">
+                <div class="ai-card-title">${escapeHtml(analysis.title)}</div>
+                <div class="ai-card-value ${valueClass}">${analysis.value}</div>
+                <div class="ai-card-rec ${recClass}">${escapeHtml(analysis.recommendation)}</div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:8px;">${escapeHtml(analysis.reasoning)}</div>
+                <div class="ai-card-routine">${routineText}</div>
+                <div class="ai-card-protocol" title="${escapeHtml(analysis.protocol)}">${escapeHtml(analysis.protocol)}</div>
+              </div>`;
+          }).join('');
+
+          ids.aiAnalysisContent.innerHTML = html;
+          ids.aiAnalysisLoading.hidden = true;
+          renderStats(state.filteredRows);
+        } catch (error) {
+          ids.aiAnalysisLoading.hidden = true;
+          ids.aiAnalysisError.hidden = false;
+          ids.aiAnalysisError.textContent = 'Ошибка анализа: ' + error.message;
+          console.error('AI analysis error:', error);
+        }
+      }
+
+      // ── Chat ──────────────────────────────────────────────────────────
+      const chatState = { history: [], busy: false };
+
+      function openChat() {
+        ids.chatWrap.hidden = false;
+        ids.chatFab.classList.add('hidden-fab');
+        setTimeout(() => ids.chatInput && ids.chatInput.focus(), 60);
+      }
+      function closeChat() {
+        ids.chatWrap.hidden = true;
+        ids.chatFab.classList.remove('hidden-fab');
+      }
+
+      function formatChatText(text) {
+        // Escape HTML, then apply minimal markdown (bold + bullet markers)
+        const esc = text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+        return esc
+          .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+          .replace(/^\s*\*\s+/gm, '• ')
+          .replace(/^\s*-\s+/gm, '• ');
+      }
+
+      function appendChatMessage(role, text) {
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-msg ' + (role === 'user' ? 'chat-msg-user' : 'chat-msg-bot');
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble';
+        if (role === 'user') {
+          bubble.textContent = text;
+        } else {
+          bubble.innerHTML = formatChatText(text);
+        }
+        wrap.appendChild(bubble);
+        ids.chatMessages.appendChild(wrap);
+        ids.chatMessages.scrollTop = ids.chatMessages.scrollHeight;
+        return bubble;
+      }
+
+      function showChatTyping() {
+        const wrap = document.createElement('div');
+        wrap.className = 'chat-msg chat-msg-bot';
+        wrap.id = 'chatTyping';
+        wrap.innerHTML = '<div class="chat-bubble"><span class="chat-typing"><span></span><span></span><span></span></span></div>';
+        ids.chatMessages.appendChild(wrap);
+        ids.chatMessages.scrollTop = ids.chatMessages.scrollHeight;
+      }
+      function removeChatTyping() {
+        const t = document.getElementById('chatTyping');
+        if (t) t.remove();
+      }
+
+      async function sendChatMessage(message) {
+        if (!message || chatState.busy) return;
+        chatState.busy = true;
+        ids.chatSend.disabled = true;
+        ids.chatInput.value = '';
+
+        appendChatMessage('user', message);
+        chatState.history.push({ role: 'user', text: message });
+        showChatTyping();
+
+        // Compact task payload for the AI (filtered by current period to match the leaderboard)
+        const tasks = state.filteredRows.map(row => ({
+          title: row['Название задачи'],
+          executor: row['Исполнитель'],
+          department: row['Отдел'],
+          creatorDept: row['Отдел постановщика'],
+          creator: row['Постановщик'],
+          status: row['Состояние задачи'],
+          importance: row['AI важность'],            // V (1-10), оценка AI
+          points: taskExecutorScore(row),            // балл исполнителя за эту задачу
+          deadline: row['Дедлайн']
+        }));
+
+        // Authoritative aggregated leaderboard (same numbers shown on the dashboard)
+        const people = aggregatePeople().map((emp, i) => ({
+          rank: i + 1,
+          name: emp.name,
+          department: emp.dept,
+          totalScore: Math.round(emp.score * 10) / 10,
+          tasks: emp.tasks,
+          active: emp.active,
+          assigned: emp.assignedCount,
+          overdueDays: emp.overdue
+        }));
+
+        try {
+          const resp = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message, tasks, people, history: chatState.history.slice(0, -1) })
+          });
+          const data = await resp.json();
+          removeChatTyping();
+          if (data.ok) {
+            appendChatMessage('bot', data.answer);
+            chatState.history.push({ role: 'bot', text: data.answer });
+          } else {
+            appendChatMessage('bot', '⚠️ Ошибка: ' + (data.error || 'не удалось получить ответ'));
+          }
+        } catch (err) {
+          removeChatTyping();
+          appendChatMessage('bot', '⚠️ Ошибка соединения: ' + err.message);
+        } finally {
+          chatState.busy = false;
+          ids.chatSend.disabled = false;
+          ids.chatInput.focus();
+        }
+      }
+
+      if (ids.chatForm) {
+        ids.chatForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          sendChatMessage(ids.chatInput.value.trim());
+        });
+      }
+      if (ids.chatMessages) {
+        ids.chatMessages.addEventListener('click', (e) => {
+          const chip = e.target.closest('.chat-chip');
+          if (chip) sendChatMessage(chip.getAttribute('data-q'));
+        });
+      }
+      if (ids.chatFab) ids.chatFab.addEventListener('click', openChat);
+      if (ids.chatClose) ids.chatClose.addEventListener('click', closeChat);
+
+      // ── Table dispatcher ──────────────────────────────────────────────
+      function renderTable() {
+        document.body.classList.toggle('gallery-active', state.viewMode === 'table3');
+        if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
+        if (state.viewMode === 'table5') { renderZRSGallery(); return; }
+        if (state.viewMode === 'table3') { renderGallery(); return; }
+        ids.aiAnalysisWrap.hidden = true;
+        ids.galleryWrap.hidden = true;
+        ids.zrsWrap.hidden = true;
+        if (state.viewMode === 'table2') { renderLeaderboard(); return; }
+
+        const tree = {};
+        
+        // Calculate cross-department assignments
+        const deptAssignedToOthers = {};
+        const empAssignedToOthers = {};
+
+        state.filteredRows.forEach((row) => {
+          const assigneeDept = row['Отдел'] || 'Без отдела';
+          const creator = row['Постановщик'] || 'Без постановщика';
+          const creatorDept = row['Отдел постановщика'] || 'Без отдела';
+
+          if (creatorDept !== assigneeDept) {
+            // 1. Department stats
+            if (!deptAssignedToOthers[creatorDept]) {
+              deptAssignedToOthers[creatorDept] = { total: 0, targets: {} };
+            }
+            deptAssignedToOthers[creatorDept].total += 1;
+            deptAssignedToOthers[creatorDept].targets[assigneeDept] = (deptAssignedToOthers[creatorDept].targets[assigneeDept] || 0) + 1;
+
+            // 2. Employee stats
+            if (!empAssignedToOthers[creator]) {
+              empAssignedToOthers[creator] = { total: 0, targets: {} };
+            }
+            empAssignedToOthers[creator].total += 1;
+            empAssignedToOthers[creator].targets[assigneeDept] = (empAssignedToOthers[creator].targets[assigneeDept] || 0) + 1;
+          }
+        });
+
+        // Helpers to format badge
+        const formatDeptCrossAssignments = (deptName) => {
+          const data = deptAssignedToOthers[deptName];
+          if (!data || data.total === 0) return '';
+          const parts = Object.entries(data.targets).map(([tDept, count]) => `${escapeHtml(tDept)}: ${count}`);
+          return `<span style="font-size: 10px; color: var(--text-muted); font-weight: 500; margin-left: 8px; border-left: 2px solid var(--brand-green); padding-left: 6px;">→ другим: ${data.total} (${parts.join(', ')})</span>`;
+        };
+
+        const formatEmpCrossAssignments = (empName) => {
+          const data = empAssignedToOthers[empName];
+          if (!data || data.total === 0) return '';
+          const parts = Object.entries(data.targets).map(([tDept, count]) => `${escapeHtml(tDept)}: ${count}`);
+          return `<span style="font-size: 9.5px; color: var(--text-muted); font-weight: 500; margin-left: 8px; border-left: 2px solid #ccc; padding-left: 6px;">→ другим: ${data.total} (${parts.join(', ')})</span>`;
+        };
+
+
+        // (formatTasks / formatDays / formatPoints are module-level functions above)
+
+
+        // Helper to render an employee's tasks
+        const renderEmployeeTasks = (emp, deptName, empName, indentOffset = 0) => {
+          let empHtml = '';
+          const sortedTasks = emp.tasks.slice().sort((a, b) => {
+            const isAImportant = a.priority == '2' || a.priority == 2 || String(a.priority).toLowerCase().includes('high') || String(a.priority).toLowerCase().includes('важн');
+            const isBImportant = b.priority == '2' || b.priority == 2 || String(b.priority).toLowerCase().includes('high') || String(b.priority).toLowerCase().includes('важн');
+
+            if (isAImportant && !isBImportant) return -1;
+            if (!isAImportant && isBImportant) return 1;
+
+            const getDeadlineTime = (t) => {
+              if (t.deadlineRaw) {
+                const d = new Date(t.deadlineRaw);
+                if (!Number.isNaN(d.getTime())) return d.getTime();
+              }
+              if (t.deadline) {
+                const d = parseDateStr(t.deadline);
+                if (d) return d.getTime();
+              }
+              return Infinity;
+            };
+
+            const dateA = getDeadlineTime(a);
+            const dateB = getDeadlineTime(b);
+            
+            if (dateA !== dateB) {
+              return dateA - dateB;
+            }
+
+            const getCreatedTime = (t) => {
+              if (t.createdDateRaw) {
+                const d = new Date(t.createdDateRaw);
+                if (!Number.isNaN(d.getTime())) return d.getTime();
+              }
+              if (t.created) {
+                const d = parseDateStr(t.created);
+                if (d) return d.getTime();
+              }
+              return 0;
+            };
+
+            return getCreatedTime(a) - getCreatedTime(b);
+          });
+
+          // Separate active and closed tasks
+          const activeTasks = [];
+          const closedTasks = [];
+          
+          sortedTasks.forEach((t) => {
+            const isClosed = t.state && t.state.startsWith('Закрыта');
+            if (isClosed) {
+              closedTasks.push(t);
+            } else {
+              activeTasks.push(t);
+            }
+          });
+
+          // Render active tasks
+          activeTasks.forEach((task) => {
+            const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
+            const taskIcon = isImportant ? '🔥' : '📋';
+            let taskTitleHtml = escapeHtml(task.title);
+            if (state.portalHost && task.id) {
+              const idNum = String(task.id).replace('#', '').trim();
+              taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link">${taskTitleHtml}</a>`;
+            }
+            
+            let projectPrefix = '';
+            if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+              projectPrefix = `<span style="font-weight: 800; color: var(--text-dark); margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
+            }
+            
+            let rowClass = '';
+            let statusBadge = '';
+            
+            if (task.state && !task.state.startsWith('Закрыта') && task.deadlineRaw) {
+              const deadlineDate = new Date(task.deadlineRaw);
+              if (!Number.isNaN(deadlineDate.getTime())) {
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const target = new Date(deadlineDate.getFullYear(), deadlineDate.getMonth(), deadlineDate.getDate());
+                const diffTime = target - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffTime < 0) {
+                  rowClass = 'row-overdue';
+                  statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #ef4444; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Просрочено</span>';
+                } else if (diffDays === 0) {
+                  rowClass = 'row-today';
+                  statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #ffedd5; color: #f97316; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Дедлайн сегодня</span>';
+                } else if (diffDays > 0 && diffDays <= 3) {
+                  rowClass = 'row-soon';
+                  statusBadge = ' <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fef9c3; color: #ca8a04; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Скоро дедлайн</span>';
+                }
+              }
+            }
+            
+            empHtml += `
+              <tr class="tree-row tree-level-3 ${rowClass}">
+                <td style="padding-left: ${48 + indentOffset}px; color: #555555;">${taskIcon} ${projectPrefix}${taskTitleHtml}${statusBadge}</td>
+                <td>${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</td>
+                <td>${escapeHtml(formatShortName(task.creator))}</td>
+                <td></td>
+                <td></td>
+                <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                <td>${formatImportance(task.importance)}</td>
+                <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${formatPoints(task.efficiency)}</td>
+              </tr>
+            `;
+          });
+
+          // Render Closed Tasks folder if there are any
+          if (closedTasks.length > 0) {
+            const closedFolderKey = `closed:${deptName}:${empName}`;
+            const isClosedFolderExpanded = state.expandedNodes.has(closedFolderKey);
+            const closedFolderToggleIcon = isClosedFolderExpanded ? '▼' : '▶';
+            const closedScore = closedTasks.reduce((s, t) => s + (t.efficiency || 0), 0);
+            const closedScoreBadge = `<span style="display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:800;background:rgba(100,100,100,0.1);color:#64748b;">${closedScore > 0 ? '+' : ''}${closedScore} б.</span>`;
+
+            empHtml += `
+              <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${closedFolderKey}" style="font-weight: 600; background-color: rgba(200, 200, 200, 0.1); cursor: pointer; color: var(--text-muted);">
+                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${closedFolderToggleIcon}</span> 📁 Закрытые задачи (${closedTasks.length})${closedScoreBadge}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            `;
+            
+            if (isClosedFolderExpanded) {
+              closedTasks.forEach((task) => {
+                const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
+                const taskIcon = isImportant ? '🔥' : '📋';
+                let taskTitleHtml = escapeHtml(task.title);
+                if (state.portalHost && task.id) {
+                  const idNum = String(task.id).replace('#', '').trim();
+                  taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 500;">${taskTitleHtml}</a>`;
+                }
+                
+                let projectPrefix = '';
+                if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+                  projectPrefix = `<span style="font-weight: 800; color: #888888; margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
+                }
+                
+                const closedRowBg = task.overdue > 0 ? 'rgba(239, 68, 68, 0.08)' : 'rgba(240, 240, 240, 0.3)';
+                
+                empHtml += `
+                  <tr class="tree-row tree-level-4 closed-task-row" style="background-color: ${closedRowBg}; color: #888888;">
+                    <td style="padding-left: ${68 + indentOffset}px; color: #888888;">${taskIcon} ${projectPrefix}<span>${taskTitleHtml}</span> <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span></td>
+                    <td style="color: #888888; white-space: normal; line-height: 1.25; font-size: 10.5px;">
+                      <div style="font-size: 9.5px; opacity: 0.8;">🏁 ${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</div>
+                      <div style="font-weight: 600; margin-top: 1px;">✔️ ${escapeHtml(removeYear(task.closedDateRaw, task.closed))}</div>
+                    </td>
+                    <td style="color: #888888;">${escapeHtml(formatShortName(task.creator))}</td>
+                    <td></td>
+                    <td></td>
+                    <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                    <td style="opacity: 0.8;">${formatImportance(task.importance)}</td>
+                    <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}" style="opacity: 0.8;">${formatPoints(task.efficiency)}</td>
+                  </tr>
+                `;
+              });
+            }
+          }
+          // Render Delegated Tasks folder — only tasks assigned to someone else
+          const delegatedTasks = (emp.delegatedTasks || []).filter(t => t.assignee !== empName);
+          if (delegatedTasks.length > 0) {
+            const delegFolderKey = `delegated:${deptName}:${empName}`;
+            const isDelegFolderExpanded = state.expandedNodes.has(delegFolderKey);
+            const delegFolderToggleIcon = isDelegFolderExpanded ? '▼' : '▶';
+            const delegScore = delegatedTasks.reduce((s, t) => s + (t.efficiency || 0), 0);
+            const delegScoreBadge = `<span style="display:inline-block;margin-left:8px;padding:1px 7px;border-radius:10px;font-size:11px;font-weight:800;background:rgba(99,152,240,0.12);color:#3b6fd4;">${delegScore > 0 ? '+' : ''}${delegScore} б.</span>`;
+
+            empHtml += `
+              <tr class="tree-row tree-level-3 closed-tasks-folder" data-key="${delegFolderKey}" style="font-weight: 600; background-color: rgba(99, 152, 240, 0.07); cursor: pointer; color: var(--text-muted);">
+                <td style="padding-left: ${48 + indentOffset}px;"><span class="tree-toggle">${delegFolderToggleIcon}</span> 📂 Порученные (${delegatedTasks.length})${delegScoreBadge}</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            `;
+
+            if (isDelegFolderExpanded) {
+              delegatedTasks.forEach((task) => {
+                const isClosed = task.state && task.state.startsWith('Закрыта');
+                const isImportant = task.priority == '2' || task.priority == 2 || String(task.priority).toLowerCase().includes('high') || String(task.priority).toLowerCase().includes('важн');
+                const taskIcon = isImportant ? '🔥' : '📋';
+                let taskTitleHtml = escapeHtml(task.title);
+                if (state.portalHost && task.id) {
+                  const idNum = String(task.id).replace('#', '').trim();
+                  const linkStyle = isClosed ? 'color: #888888; border-bottom-color: rgba(136, 136, 136, 0.4); font-weight: 500;' : '';
+                  taskTitleHtml = `<a href="https://${state.portalHost}/company/personal/user/0/tasks/task/view/${idNum}/" target="_blank" class="task-link" style="${linkStyle}">${taskTitleHtml}</a>`;
+                }
+
+                let projectPrefix = '';
+                if (task.project && String(task.project).trim() !== '' && String(task.project).trim() !== '0') {
+                  projectPrefix = `<span style="font-weight: 800; color: ${isClosed ? '#888' : 'var(--text-dark)'}; margin-right: 6px;">[${escapeHtml(task.project)}]</span>`;
+                }
+
+                let stateBadge = '';
+                if (isClosed) {
+                  stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #e2e8f0; color: #475569; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Закрыта</span>`;
+                } else if (task.deadlineRaw) {
+                  const deadlineDate = new Date(task.deadlineRaw);
+                  if (!Number.isNaN(deadlineDate.getTime())) {
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const target = new Date(deadlineDate.getFullYear(), deadlineDate.getMonth(), deadlineDate.getDate());
+                    const diffDays = Math.ceil((target - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays < 0) {
+                      stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fee2e2; color: #ef4444; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Просрочено</span>`;
+                    } else if (diffDays === 0) {
+                      stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #ffedd5; color: #f97316; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Дедлайн сегодня</span>`;
+                    } else if (diffDays <= 3) {
+                      stateBadge = ` <span style="font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #fef9c3; color: #ca8a04; font-weight: 700; margin-left: 6px; vertical-align: middle; white-space: nowrap;">Скоро дедлайн</span>`;
+                    }
+                  }
+                }
+
+                const assigneeLabel = task.assignee ? `<span style="font-size: 10px; color: #6b9ef0; margin-left: 6px;">→ ${escapeHtml(formatShortName(task.assignee))}</span>` : '';
+                const rowStyle = isClosed ? 'background-color: rgba(240, 240, 240, 0.3); color: #888888;' : 'background-color: rgba(99, 152, 240, 0.04);';
+                const titleColor = isClosed ? 'color: #888888;' : 'color: #555555;';
+
+                empHtml += `
+                  <tr class="tree-row tree-level-4" style="${rowStyle}">
+                    <td style="padding-left: ${68 + indentOffset}px; ${titleColor}">${taskIcon} ${projectPrefix}<span>${taskTitleHtml}</span>${stateBadge}${assigneeLabel}</td>
+                    <td style="${isClosed ? 'color: #888888; white-space: normal; line-height: 1.25; font-size: 10.5px;' : ''}">
+                      ${isClosed
+                        ? `<div style="font-size: 9.5px; opacity: 0.8;">🏁 ${escapeHtml(removeYear(task.deadlineRaw, task.deadline))}</div><div style="font-weight: 600; margin-top: 1px;">✔️ ${escapeHtml(removeYear(task.closedDateRaw, task.closed))}</div>`
+                        : escapeHtml(removeYear(task.deadlineRaw, task.deadline))
+                      }
+                    </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="${isClosed ? 'opacity: 0.8;' : ''}">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
+                    <td style="${isClosed ? 'opacity: 0.8;' : ''}">${formatImportance(task.importance)}</td>
+                    <td></td>
+                  </tr>
+                `;
+              });
+            }
+          }
+
+          return empHtml;
+        };
+
+        // Build departments maps for dynamic nesting walk-up
+        const depById = {};
+        const depByName = {};
+        // Set of user IDs who are department heads (UF_HEAD)
+        headUserIds = new Set();
+        if (state.departments) {
+          state.departments.forEach(d => {
+            depById[String(d.ID)] = d;
+            depByName[d.NAME] = d;
+            if (d.UF_HEAD) headUserIds.add(String(d.UF_HEAD));
+          });
+        }
+
+        // Map: employee display name → user ID (built from rows)
+        const empNameToId = new Map();
+        state.filteredRows.forEach(row => {
+          const name = row['Исполнитель'];
+          const id = String(row['ID исполнителя'] || '');
+          if (name && id && !empNameToId.has(name)) empNameToId.set(name, id);
+        });
+
+        function isHead(empName) {
+          const id = empNameToId.get(empName);
+          return id && headUserIds.has(id);
+        }
+
+        // Helper to find parent-child relationship dynamically
+        function getDeptGroupAndSub(deptName) {
+          const chain = [];
+          let current = depByName[deptName];
+          while (current) {
+            chain.push(current);
+            if (current.PARENT) {
+              current = depById[String(current.PARENT)];
+            } else {
+              current = null;
+            }
+          }
+          
+          // Top-level departments = direct children of АУП (ID: 157)
+          // Аккаунты is a sub of УКС, so it must NOT be listed here
+          const topLevelNames = ['УКС', 'ФУ', 'УРБ', 'АУ', 'I1C', 'ПС'];
+          
+          let topIndex = chain.findIndex(d => topLevelNames.includes(d.NAME));
+          if (topIndex !== -1) {
+            const topDept = chain[topIndex];
+            if (topIndex === 0) {
+              return { dept: topDept.NAME, subDept: null };
+            } else {
+              return { dept: topDept.NAME, subDept: deptName };
+            }
+          }
+          
+          if (chain.length > 1) {
+            let idx = chain.length - 1;
+            while (idx >= 0 && (chain[idx].ID === '1' || chain[idx].ID === '157' || chain[idx].NAME === 'IC Group' || chain[idx].NAME === 'АУП')) {
+              idx--;
+            }
+            if (idx >= 0) {
+              const topDeptName = chain[idx].NAME;
+              if (topDeptName === deptName) {
+                return { dept: deptName, subDept: null };
+              } else {
+                return { dept: topDeptName, subDept: deptName };
+              }
+            }
+          }
+          
+          return { dept: deptName, subDept: null };
+        }
+
+        // Group the rows dynamically on client-side
+        state.filteredRows.forEach((row) => {
+          let dept = row['Отдел'] || 'Без отдела';
+          const assignee = row['Исполнитель'] || 'Без исполнителя';
+          if (isExcludedPerson(assignee)) return;
+          const taskTitle = row['Название задачи'] || 'Без названия';
+          
+          const overdue = parseInt(row['Просрочка, дней']) || 0;
+          // Балл за задачу = важность AI × доля за статус — как в рейтинге
+          const efficiency = taskExecutorScore(row);
+
+          let subDept = null;
+          if (dept !== 'Без отдела') {
+            const resolved = getDeptGroupAndSub(dept);
+            dept = resolved.dept;
+            subDept = resolved.subDept;
+          }
+          
+          if (!tree[dept]) {
+            tree[dept] = { 
+              name: dept, 
+              overdueSum: 0, 
+              efficiencySum: 0, 
+              employees: {},
+              subDepts: {}
+            };
+          }
+          tree[dept].overdueSum += overdue;
+          tree[dept].efficiencySum += efficiency;
+          
+          const taskData = {
+            id: row['ID задачи'],
+            title: taskTitle,
+            overdue: overdue,
+            efficiency: efficiency,
+            importance: row['AI важность'],
+            creator: row['Постановщик'],
+            priority: row['Приоритет'],
+            deadline: row['Дедлайн'],
+            deadlineRaw: row['deadlineRaw'],
+            createdDateRaw: row['createdDateRaw'],
+            created: row['Дата создания'],
+            state: row['Состояние задачи'],
+            closed: row['Дата закрытия'],
+            closedDateRaw: row['closedDateRaw'],
+            project: row['Проект']
+          };
+
+          if (subDept) {
+            if (!tree[dept].subDepts[subDept]) {
+              tree[dept].subDepts[subDept] = {
+                name: subDept,
+                overdueSum: 0,
+                efficiencySum: 0,
+                employees: {}
+              };
+            }
+            tree[dept].subDepts[subDept].overdueSum += overdue;
+            tree[dept].subDepts[subDept].efficiencySum += efficiency;
+            
+            if (!tree[dept].subDepts[subDept].employees[assignee]) {
+              tree[dept].subDepts[subDept].employees[assignee] = {
+                name: assignee,
+                overdueSum: 0,
+                efficiencySum: 0,
+                tasks: []
+              };
+            }
+            tree[dept].subDepts[subDept].employees[assignee].overdueSum += overdue;
+            tree[dept].subDepts[subDept].employees[assignee].efficiencySum += efficiency;
+            tree[dept].subDepts[subDept].employees[assignee].tasks.push(taskData);
+          } else {
+            if (!tree[dept].employees[assignee]) {
+              tree[dept].employees[assignee] = {
+                name: assignee,
+                overdueSum: 0,
+                efficiencySum: 0,
+                tasks: []
+              };
+            }
+            tree[dept].employees[assignee].overdueSum += overdue;
+            tree[dept].employees[assignee].efficiencySum += efficiency;
+            tree[dept].employees[assignee].tasks.push(taskData);
+          }
+        });
+
+        // Second pass: add delegation bonus to the CREATOR's node (matches Rating/Gallery totals).
+        // Own department = +1 per task; another department = +round(0.5 * importance).
+        state.filteredRows.forEach((row) => {
+          const creatorName = row['Постановщик'];
+          if (!creatorName || creatorName === 'Без постановщика') return;
+          if (isExcludedPerson(creatorName)) return;
+          // Нельзя «поручить» задачу самому себе — ни бонуса, ни папки «Порученные»
+          const creatorId = String(row['ID постановщика'] || '');
+          if (creatorId && String(row['ID исполнителя'] || '') === creatorId) return;
+          let cDept = row['Отдел постановщика'] || 'Без отдела';
+          const execDept = row['Отдел'] || 'Без отдела';
+          const V = parseFloat(row['AI важность']) || 0;
+          const bonus = (cDept !== execDept) ? Math.round(0.5 * V) : 1;
+
+          let cSub = null;
+          if (cDept !== 'Без отдела') {
+            const r = getDeptGroupAndSub(cDept);
+            cDept = r.dept;
+            cSub = r.subDept;
+          }
+          if (!tree[cDept]) {
+            tree[cDept] = { name: cDept, overdueSum: 0, efficiencySum: 0, employees: {}, subDepts: {} };
+          }
+          if (bonus) tree[cDept].efficiencySum += bonus;
+
+          const delegTaskData = {
+            id: row['ID задачи'],
+            title: row['Название задачи'] || 'Без названия',
+            assignee: row['Исполнитель'] || '',
+            assigneeDept: execDept,
+            state: row['Состояние задачи'],
+            deadline: row['Дедлайн'],
+            deadlineRaw: row['deadlineRaw'],
+            closed: row['Дата закрытия'],
+            closedDateRaw: row['closedDateRaw'],
+            importance: row['AI важность'],
+            overdue: parseInt(row['Просрочка, дней']) || 0,
+            project: row['Проект'],
+            priority: row['Приоритет'],
+          };
+
+          const ensureEmp = (map) => {
+            if (!map[creatorName]) map[creatorName] = { name: creatorName, overdueSum: 0, efficiencySum: 0, tasks: [], delegationBonus: 0, delegatedTasks: [] };
+            if (!map[creatorName].delegatedTasks) map[creatorName].delegatedTasks = [];
+            if (bonus) {
+              map[creatorName].efficiencySum += bonus;
+              map[creatorName].delegationBonus = (map[creatorName].delegationBonus || 0) + bonus;
+            }
+            map[creatorName].delegatedTasks.push(delegTaskData);
+          };
+          if (cSub) {
+            if (!tree[cDept].subDepts[cSub]) tree[cDept].subDepts[cSub] = { name: cSub, overdueSum: 0, efficiencySum: 0, employees: {} };
+            if (bonus) tree[cDept].subDepts[cSub].efficiencySum += bonus;
+            ensureEmp(tree[cDept].subDepts[cSub].employees);
+          } else {
+            ensureEmp(tree[cDept].employees);
+          }
+        });
+
+        // Set columns headers
+        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'В работе', 'Просрочка, дн.', 'Важность', 'Баллы'];
+        ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+
+        let html = '';
+        const depts = Object.keys(tree).sort();
+        
+        if (depts.length === 0) {
+          ids.tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных для группировки</td></tr>`;
+          return;
+        }
+        
+        depts.forEach((deptName) => {
+          const dept = tree[deptName];
+          const deptKey = `dept:${deptName}`;
+          const isDeptExpanded = state.expandedNodes.has(deptKey);
+          const deptIcon = isDeptExpanded ? '▼' : '▶';
+          
+          // Calculate Department tasks count (including sub-departments)
+          let deptTasksCount = 0;
+          let deptActiveCount = 0;
+          Object.values(dept.employees).forEach(emp => {
+            deptTasksCount += emp.tasks.length;
+            deptActiveCount += emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+          });
+          if (dept.subDepts) {
+            Object.values(dept.subDepts).forEach(sub => {
+              Object.values(sub.employees).forEach(emp => {
+                deptTasksCount += emp.tasks.length;
+                deptActiveCount += emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+              });
+            });
+          }
+          
+          // Render Department row
+          html += `
+            <tr class="tree-row tree-level-1" data-key="${deptKey}" style="font-weight: 700; background-color: rgba(138, 196, 63, 0.08); cursor: pointer;">
+              <td><span class="tree-toggle">${deptIcon}</span> 📁 ${escapeHtml(deptName)}${formatDeptCrossAssignments(deptName)}</td>
+              <td></td>
+              <td></td>
+              <td>${formatTasks(deptTasksCount)}</td>
+              <td>${formatTasks(deptActiveCount)}</td>
+              <td class="${dept.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(dept.overdueSum)}</td>
+              <td style="color:var(--text-muted);">—</td>
+              <td class="${dept.efficiencySum < 0 ? 'color-danger' : (dept.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(dept.efficiencySum)}</td>
+            </tr>
+          `;
+          
+          if (isDeptExpanded) {
+            // 1. Render sub-departments under this department
+            if (dept.subDepts) {
+              const subDeptsNames = Object.keys(dept.subDepts).sort();
+              subDeptsNames.forEach((subDeptName) => {
+                const subDept = dept.subDepts[subDeptName];
+                const subDeptKey = `subdept:${deptName}:${subDeptName}`;
+                const isSubExpanded = state.expandedNodes.has(subDeptKey);
+                const subIcon = isSubExpanded ? '▼' : '▶';
+                
+                let subTasksCount = 0;
+                let subActiveCount = 0;
+                Object.values(subDept.employees).forEach(emp => {
+                  subTasksCount += emp.tasks.length;
+                  subActiveCount += emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+                });
+                
+                // Render Sub-department row (Level 1.5, uses tree-level-2 styling)
+                html += `
+                  <tr class="tree-row tree-level-2" data-key="${subDeptKey}" style="font-weight: 800; background-color: rgba(138, 196, 63, 0.04); cursor: pointer;">
+                    <td style="padding-left: 28px;"><span class="tree-toggle">${subIcon}</span> 📁 ${escapeHtml(subDeptName)}</td>
+                    <td></td>
+                    <td></td>
+                    <td>${formatTasks(subTasksCount)}</td>
+                    <td>${formatTasks(subActiveCount)}</td>
+                    <td class="${subDept.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(subDept.overdueSum)}</td>
+                    <td style="color:var(--text-muted);">—</td>
+                    <td class="${subDept.efficiencySum < 0 ? 'color-danger' : (subDept.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(subDept.efficiencySum)}</td>
+                  </tr>
+                `;
+                
+                if (isSubExpanded) {
+                  const subEmployees = Object.keys(subDept.employees).sort();
+                  subEmployees.forEach((empName) => {
+                    const emp = subDept.employees[empName];
+                    const empKey = `emp:${deptName}:${subDeptName}:${empName}`;
+                    const isEmpExpanded = state.expandedNodes.has(empKey);
+                    const empIcon = isEmpExpanded ? '▼' : '▶';
+                    
+                    const empTasksCount = emp.tasks.length;
+                    const empActiveCount = emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+                    const isEmpHead2 = isHead(empName);
+                    
+                    // Render Employee row under sub-department
+                    html += `
+                      <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
+                        <td style="padding-left: 56px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                        <td></td>
+                        <td></td>
+                        <td>${formatTasks(empTasksCount)}</td>
+                        <td>${formatTasks(empActiveCount)}</td>
+                        <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
+                        <td>${avgImportance(emp.tasks)}</td>
+                        <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
+                      </tr>
+                    `;
+                    
+                    if (isEmpExpanded) {
+                      html += renderEmployeeTasks(emp, `${deptName}:${subDeptName}`, empName, 28);
+                    }
+                  });
+                }
+              });
+            }
+
+            // 2. Render direct employees of this department
+            const employees = Object.keys(dept.employees).sort();
+            employees.forEach((empName) => {
+              const emp = dept.employees[empName];
+              const empKey = `emp:${deptName}:${empName}`;
+              const isEmpExpanded = state.expandedNodes.has(empKey);
+              const empIcon = isEmpExpanded ? '▼' : '▶';
+              
+              const empTasksCount = emp.tasks.length;
+              const empActiveCount = emp.tasks.filter(t => !(t.state && t.state.startsWith('Закрыта'))).length;
+              const isEmpHead = isHead(empName);
+              
+              // Render Employee row
+              html += `
+                <tr class="tree-row tree-level-2" data-key="${empKey}" style="font-weight: 800; background-color: rgba(233, 235, 232, 0.3); cursor: pointer;">
+                  <td style="padding-left: 28px;"><span class="tree-toggle">${empIcon}</span> 👤 ${escapeHtml(empName)}${formatEmpCrossAssignments(empName)}</td>
+                  <td></td>
+                  <td></td>
+                  <td>${formatTasks(empTasksCount)}</td>
+                  <td>${formatTasks(empActiveCount)}</td>
+                  <td class="${emp.overdueSum > 0 ? 'color-danger' : ''}">${formatDays(emp.overdueSum)}</td>
+                  <td>${avgImportance(emp.tasks)}</td>
+                  <td class="${emp.efficiencySum < 0 ? 'color-danger' : (emp.efficiencySum > 0 ? 'color-success' : '')}">${formatPoints(emp.efficiencySum)}</td>
+                </tr>
+              `;
+              
+              if (isEmpExpanded) {
+                html += renderEmployeeTasks(emp, deptName, empName, 0);
+              }
+            });
+          }
+        });
+        
+        ids.tableBody.innerHTML = html;
+        ids.rowCount.textContent = state.filteredRows.length;
+        ids.tableWrap.hidden = false;
+        renderStats(state.filteredRows);
+        
+        // Attach click listeners to expand/collapse toggles
+        document.querySelectorAll('.tree-row[data-key]').forEach((row) => {
+          row.addEventListener('click', (e) => {
+            if (e.target.tagName === 'A') return; // Don't collapse if clicked on task link
+            
+            const key = row.getAttribute('data-key');
+            if (state.expandedNodes.has(key)) {
+              state.expandedNodes.delete(key);
+            } else {
+              state.expandedNodes.add(key);
+            }
+            renderTable();
+          });
+        });
+
+        const table = document.querySelector('table');
+        if (table && state.viewMode === 'table1') {
+          let hasExpandedEmp = false;
+          for (const key of state.expandedNodes) {
+            if (key.startsWith('emp:')) {
+              hasExpandedEmp = true;
+              break;
+            }
+          }
+          if (hasExpandedEmp) {
+            table.classList.remove('hide-task-details');
+          } else {
+            table.classList.add('hide-task-details');
+          }
+        } else if (table) {
+          table.classList.remove('hide-task-details');
+        }
+
+      }
+
+      function escapeHtml(value) {
+        return value
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      }
+
+      function applyFilters() {
+        const period = ids.periodSelect ? ids.periodSelect.value : 'all';
+        const now = new Date();
+        
+        let filtered = state.rows.slice();
+
+        // Keep only АУП (ID: 157) and its descendants in the department structure
+        if (state.departments && state.departments.length > 0) {
+          const allowedDeptIds = new Set(['157']);
+          let added = true;
+          while (added) {
+            added = false;
+            state.departments.forEach(d => {
+              const parentId = String(d.PARENT || '');
+              const id = String(d.ID);
+              if (parentId && allowedDeptIds.has(parentId) && !allowedDeptIds.has(id)) {
+                allowedDeptIds.add(id);
+                added = true;
+              }
+            });
+          }
+          const allowedDeptNames = new Set();
+          state.departments.forEach(d => {
+            if (allowedDeptIds.has(String(d.ID))) {
+              allowedDeptNames.add(d.NAME);
+            }
+          });
+          filtered = filtered.filter(row => allowedDeptNames.has(row['Отдел']));
+        }
+        
+        if (period !== 'all') {
+          // Prepare period boundaries in user's browser local time
+          const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+          const endToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+
+          const day = now.getDay();
+          const diffToMonday = now.getDate() - day + (day === 0 ? -6 : 1);
+          const startWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday, 0, 0, 0, 0);
+          const endWeek = new Date(startWeek.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
+
+          const startMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
+          const endMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+
+          const startLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
+          const endLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+
+          let start, end;
+          if (period === 'today') {
+            start = startToday;
+            end = endToday;
+          } else if (period === 'week') {
+            start = startWeek;
+            end = endWeek;
+          } else if (period === 'month') {
+            start = startMonth;
+            end = endMonth;
+          } else if (period === 'lastMonth') {
+            start = startLastMonth;
+            end = endLastMonth;
+          }
+
+          filtered = state.rows.filter((row) => {
+            const parseDate = (rawKey, strKey) => {
+              if (row[rawKey]) {
+                const d = new Date(row[rawKey]);
+                if (!Number.isNaN(d.getTime())) return d;
+              }
+              return parseDateStr(row[strKey]);
+            };
+
+            const created = parseDate('createdDateRaw', 'Дата создания');
+            const deadline = parseDate('deadlineRaw', 'Дедлайн');
+            const closed = parseDate('closedDateRaw', 'Дата закрытия');
+
+            const isDeadlineIn = deadline && deadline >= start && deadline <= end;
+
+            return isDeadlineIn;
+          });
+        }
+        
+        // Apply name search filter
+        const q = state.searchQuery.toLowerCase().trim();
+        if (q) {
+          const matchedPeople = new Set();
+          filtered.forEach(row => {
+            const executor = (row['Исполнитель'] || '').toLowerCase();
+            const creator = (row['Постановщик'] || '').toLowerCase();
+            if (executor.includes(q)) matchedPeople.add(row['Исполнитель']);
+            if (creator.includes(q)) matchedPeople.add(row['Постановщик']);
+          });
+          filtered = filtered.filter(row => matchedPeople.has(row['Исполнитель']) || matchedPeople.has(row['Постановщик']));
+        }
+
+        state.filteredRows = filtered;
+        
+        // We do NOT clear/re-populate state.expandedNodes here anymore.
+        // This ensures the tree starts collapsed by default initially,
+        // and preserves manual expanded states when filters are changed or auto-refreshed.
+        
+        renderTable();
+      }
+
+      function isTvBrowser() {
+        const ua = String(navigator.userAgent || '');
+        return /SmartTV|Tizen|Web0S|WebOS|NetCast|HbbTV|TV\b/i.test(ua);
+      }
+
+      // Smart TV browsers are more stable with plain XHR than with fetch.
+      function requestReportXHR(method) {
+        return new Promise((resolve, reject) => {
+          try {
+            const xhr = new XMLHttpRequest();
+            xhr.open(method, `/api/task-report?t=${Date.now()}`, true);
+            xhr.timeout = 55000;
+            xhr.setRequestHeader('Accept', 'application/json');
+            xhr.setRequestHeader('Cache-Control', 'no-store');
+            xhr.setRequestHeader('Pragma', 'no-cache');
+            xhr.onload = () => {
+              if (xhr.status < 200 || xhr.status >= 300) {
+                try {
+                  const errorPayload = JSON.parse(xhr.responseText || '{}');
+                  reject(new Error(errorPayload.error || `Ошибка сервера ${xhr.status}`));
+                } catch (e) {
+                  reject(new Error(`Ошибка сервера ${xhr.status}`));
+                }
+                return;
+              }
+              try {
+                const data = JSON.parse(xhr.responseText || '{}');
+                resolve(data);
+              } catch (e) {
+                reject(new Error('Некорректный ответ сервера'));
+              }
+            };
+            xhr.onerror = () => reject(new Error('Нет связи с сервером'));
+            xhr.ontimeout = () => reject(new Error('Превышено время ожидания'));
+            xhr.send();
+          } catch (e) {
+            reject(e);
+          }
+        });
+      }
+
+      // Prefer XHR on TVs, otherwise fall back to it when fetch breaks at network layer.
+      async function requestReport(method) {
+        if (isTvBrowser() || typeof fetch !== 'function') {
+          return requestReportXHR(method);
+        }
+
+        const url = `/api/task-report?t=${Date.now()}`;
+        try {
+          const response = await fetch(url, { method });
+          return await response.json();
+        } catch (e) {
+          return requestReportXHR(method);
+        }
+      }
+
+      // Normalize AI importance (value 1-10) to a 0-5 score added on top of status points
+      function normalizeImportance(value) {
+        const v = parseFloat(value);
+        if (!v || isNaN(v)) return 0;
+        if (v <= 3) return 0;       // нет ценности
+        if (v <= 6) return 2.5;     // средняя ценность
+        return 5;                   // критично/ценно
+      }
+
+      let aiScoresCache = null;
+      async function mergeAiScores() {
+        try {
+          if (!aiScoresCache) {
+            const resp = await fetch('/ai-scores.json', { cache: 'no-store' });
+            aiScoresCache = resp.ok ? await resp.json() : {};
+          }
+        } catch { aiScoresCache = {}; }
+
+        state.rows.forEach(row => {
+          const id = String(row['ID задачи']);
+          const ai = aiScoresCache[id];
+          if (ai && ai.value != null) {
+            row['AI важность'] = ai.value;
+            row['AI важность (0-5)'] = normalizeImportance(ai.value);
+            row['AI рекомендация'] = ai.recommendation || '';
+          } else {
+            row['AI важность'] = null;
+            row['AI важность (0-5)'] = 0;
+            row['AI рекомендация'] = '';
+          }
+        });
+      }
+
+      async function loadReport(method = 'GET') {
+        ids.errorBox.hidden = true;
+        
+        const isFirstLoad = state.rows.length === 0;
+        if (isFirstLoad) {
+          ids.loadingBox.hidden = false;
+          ids.tableWrap.hidden = true;
+          ids.galleryWrap.hidden = true;
+        } else {
+          if (ids.syncIndicator) ids.syncIndicator.hidden = false;
+        }
+        
+        if (ids.refreshBtn) ids.refreshBtn.disabled = true;
+
+        try {
+          const payload = await requestReport(method);
+          if (!payload.ok) {
+            throw new Error(payload.error || 'Не удалось загрузить отчет');
+          }
+
+          state.columns = payload.columns;
+          state.rows = payload.rows;
+          await mergeAiScores();
+          state.departments = payload.departments || [];
+          state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
+          state.portalHost = payload.portalHost || null;
+
+          ids.fetchedAt.textContent = formatDate(payload.fetchedAt);
+
+          applyFilters();
+          scheduleRefresh();
+        } catch (error) {
+          ids.errorBox.hidden = false;
+          ids.errorBox.textContent = error.message || 'Ошибка загрузки отчета';
+        } finally {
+          ids.loadingBox.hidden = true;
+          if (ids.syncIndicator) ids.syncIndicator.hidden = true;
+          if (ids.refreshBtn) ids.refreshBtn.disabled = false;
+        }
+      }
+
+      function scheduleRefresh() {
+        if (state.refreshTimer) {
+          clearTimeout(state.refreshTimer);
+        }
+
+        state.refreshTimer = setTimeout(() => {
+          loadReport('GET');
+        }, state.refreshIntervalMs);
+      }
+
+      if (ids.refreshBtn) {
+        ids.refreshBtn.addEventListener('click', () => loadReport('POST'));
+      }
+
+      if (ids.periodSelect) {
+        // Dynamically set actual names for current and previous months
+        const now = new Date();
+        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const currentMonthName = monthNames[now.getMonth()];
+        const prevMonthName = monthNames[(now.getMonth() + 11) % 12];
+        
+        const monthOpt = ids.periodSelect.querySelector('option[value="month"]');
+        if (monthOpt) monthOpt.textContent = currentMonthName;
+        
+        const lastMonthOpt = ids.periodSelect.querySelector('option[value="lastMonth"]');
+        if (lastMonthOpt) lastMonthOpt.textContent = prevMonthName;
+
+        // Restore saved period preference
+        let savedPeriod = localStorage.getItem('dashboard_period');
+        // Migrate old default 'all' (Все время) to new default 'month' (Июнь)
+        if (savedPeriod === 'all' || !savedPeriod) {
+          savedPeriod = 'month';
+          localStorage.setItem('dashboard_period', 'month');
+        }
+        
+        ids.periodSelect.value = savedPeriod;
+        
+        ids.periodSelect.addEventListener('change', () => {
+          applyFilters();
+          localStorage.setItem('dashboard_period', ids.periodSelect.value);
+        });
+      }
+
+      // Search input with 200ms debounce
+      if (ids.searchInput) {
+        let searchTimer = null;
+        ids.searchInput.addEventListener('input', () => {
+          clearTimeout(searchTimer);
+          const val = ids.searchInput.value;
+          ids.searchClear.classList.toggle('visible', val.length > 0);
+          searchTimer = setTimeout(() => {
+            state.searchQuery = val;
+            applyFilters();
+          }, 200);
+        });
+        ids.searchClear.addEventListener('click', () => {
+          ids.searchInput.value = '';
+          ids.searchClear.classList.remove('visible');
+          state.searchQuery = '';
+          applyFilters();
+          ids.searchInput.focus();
+        });
+      }
+
+      // View switcher
+      function setView(mode) {
+        state.viewMode = mode;
+        ids.viewBtn1.classList.toggle('active', mode === 'table1');
+        ids.viewBtn2.classList.toggle('active', mode === 'table2');
+        ids.viewBtn3.classList.toggle('active', mode === 'table3');
+        ids.viewBtn4.classList.toggle('active', mode === 'table4');
+        if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
+        renderTable();
+      }
+      if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
+      if (ids.viewBtn2) ids.viewBtn2.addEventListener('click', () => setView('table2'));
+      if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
+      if (ids.viewBtn4) ids.viewBtn4.addEventListener('click', () => setView('table4'));
+      if (ids.viewBtn5) ids.viewBtn5.addEventListener('click', () => setView('table5'));
+
+      loadReport('GET');
+
+
+    </script>
+  </body>
+</html>
