@@ -84,10 +84,13 @@ function weekLabel() {
 }
 
 function weekDeadline() {
-  const now = new Date();
-  const d = (now.getDay() + 6) % 7;
-  const sun = new Date(now); sun.setDate(now.getDate() - d + 6); sun.setHours(23,59,59,0);
-  return sun.toISOString();
+  const KZ = 5 * 60 * 60 * 1000; // UTC+5 Казахстан
+  const nowKz = new Date(Date.now() + KZ);
+  const d = (nowKz.getUTCDay() + 6) % 7; // Mon=0 … Sun=6
+  const sunKz = new Date(nowKz);
+  sunKz.setUTCDate(nowKz.getUTCDate() - d + 6); // воскресенье
+  sunKz.setUTCHours(23, 59, 59, 0);             // 23:59 по KZ
+  return new Date(sunKz.getTime() - KZ).toISOString(); // в UTC для Битрикс
 }
 
 async function bitrix(method, params) {
@@ -138,6 +141,7 @@ async function analyzeZRS({ situation, data, solution1, solution2 }) {
 
 Ответь ТОЛЬКО JSON, без пояснений до/после:
 {
+  "shortTitle": "3-5 слов — суть что было сделано, например: Устранение опозданий клинеров",
   "scores": { "situation": 0, "data": 0, "solution": 0, "result": 0 },
   "comments": {
     "situation": "1 предложение — что конкретно не так или что хорошо",
@@ -213,6 +217,7 @@ app.post('/api/zrs', async (req, res) => {
     const desc =
 `ЗРС от: ${who}
 Неделя: ${wk}
+🤖 ИИ оценила в ${analysis.total}/10 ${verdictIcon} ${analysis.verdict.toUpperCase()}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📌 СИТУАЦИЯ
@@ -241,20 +246,26 @@ ${critComments}
 
 ${analysis.feedback}`;
 
+    // Если AI-балл < 5 — задачу не создаём, просим исправить
+    if (analysis.total < 5) {
+      return res.json({ ok: true, analysis, taskId: null, needsCorrection: true });
+    }
+
+    const shortTitle = analysis.shortTitle || situation.slice(0, 40);
+    const taskTitle = `ЗРС по (${shortTitle})`;
+
     // Постановщик = сотрудник, Исполнитель = руководитель
-    // Если taskId передан — обновляем существующую задачу, иначе создаём новую
     let taskId = req.body.taskId || null;
     if (taskId) {
-      await bitrix('tasks.task.update', { taskId, fields: { TITLE: `ЗРС | ${wk} | ${who}`, DESCRIPTION: desc } });
+      await bitrix('tasks.task.update', { taskId, fields: { TITLE: taskTitle, DESCRIPTION: desc } });
     } else {
       const taskRes = await bitrix('tasks.task.add', {
         fields: {
-          TITLE: `ЗРС | ${wk} | ${who}`,
+          TITLE: taskTitle,
           DESCRIPTION: desc,
           DEADLINE: weekDeadline(),
           ...(managerId ? { RESPONSIBLE_ID: managerId } : userId ? { RESPONSIBLE_ID: userId } : {}),
           ...(userId ? { CREATED_BY: userId } : {}),
-          STATUS: 5,
           TAGS: ['ЗРС'],
         }
       });
@@ -303,14 +314,21 @@ ${critComments}
 
 ${analysis.feedback}`;
 
+    // Если AI-балл < 5 — задачу не создаём, просим исправить
+    if (analysis.total < 5) {
+      return res.json({ ok: true, analysis, taskId: null, needsCorrection: true });
+    }
+
+    const taskTitle = `${title} | ${verdictIcon} ${analysis.total}/10`;
+
     // Постановщик = сотрудник, Исполнитель = руководитель
     let taskId = req.body.taskId || null;
     if (taskId) {
-      await bitrix('tasks.task.update', { taskId, fields: { TITLE: title, DESCRIPTION: desc } });
+      await bitrix('tasks.task.update', { taskId, fields: { TITLE: taskTitle, DESCRIPTION: desc } });
     } else {
       const taskRes = await bitrix('tasks.task.add', {
         fields: {
-          TITLE: title,
+          TITLE: taskTitle,
           DESCRIPTION: desc,
           DEADLINE: weekDeadline(),
           ...(managerId ? { RESPONSIBLE_ID: managerId } : userId ? { RESPONSIBLE_ID: userId } : {}),
@@ -322,7 +340,6 @@ ${analysis.feedback}`;
     }
 
     if (taskId) {
-      // При обновлении — удаляем старые пункты чеклиста и добавляем новые
       if (req.body.taskId) {
         const existing = await bitrix('tasks.task.checklist.getlist', { taskId });
         for (const item of (existing.result || [])) {

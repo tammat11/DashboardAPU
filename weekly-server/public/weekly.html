@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Недельное планирование | iC Group</title>
-  <script src="//api.bitrix24.com/api/v1/"></script>
+  <script src="https://api.bitrix24.com/api/v1/"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f4f8; color: #1a1a2e; min-height: 100vh; }
@@ -145,11 +145,11 @@
         <textarea id="zrs-data" placeholder="Факты, цифры, метрики до и после..."></textarea>
       </div>
       <div class="field">
-        <label>Решение 1 — что сделано <span class="req">*</span></label>
+        <label>Решение 1 <span class="req">*</span></label>
         <textarea id="zrs-sol1" placeholder="Что конкретно было сделано?"></textarea>
       </div>
       <div class="field">
-        <label>Решение 2 — результат <span class="req">*</span></label>
+        <label>Решение 2 <span class="req">*</span></label>
         <textarea id="zrs-sol2" placeholder="Какой конкретный результат это дало компании?"></textarea>
       </div>
 
@@ -201,7 +201,17 @@
 
   // ── State ─────────────────────────────────────────────────────────────────
   let currentUser = null;
-  let managerId = window.__BX_MANAGER_ID__ || null;
+
+  // managerIdPromise резолвится когда получим руководителя (сервер или BX24.js)
+  let _managerIdResolve;
+  const managerIdPromise = new Promise(resolve => { _managerIdResolve = resolve; });
+  let _managerIdResolved = false;
+  function resolveManagerId(id) {
+    if (!_managerIdResolved) { _managerIdResolved = true; _managerIdResolve(id || null); }
+  }
+
+  // Если сервер вшил managerId — резолвим сразу
+  if (window.__BX_MANAGER_ID__) resolveManagerId(window.__BX_MANAGER_ID__);
 
   // Используем данные вшитые сервером (Серверный тип Битрикс24)
   if (window.__BX_USER_ID__) {
@@ -213,6 +223,9 @@
   // ── Init ──────────────────────────────────────────────────────────────────
   setWeekBadge();
   addItem();
+
+  // Таймаут — если BX24 не ответил за 5с, резолвим null чтобы не блокировать сабмит
+  setTimeout(() => resolveManagerId(null), 5000);
 
   try {
     BX24.init(() => {
@@ -231,14 +244,21 @@
             BX24.callMethod('department.get', { ID: deptIds[0] }, dr => {
               if (!dr.error()) {
                 const head = (dr.data() || [])[0]?.UF_HEAD || null;
-                if (head) managerId = head; // перезаписываем серверное значение если получили
+                resolveManagerId(head); // резолвим Promise с реальным ID руководителя
+              } else {
+                resolveManagerId(null);
               }
             });
+          } else {
+            resolveManagerId(null);
           }
+        } else {
+          resolveManagerId(null);
         }
       });
     });
   } catch(e) {
+    resolveManagerId(null);
     document.getElementById('userName').textContent = 'Вне Битрикс — тест';
     document.getElementById('userAvatar').textContent = '👤';
   }
@@ -313,7 +333,7 @@
 
   // ── AI Result Render ──────────────────────────────────────────────────────
   function renderResult(containerId, analysis, taskId, editFn, resetFn) {
-    const cls = analysis.verdict==='отлично'?'excellent': analysis.verdict==='хорошо'?'good':'improve';
+    const cls = analysis.total >= 8 ? 'excellent' : analysis.total >= 5 ? 'good' : 'improve';
     const icon = cls==='excellent'?'🟢': cls==='good'?'🟡':'🔴';
     const labels = Object.keys(analysis.scores);
     const labelNames = {
@@ -324,35 +344,46 @@
     const crits = labels.map(k => {
       const v = analysis.scores[k];
       const barCls = v>=7?'hi': v>=5?'mid':'lo';
-      const comment = analysis.comments?.[k] || '';
       return `<div class="crit-card">
-        <div class="crit-label">${labelNames[k]||k}</div>
         <div class="crit-row">
-          <div class="crit-bar-wrap"><div class="crit-bar ${barCls}" style="width:${v*10}%"></div></div>
+          <div class="crit-label" style="min-width:80px">${labelNames[k]||k}</div>
+          <div class="crit-bar-wrap" style="flex:1"><div class="crit-bar ${barCls}" style="width:${v*10}%"></div></div>
           <div class="crit-score">${v}/10</div>
         </div>
-        ${comment ? `<div class="crit-comment">${comment}</div>` : ''}
       </div>`;
     }).join('');
+
+    const needsCorrection = !taskId && analysis.total < 5;
 
     const bitrixBtn = taskId
       ? `<a class="bitrix-link" href="javascript:void(0)" onclick="try{BX24.openPath('/company/personal/user/0/tasks/task/view/${taskId}/');}catch(e){}">🔗 Открыть в Битрикс → задача #${taskId}</a>`
       : '';
+
+    const correctionBanner = needsCorrection
+      ? `<div style="background:#fef2f2;border:1.5px solid #fecaca;border-radius:12px;padding:12px 14px;margin:10px 0;font-size:13px;color:#b91c1c;font-weight:600;">
+           ⚠️ Балл ниже 5 — задача не создана. Улучшите отчёт и отправьте снова.
+         </div>`
+      : '';
+
+    const buttons = needsCorrection
+      ? `<button class="again-btn" style="width:100%;background:#e0f0ff;color:#1e6aaa" onclick="${editFn}">✏️ Исправить и отправить заново</button>`
+      : `<div style="display:flex;gap:8px;margin-top:10px">
+           <button class="again-btn" style="flex:1;background:#e0f0ff;color:#1e6aaa" onclick="${editFn}">✏️ Редактировать</button>
+           <button class="again-btn" style="flex:1" onclick="${resetFn}">＋ Создать ещё</button>
+         </div>`;
 
     document.getElementById(containerId).innerHTML = `
       <div class="score-banner ${cls}">
         <div class="score-circle"><div class="num">${analysis.total}</div><div class="den">/10</div></div>
         <div class="score-info">
           <div class="score-verdict">${icon} ${analysis.verdict}</div>
-          <div class="score-feedback">${analysis.feedback}</div>
+          <div class="score-feedback">${(analysis.feedback||'').split(/[.!]\s/)[0]}.</div>
         </div>
       </div>
       <div class="criteria-grid">${crits}</div>
+      ${correctionBanner}
       ${bitrixBtn}
-      <div style="display:flex;gap:8px;margin-top:10px">
-        <button class="again-btn" style="flex:1;background:#e0f0ff;color:#1e6aaa" onclick="${editFn}">✏️ Редактировать</button>
-        <button class="again-btn" style="flex:1" onclick="${resetFn}">＋ Создать ещё</button>
-      </div>
+      <div style="margin-top:10px">${buttons}</div>
     `;
     document.getElementById(containerId).classList.add('show');
     try { BX24.fitWindow(); } catch(e){}
@@ -378,7 +409,7 @@
           situation, data, solution1, solution2,
           userName: currentUser ? [currentUser.NAME,currentUser.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник',
           userId: currentUser?.ID,
-          managerId,
+          managerId: await managerIdPromise,
           taskId: editingZrsTaskId
         })
       });
@@ -440,7 +471,7 @@
           title, benefit, measure, checklist,
           userName: currentUser ? [currentUser.NAME,currentUser.LAST_NAME].filter(Boolean).join(' ') : 'Сотрудник',
           userId: currentUser?.ID,
-          managerId,
+          managerId: await managerIdPromise,
           taskId: editingTaskTaskId
         })
       });
