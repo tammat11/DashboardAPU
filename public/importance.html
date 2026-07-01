@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Важность задач — iC Group</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f4f6; color: #111; font-size: 13px; }
+
+    .header {
+      background: #1e293b;
+      color: #fff;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .header h1 { font-size: 16px; font-weight: 700; flex: 1; }
+    .header-badge { background: #6366f1; color: #fff; border-radius: 6px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+
+    .controls {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 10px 24px;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    select, input {
+      border: 1px solid #d1d5db;
+      border-radius: 7px;
+      padding: 6px 10px;
+      font-size: 12px;
+      background: #fff;
+      outline: none;
+    }
+    select:focus, input:focus { border-color: #6366f1; }
+    .stat-chips { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+    .chip { background: #f1f5f9; border-radius: 8px; padding: 5px 12px; font-size: 12px; font-weight: 600; color: #475569; }
+    .chip b { color: #1e293b; }
+
+    .content { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
+
+    .dept-block { margin-bottom: 20px; }
+    .dept-header {
+      background: #1e293b;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 10px 10px 0 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .dept-avg { margin-left: auto; font-size: 12px; opacity: .8; }
+
+    .emp-block { background: #fff; border: 1px solid #e5e7eb; border-top: none; }
+    .emp-block:last-child { border-radius: 0 0 10px 10px; }
+
+    .emp-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 16px;
+      background: #f8fafc;
+      border-top: 1px solid #e5e7eb;
+      cursor: pointer;
+      user-select: none;
+    }
+    .emp-header:hover { background: #f1f5f9; }
+    .emp-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0;
+    }
+    .emp-avatar-initials {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .emp-name { font-weight: 600; flex: 1; }
+    .emp-avg { font-size: 12px; color: #64748b; }
+    .emp-toggle { font-size: 10px; color: #94a3b8; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: #f8fafc;
+      color: #64748b;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+      padding: 7px 12px;
+      border-bottom: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    td { padding: 7px 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafafa; }
+
+    .imp-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .imp-track {
+      flex: 1;
+      max-width: 120px;
+      height: 6px;
+      background: #e5e7eb;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .imp-fill { height: 100%; border-radius: 3px; transition: width .3s; }
+    .imp-val { font-weight: 700; font-size: 13px; min-width: 28px; }
+    .c-high { color: #16a34a; }
+    .c-med  { color: #d97706; }
+    .c-low  { color: #9ca3af; }
+    .c-none { color: #d1d5db; }
+
+    .task-link { color: #3b82f6; text-decoration: none; }
+    .task-link:hover { text-decoration: underline; }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .s-done   { background: #dcfce7; color: #16a34a; }
+    .s-active { background: #dbeafe; color: #2563eb; }
+    .s-overdue{ background: #fee2e2; color: #dc2626; }
+    .s-other  { background: #f1f5f9; color: #64748b; }
+
+    .loading { text-align: center; padding: 60px; color: #94a3b8; font-size: 15px; }
+    .error-box { background: #fee2e2; color: #dc2626; padding: 16px 24px; border-radius: 8px; margin: 20px; }
+
+    .search-box { position: relative; }
+    .search-box input { padding-left: 28px; width: 200px; }
+    .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 13px; pointer-events: none; }
+
+    @media (max-width: 700px) {
+      .content { padding: 12px; }
+      .controls { padding: 8px 12px; }
+      .header { padding: 12px; }
+      th, td { padding: 6px 8px; font-size: 11px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>🤖</div>
+  <h1>AI Важность задач</h1>
+  <span class="header-badge">Только для руководства</span>
+</div>
+
+<div class="controls">
+  <select id="periodSelect">
+    <option value="week">Текущая неделя</option>
+    <option value="month">Текущий месяц</option>
+    <option value="lastMonth">Прошлый месяц</option>
+    <option value="all">Всё время</option>
+  </select>
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input id="searchInput" type="text" placeholder="Поиск сотрудника...">
+  </div>
+  <select id="sortSelect">
+    <option value="importance_desc">По важности ↓</option>
+    <option value="importance_asc">По важности ↑</option>
+    <option value="name">По имени</option>
+  </select>
+  <div class="stat-chips">
+    <div class="chip">Задач: <b id="statTotal">—</b></div>
+    <div class="chip">Средняя важность: <b id="statAvg">—</b></div>
+    <div class="chip">Высокая (≥7): <b id="statHigh">—</b></div>
+  </div>
+</div>
+
+<div class="content">
+  <div id="loading" class="loading">⏳ Загрузка данных…</div>
+  <div id="errorBox" class="error-box" hidden></div>
+  <div id="mainContent" hidden></div>
+</div>
+
+<script>
+  let allRows = [], aiScores = {}, departments = [], portalHost = null;
+
+  const COLORS = ['#6366f1','#ec4899','#f59e0b','#10b981','#3b82f6','#8b5cf6','#14b8a6','#f97316'];
+
+  function impColor(v) {
+    if (!v) return '#d1d5db';
+    if (v >= 7) return '#16a34a';
+    if (v >= 5) return '#d97706';
+    return '#9ca3af';
+  }
+
+  function impClass(v) {
+    if (!v) return 'c-none';
+    if (v >= 7) return 'c-high';
+    if (v >= 5) return 'c-med';
+    return 'c-low';
+  }
+
+  function initials(name) {
+    return (name || '?').split(' ').slice(0,2).map(w => w[0]||'').join('').toUpperCase();
+  }
+
+  function avatarHtml(name, url, size=32) {
+    if (url) return `<img class="emp-avatar" src="${url}" style="width:${size}px;height:${size}px;" onerror="this.style.display='none'">`;
+    const color = COLORS[(name||'').charCodeAt(0) % COLORS.length];
+    return `<div class="emp-avatar-initials" style="width:${size}px;height:${size}px;background:${color};font-size:${Math.round(size*0.35)}px;">${initials(name)}</div>`;
+  }
+
+  function statusBadge(row) {
+    const s = row['Состояние задачи'] || '';
+    const overdue = parseInt(row['Просрочка, дней']) || 0;
+    if (s.includes('завершён') || s.includes('закрыт') || s.includes('Завершён')) return `<span class="status-badge s-done">Закрыта</span>`;
+    if (overdue > 0) return `<span class="status-badge s-overdue">Просрочена</span>`;
+    if (s.includes('работ') || s.includes('В работе')) return `<span class="status-badge s-active">В работе</span>`;
+    return `<span class="status-badge s-other">${s || '—'}</span>`;
+  }
+
+  function taskLink(row) {
+    const title = row['Название задачи'] || 'Без названия';
+    const id = row['ID задачи'];
+    if (id && portalHost) {
+      return `<a class="task-link" href="https://${portalHost}/company/personal/user/0/tasks/task/view/${id}/" target="_blank">${escHtml(title)}</a>`;
+    }
+    return escHtml(title);
+  }
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function impBarHtml(v) {
+    if (!v || isNaN(v)) return `<span class="c-none">—</span>`;
+    const pct = Math.round(v * 10);
+    const col = impColor(v);
+    const cls = impClass(v);
+    return `<div class="imp-bar">
+      <div class="imp-track"><div class="imp-fill" style="width:${pct}%;background:${col};"></div></div>
+      <span class="imp-val ${cls}">${v}<span style="font-size:10px;opacity:.5;">/10</span></span>
+    </div>`;
+  }
+
+  function getAupDeptNames() {
+    if (!departments.length) return null;
+    const ids = new Set(['157']);
+    let added = true;
+    while (added) {
+      added = false;
+      departments.forEach(d => {
+        const pid = String(d.PARENT||'');
+        const id = String(d.ID);
+        if (pid && ids.has(pid) && !ids.has(id)) { ids.add(id); added = true; }
+      });
+    }
+    const names = new Set();
+    departments.forEach(d => { if (ids.has(String(d.ID))) names.add(d.NAME); });
+    return names;
+  }
+
+  function applyPeriodFilter(rows, period) {
+    if (period === 'all') return rows;
+    const now = new Date();
+    const day = now.getDay();
+    const diffToMon = now.getDate() - day + (day === 0 ? -6 : 1);
+    const startWeek = new Date(now.getFullYear(), now.getMonth(), diffToMon);
+    const endWeek = new Date(startWeek.getTime() + 7*864e5 - 1);
+    const startMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const endMonth = new Date(now.getFullYear(), now.getMonth()+1, 0, 23,59,59,999);
+    const startLastMonth = new Date(now.getFullYear(), now.getMonth()-1, 1);
+    const endLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23,59,59,999);
+
+    let start, end;
+    if (period === 'week')      { start = startWeek; end = endWeek; }
+    if (period === 'month')     { start = startMonth; end = endMonth; }
+    if (period === 'lastMonth') { start = startLastMonth; end = endLastMonth; }
+
+    return rows.filter(row => {
+      const raw = row['Дедлайн (raw)'] || row['Дедлайн'] || '';
+      if (!raw) return true;
+      const d = new Date(raw);
+      return d >= start && d <= end;
+    });
+  }
+
+  function render() {
+    const period = document.getElementById('periodSelect').value;
+    const search = document.getElementById('searchInput').value.trim().toLowerCase();
+    const sort = document.getElementById('sortSelect').value;
+
+    const aupNames = getAupDeptNames();
+    let rows = allRows.filter(r => {
+      if (aupNames && !aupNames.has(r['Отдел'])) return false;
+      return true;
+    });
+    rows = applyPeriodFilter(rows, period);
+
+    // Only rows with AI importance
+    const withImportance = rows.filter(r => r['AI важность'] && !isNaN(parseFloat(r['AI важность'])));
+
+    // Stats
+    document.getElementById('statTotal').textContent = withImportance.length;
+    const avg = withImportance.length
+      ? (withImportance.reduce((s,r) => s + parseFloat(r['AI важность']),0) / withImportance.length).toFixed(1)
+      : '—';
+    document.getElementById('statAvg').textContent = avg;
+    document.getElementById('statHigh').textContent = withImportance.filter(r => parseFloat(r['AI важность']) >= 7).length;
+
+    // Group by employee
+    const empMap = {};
+    rows.forEach(row => {
+      const name = row['Исполнитель'] || 'Без исполнителя';
+      if (!empMap[name]) empMap[name] = { name, avatar: row['Аватар']||'', dept: row['Отдел']||'', tasks: [] };
+      if (!empMap[name].avatar && row['Аватар']) empMap[name].avatar = row['Аватар'];
+      empMap[name].tasks.push(row);
+    });
+
+    // Filter by search
+    let emps = Object.values(empMap).filter(e => !search || e.name.toLowerCase().includes(search));
+
+    // Sort employees
+    emps.forEach(e => {
+      const vals = e.tasks.map(t => parseFloat(t['AI важность'])).filter(v => !isNaN(v));
+      e.avgImp = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*10)/10 : null;
+    });
+    if (sort === 'importance_desc') emps.sort((a,b) => (b.avgImp||0)-(a.avgImp||0));
+    else if (sort === 'importance_asc') emps.sort((a,b) => (a.avgImp||0)-(b.avgImp||0));
+    else emps.sort((a,b) => a.name.localeCompare(b.name,'ru'));
+
+    // Group by dept
+    const deptMap = {};
+    emps.forEach(e => {
+      const d = e.dept || 'Без отдела';
+      if (!deptMap[d]) deptMap[d] = [];
+      deptMap[d].push(e);
+    });
+
+    if (emps.length === 0) {
+      document.getElementById('mainContent').innerHTML = `<div class="loading" style="color:#94a3b8;">Нет данных за выбранный период</div>`;
+      document.getElementById('mainContent').hidden = false;
+      return;
+    }
+
+    let html = '';
+    Object.keys(deptMap).sort().forEach(dept => {
+      const dEmps = deptMap[dept];
+      const dVals = dEmps.flatMap(e => e.tasks.map(t => parseFloat(t['AI важность'])).filter(v=>!isNaN(v)));
+      const dAvg = dVals.length ? (dVals.reduce((a,b)=>a+b,0)/dVals.length).toFixed(1) : null;
+
+      html += `<div class="dept-block">
+        <div class="dept-header">
+          📁 ${escHtml(dept)}
+          <span class="dept-avg">${dAvg ? `Средняя важность: ${dAvg}/10` : ''}</span>
+        </div>
+        <div class="emp-block">`;
+
+      dEmps.forEach(emp => {
+        const empId = `emp-${emp.name.replace(/\s/g,'_')}`;
+        const sortedTasks = [...emp.tasks].sort((a,b)=>(parseFloat(b['AI важность'])||0)-(parseFloat(a['AI важность'])||0));
+
+        html += `
+          <div class="emp-header" onclick="toggleEmp('${empId}')">
+            ${avatarHtml(emp.name, emp.avatar)}
+            <span class="emp-name">${escHtml(emp.name)}</span>
+            <span class="emp-avg">${emp.avgImp ? `Средняя: <b>${emp.avgImp}/10</b>` : 'Нет оценок'} · ${emp.tasks.length} задач</span>
+            <span class="emp-toggle" id="${empId}-toggle">▶</span>
+          </div>
+          <div id="${empId}" hidden>
+            <table>
+              <thead><tr>
+                <th style="width:40%">Задача</th>
+                <th>Статус</th>
+                <th>Дедлайн</th>
+                <th>Важность AI</th>
+                <th>Баллы</th>
+              </tr></thead>
+              <tbody>`;
+
+        sortedTasks.forEach(row => {
+          const imp = parseFloat(row['AI важность']);
+          const pts = parseFloat(row['Баллы эффективности']) || 0;
+          const overdue = parseInt(row['Просрочка, дней']) || 0;
+          html += `<tr>
+            <td>${taskLink(row)}</td>
+            <td>${statusBadge(row)}</td>
+            <td style="white-space:nowrap;color:#64748b;">${escHtml(row['Дедлайн']||'—')}</td>
+            <td>${impBarHtml(isNaN(imp)?null:imp)}</td>
+            <td style="font-weight:700;color:${pts>0?'#16a34a':pts<0?'#dc2626':'#94a3b8'}">${pts>0?'+':''}${pts||'—'}</td>
+          </tr>`;
+        });
+
+        html += `</tbody></table></div>`;
+      });
+
+      html += `</div></div>`;
+    });
+
+    document.getElementById('mainContent').innerHTML = html;
+    document.getElementById('mainContent').hidden = false;
+  }
+
+  function toggleEmp(id) {
+    const el = document.getElementById(id);
+    const toggle = document.getElementById(id+'-toggle');
+    if (!el) return;
+    el.hidden = !el.hidden;
+    if (toggle) toggle.textContent = el.hidden ? '▶' : '▼';
+  }
+
+  async function load() {
+    document.getElementById('loading').hidden = false;
+    document.getElementById('mainContent').hidden = true;
+    document.getElementById('errorBox').hidden = true;
+    try {
+      const [reportResp, scoresResp] = await Promise.all([
+        fetch('/api/task-report'),
+        fetch('/ai-scores.json', { cache: 'no-store' }).catch(() => ({ ok: false }))
+      ]);
+      const report = await reportResp.json();
+      if (!report.ok) throw new Error(report.error || 'Ошибка загрузки');
+
+      if (scoresResp.ok) {
+        aiScores = await scoresResp.json();
+      }
+
+      departments = report.departments || [];
+      portalHost = report.portalHost || null;
+
+      // Merge AI scores into rows
+      allRows = (report.rows || []).map(row => {
+        const id = row['ID задачи'];
+        const ai = id && aiScores[id];
+        if (ai) {
+          row['AI важность'] = ai.value;
+        }
+        return row;
+      });
+
+      document.getElementById('loading').hidden = true;
+      render();
+    } catch(e) {
+      document.getElementById('loading').hidden = true;
+      document.getElementById('errorBox').hidden = false;
+      document.getElementById('errorBox').textContent = 'Ошибка: ' + e.message;
+    }
+  }
+
+  document.getElementById('periodSelect').addEventListener('change', render);
+  document.getElementById('searchInput').addEventListener('input', render);
+  document.getElementById('sortSelect').addEventListener('change', render);
+
+  load();
+</script>
+</body>
+</html>

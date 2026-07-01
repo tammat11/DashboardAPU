@@ -2255,7 +2255,6 @@
                 <td></td>
                 <td></td>
                 <td class="${task.overdue > 0 ? 'color-danger' : ''}">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
-                <td>${formatImportance(task.importance)}</td>
                 <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}">${formatPoints(task.efficiency)}</td>
               </tr>
             `;
@@ -2310,7 +2309,6 @@
                     <td></td>
                     <td></td>
                     <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="color: #888888 !important; opacity: 0.8;">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
-                    <td style="opacity: 0.8;">${formatImportance(task.importance)}</td>
                     <td class="${task.efficiency < 0 ? 'color-danger' : (task.efficiency > 0 ? 'color-success' : '')}" style="opacity: 0.8;">${formatPoints(task.efficiency)}</td>
                   </tr>
                 `;
@@ -2393,7 +2391,6 @@
                     <td></td>
                     <td></td>
                     <td class="${task.overdue > 0 ? 'color-danger' : ''}" style="${isClosed ? 'opacity: 0.8;' : ''}">${task.overdue > 0 ? formatDays(task.overdue) : ''}</td>
-                    <td style="${isClosed ? 'opacity: 0.8;' : ''}">${formatImportance(task.importance)}</td>
                     <td></td>
                   </tr>
                 `;
@@ -2621,14 +2618,14 @@
         });
 
         // Set columns headers
-        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'В работе', 'Просрочка, дн.', 'Важность', 'Баллы'];
+        const headers = ['Структура (Отдел → Исполнитель → Задача)', 'Дедлайн / Вып.', 'Поручил', 'Кол-во задач', 'В работе', 'Просрочка, дн.', 'Баллы'];
         ids.tableHead.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
 
         let html = '';
         const depts = Object.keys(tree).sort();
         
         if (depts.length === 0) {
-          ids.tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных для группировки</td></tr>`;
+          ids.tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:24px;">Нет данных для группировки</td></tr>`;
           return;
         }
         
