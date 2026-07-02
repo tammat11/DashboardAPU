@@ -1323,7 +1323,7 @@
 
         ids.statOverdueOpen.textContent = counts['Открыта просрочена'];
         ids.statOpenInTime.textContent = counts['Открыта в срок'] + counts['Открыта просрочена'];
-        if (ids.statTotal) ids.statTotal.textContent = rows.length;
+        if (ids.statTotal) ids.statTotal.textContent = new Set(rows.map(r => r['ID задачи']).filter(Boolean)).size;
         ids.statClosedInTime.textContent = counts['Закрыта в срок'] + counts['Закрыта с просрочкой'];
       }
 
