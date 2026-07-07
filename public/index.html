@@ -1033,6 +1033,7 @@
               <option value="all">Все время</option>
               <option value="today">Сегодня</option>
               <option value="week">Текущая неделя</option>
+              <option value="lastWeek">Прошлая неделя</option>
               <option value="month" selected>Текущий месяц</option>
               <option value="lastMonth">Прошлый месяц</option>
             </select>
@@ -1680,6 +1681,9 @@
             periodEnd   = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
           } else if (period === 'week') {
             periodStart = startWeek; periodEnd = endWeek;
+          } else if (period === 'lastWeek') {
+            periodStart = new Date(startWeek.getTime() - 7 * 24 * 60 * 60 * 1000);
+            periodEnd   = new Date(startWeek.getTime() - 1);
           } else if (period === 'month') {
             periodStart = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
             periodEnd   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
@@ -2804,6 +2808,9 @@
           const startLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
           const endLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
 
+          const startLastWeek = new Date(startWeek.getTime() - 7 * 24 * 60 * 60 * 1000);
+          const endLastWeek = new Date(startWeek.getTime() - 1);
+
           let start, end;
           if (period === 'today') {
             start = startToday;
@@ -2811,6 +2818,9 @@
           } else if (period === 'week') {
             start = startWeek;
             end = endWeek;
+          } else if (period === 'lastWeek') {
+            start = startLastWeek;
+            end = endLastWeek;
           } else if (period === 'month') {
             start = startMonth;
             end = endMonth;
