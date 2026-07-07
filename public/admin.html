@@ -1701,7 +1701,7 @@
 
         // Find ZRS tasks in ALL rows (no dept filter — executor is manager, not employee)
         const zrsRows = state.rows.filter(r => {
-          if (!(r['Название задачи'] || '').startsWith('ЗРС |')) return false;
+          if (!(r['Название задачи'] || '').startsWith('ЗРС')) return false;
           if (periodStart && periodEnd) {
             const dl = r['deadlineRaw'] ? new Date(r['deadlineRaw']) : parseDateStr(r['Дедлайн']);
             if (!dl || dl < periodStart || dl > periodEnd) return false;
