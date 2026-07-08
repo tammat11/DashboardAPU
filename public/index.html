@@ -1422,6 +1422,7 @@
       function aggregatePeople() {
         const empMap = {};
         state.filteredRows.forEach(row => {
+          if ((row['Название задачи'] || '').startsWith('ЗРС')) return;
           const name = row['Исполнитель'] || 'Без исполнителя';
           const id   = String(row['ID исполнителя'] || '');
           const dept = row['Отдел'] || '';
