@@ -1317,10 +1317,10 @@
       }
 
       function copyDailyReport() {
-        // --- Task counts (excluding ZRS) ---
+        // --- Task counts (same logic as dashboard stat cards) ---
+        const total = new Set(state.filteredRows.map(r => r['ID задачи']).filter(Boolean)).size;
+        const closed = state.filteredRows.filter(r => (r['Состояние задачи'] || '').startsWith('Закрыта')).length;
         const nonZrsRows = state.filteredRows.filter(r => !(r['Название задачи'] || '').startsWith('ЗРС'));
-        const total = new Set(nonZrsRows.map(r => r['ID задачи']).filter(Boolean)).size;
-        const closed = nonZrsRows.filter(r => (r['Состояние задачи'] || '').startsWith('Закрыта')).length;
 
         // --- Who SET tasks (unique Постановщики, excluding self-assigned) ---
         const creatorsSet = new Set();
