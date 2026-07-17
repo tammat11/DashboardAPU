@@ -1391,11 +1391,8 @@
         // --- Build report text ---
         let text = 'Добрый день!\n';
         text += `Задачи - ${closed}/${total}\n`;
-        if (didSet.length > 0) {
-          text += `Поставили задачи только: ${didSet.join(', ')}.\n`;
-          if (didntSet.length > 0) text += 'Остальные не поставили.\n';
-        } else {
-          text += 'Задачи не поставил никто.\n';
+        if (didntSet.length > 0) {
+          text += `Не поставили: ${didntSet.join(', ')}.\n`;
         }
 
         if (zrsSubmitted === 0) {
