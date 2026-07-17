@@ -1322,12 +1322,12 @@
         const closed = state.filteredRows.filter(r => (r['Состояние задачи'] || '').startsWith('Закрыта')).length;
         const nonZrsRows = state.filteredRows.filter(r => !(r['Название задачи'] || '').startsWith('ЗРС'));
 
-        // --- Who has tasks this week as executor (in filtered rows) ---
-        const activeSet = new Set();
+        // --- Count tasks per executor (filtered rows, no ZRS) ---
+        const taskCountByName = {};
         nonZrsRows.forEach(row => {
           const name = row['Исполнитель'];
           if (!name || isExcludedPerson(name)) return;
-          activeSet.add(name);
+          taskCountByName[name] = (taskCountByName[name] || 0) + 1;
         });
 
         // --- All АУП employees from full dataset ---
@@ -1353,7 +1353,7 @@
           allEmpNames.add(name);
         }
 
-        const didntSet = [...allEmpNames].filter(n => !activeSet.has(n)).sort((a,b) => a.localeCompare(b,'ru'));
+        const didntSet = [...allEmpNames].filter(n => (taskCountByName[n] || 0) < 5).sort((a,b) => a.localeCompare(b,'ru'));
 
         // --- ZRS counts (reuse renderZRSGallery logic) ---
         const period = ids.periodSelect ? ids.periodSelect.value : 'week';
