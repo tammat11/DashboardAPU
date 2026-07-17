@@ -1322,15 +1322,12 @@
         const closed = state.filteredRows.filter(r => (r['Состояние задачи'] || '').startsWith('Закрыта')).length;
         const nonZrsRows = state.filteredRows.filter(r => !(r['Название задачи'] || '').startsWith('ЗРС'));
 
-        // --- Who SET tasks (unique Постановщики, excluding self-assigned) ---
-        const creatorsSet = new Set();
+        // --- Who has tasks this week as executor (in filtered rows) ---
+        const activeSet = new Set();
         nonZrsRows.forEach(row => {
-          const name = row['Постановщик'];
-          const cId  = String(row['ID постановщика'] || '');
-          const eId  = String(row['ID исполнителя']  || '');
+          const name = row['Исполнитель'];
           if (!name || isExcludedPerson(name)) return;
-          if (cId && cId === eId) return; // skip self-assigned
-          creatorsSet.add(name);
+          activeSet.add(name);
         });
 
         // --- All АУП employees from full dataset ---
@@ -1356,8 +1353,7 @@
           allEmpNames.add(name);
         }
 
-        const didSet   = [...creatorsSet].sort((a,b) => a.localeCompare(b,'ru'));
-        const didntSet = [...allEmpNames].filter(n => !creatorsSet.has(n)).sort((a,b) => a.localeCompare(b,'ru'));
+        const didntSet = [...allEmpNames].filter(n => !activeSet.has(n)).sort((a,b) => a.localeCompare(b,'ru'));
 
         // --- ZRS counts (reuse renderZRSGallery logic) ---
         const period = ids.periodSelect ? ids.periodSelect.value : 'week';
