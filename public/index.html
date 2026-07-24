@@ -54,10 +54,6 @@
         max-width: none;
         padding: 0 28px;
       }
-      /* The daily report button belongs to the task report, not to the OP plan */
-      body.plan-active #dailyReportRow {
-        display: none;
-      }
 
       /* Hero Section & TV Metadata */
       .hero {
@@ -859,6 +855,9 @@
       .g-meta-val.danger { color: #ef4444; }
       .g-meta-lbl { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1px; color: var(--text-muted); white-space: nowrap; }
       /* «План+задачи»: те же карточки, но три строки «сделано / всего» вместо сетки метрик */
+      /* Имя в одну строку, поэтому убираем резерв высоты под фамилию и поджимаем карточку */
+      .pt-card { padding: 13px 10px 10px; }
+      .pt-card .g-name { min-height: 0; font-size: 13px; }
       .pt-meta {
         margin-top: 11px;
         padding-top: 10px;
@@ -1121,18 +1120,6 @@
         </div>
       </div>
 
-      <!-- Daily Report Button -->
-      <div id="dailyReportRow" style="padding: 0 16px 12px;">
-        <button id="dailyReportBtn" onclick="copyDailyReport()" style="
-          display:flex;align-items:center;gap:8px;
-          background:#2563eb;color:#fff;border:none;border-radius:10px;
-          padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;
-          box-shadow:0 2px 8px rgba(37,99,235,.25);transition:background .15s;
-        " onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
-          📋 Скопировать отчёт дня
-        </button>
-      </div>
-
       <!-- Report Table Section -->
       <div class="report-container">
         <div id="errorBox" class="error-panel" hidden></div>
@@ -1344,96 +1331,6 @@
           }
         }
         return new Date(year, month, day, hour, minute);
-      }
-
-      function copyDailyReport() {
-        // --- Task counts (same logic as dashboard stat cards) ---
-        const total = new Set(state.filteredRows.map(r => r['ID задачи']).filter(Boolean)).size;
-        const closed = state.filteredRows.filter(r => (r['Состояние задачи'] || '').startsWith('Закрыта')).length;
-        // --- Count tasks per executor (filtered rows, no ZRS) ---
-        const taskCountByName = {};
-        state.filteredRows.forEach(row => {
-          const name = row['Исполнитель'];
-          if (!name || isExcludedPerson(name)) return;
-          taskCountByName[name] = (taskCountByName[name] || 0) + 1;
-        });
-
-        // --- All АУП employees from full dataset ---
-        const allowedDeptNames = new Set();
-        if (state.departments && state.departments.length > 0) {
-          const allowedIds = new Set(['157']);
-          let added = true;
-          while (added) {
-            added = false;
-            state.departments.forEach(d => {
-              const pid = String(d.PARENT || ''), id = String(d.ID);
-              if (pid && allowedIds.has(pid) && !allowedIds.has(id)) { allowedIds.add(id); added = true; }
-            });
-          }
-          state.departments.forEach(d => { if (allowedIds.has(String(d.ID))) allowedDeptNames.add(d.NAME); });
-        }
-        const allEmpNames = new Set();
-        for (const row of state.rows) {
-          const dept = row['Отдел'] || '';
-          if (allowedDeptNames.size > 0 && !allowedDeptNames.has(dept)) continue;
-          const name = row['Исполнитель'];
-          if (!name || isExcludedPerson(name)) continue;
-          allEmpNames.add(name);
-        }
-
-        const didntSet = [...allEmpNames].filter(n => (taskCountByName[n] || 0) < 5).sort((a,b) => a.localeCompare(b,'ru'));
-
-        // --- ZRS counts (reuse renderZRSGallery logic) ---
-        const period = ids.periodSelect ? ids.periodSelect.value : 'week';
-        const now = new Date();
-        let periodStart = null, periodEnd = null;
-        if (period !== 'all') {
-          const day = now.getDay();
-          const diffToMon = now.getDate() - day + (day === 0 ? -6 : 1);
-          const startWeek = new Date(now.getFullYear(), now.getMonth(), diffToMon, 0, 0, 0, 0);
-          if (period === 'week') {
-            periodStart = startWeek;
-            periodEnd   = new Date(startWeek.getTime() + 7*24*60*60*1000 - 1);
-          }
-        }
-        const zrsRows = state.rows.filter(r => {
-          if (!(r['Название задачи'] || '').startsWith('ЗРС')) return false;
-          if (periodStart && periodEnd) {
-            const dl = r['deadlineRaw'] ? new Date(r['deadlineRaw']) : parseDateStr(r['Дедлайн']);
-            if (!dl || dl < periodStart || dl > periodEnd) return false;
-          }
-          return true;
-        });
-        const zrsSubmitters = new Set();
-        zrsRows.forEach(r => {
-          const n = r['Постановщик'] || '';
-          if (n && !isExcludedPerson(n)) zrsSubmitters.add(n);
-        });
-        const zrsTotal     = allEmpNames.size || 0;
-        const zrsSubmitted = zrsSubmitters.size;
-
-        // --- Build report text ---
-        let text = 'Добрый день!\n';
-        text += `Задачи - ${closed}/${total}\n`;
-        if (didntSet.length > 0) {
-          text += `Не поставили: ${didntSet.join(', ')}.\n`;
-        }
-
-        if (zrsSubmitted === 0) {
-          text += 'ЗРС - Еще никто не сдал';
-        } else {
-          text += `ЗРС - ${zrsSubmitted} из ${zrsTotal} сдали`;
-        }
-
-        navigator.clipboard.writeText(text).then(() => {
-          const btn = document.getElementById('dailyReportBtn');
-          const orig = btn.innerHTML;
-          btn.innerHTML = '✅ Скопировано!';
-          btn.style.background = '#16a34a';
-          setTimeout(() => { btn.innerHTML = orig; btn.style.background = '#2563eb'; }, 2000);
-        }).catch(() => {
-          alert(text);
-        });
       }
 
       function renderStats(rows) {
@@ -1672,7 +1569,15 @@
         });
 
         // Keep only real users — skip department/group "assignees" that have no valid user ID
-        const realPeople = Object.values(empMap).filter(emp => emp.id && /^\d+$/.test(emp.id) && emp.id !== '0' && !isExcludedPerson(emp.name));
+        let realPeople = Object.values(empMap).filter(emp => emp.id && /^\d+$/.test(emp.id) && emp.id !== '0' && !isExcludedPerson(emp.name));
+
+        // Show only people who are still in the active АУП directory. Someone deactivated
+        // in Bitrix keeps appearing through their old tasks otherwise — that is how
+        // departed employees kept showing up.
+        if (state.allEmployees && state.allEmployees.length) {
+          const activeIds = new Set(state.allEmployees.map(e => String(e.id)));
+          realPeople = realPeople.filter(emp => activeIds.has(String(emp.id)));
+        }
 
         // Filter by name search query if any
         let displayPeople = realPeople;
@@ -1852,7 +1757,7 @@
         const cards = sorted.map((emp, i) => {
           const c = counts[emp.name] || blank();
           return `
-            <div class="g-card">
+            <div class="g-card pt-card">
               <span class="g-rank">#${i + 1}</span>
               <div class="g-ava-wrap">${galleryAvatarMarkup(emp)}</div>
               <div class="g-name">${firstNameOnly(emp.name)}</div>
@@ -2491,7 +2396,6 @@
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7');
-        document.body.classList.toggle('plan-active', state.viewMode === 'table6');
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
         if (state.viewMode === 'table5') { renderZRSGallery(); return; }
         if (state.viewMode === 'table6') { renderPlan(); return; }
