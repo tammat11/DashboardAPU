@@ -1199,7 +1199,8 @@
       let headUserIds = new Set();
 
       // Сотрудники, которых не показываем в рейтинге/галерее/структуре (системные/исключённые)
-      const EXCLUDED_NAMES = ['Larion Lyan', 'Larion'];
+      // Larion — руководство; Технический Аккаунт — служебный; Арипханов — уволен
+      const EXCLUDED_NAMES = ['Larion Lyan', 'Larion', 'Технический Аккаунт', 'Ырыскелди Арипханов'];
       function isExcludedPerson(name) {
         if (!name) return false;
         const n = String(name).toLowerCase();
