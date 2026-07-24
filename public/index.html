@@ -858,6 +858,23 @@
       .g-meta-val { font-size: 13px; font-weight: 700; color: var(--text-dark); }
       .g-meta-val.danger { color: #ef4444; }
       .g-meta-lbl { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1px; color: var(--text-muted); white-space: nowrap; }
+      /* «План+задачи»: те же карточки, но три строки «сделано / всего» вместо сетки метрик */
+      .pt-meta {
+        margin-top: 11px;
+        padding-top: 10px;
+        border-top: 1px solid rgba(0,0,0,0.06);
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+      }
+      .pt-row { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+      .pt-lbl { font-size: 7.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1px; color: var(--text-muted); white-space: nowrap; }
+      .pt-val { font-size: 13px; font-weight: 800; color: var(--text-dark); font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .pt-row.is-plan .pt-val { color: #5a9a1a; }
+      .pt-row.is-off .pt-val { color: var(--text-muted); }
+      .pt-val .pt-of { font-weight: 600; color: var(--text-muted); }
+
       .g-card.g-top1 { border-color: rgba(255,193,7,0.75); background: linear-gradient(180deg, rgba(255,200,0,0.16), transparent 60%); }
       .g-card.g-top2 { border-color: rgba(160,160,168,0.7); background: linear-gradient(180deg, rgba(176,180,190,0.18), transparent 60%); }
       .g-card.g-top3 { border-color: rgba(205,127,50,0.7); background: linear-gradient(180deg, rgba(205,127,50,0.16), transparent 60%); }
@@ -1055,6 +1072,7 @@
             <button id="viewBtn3" class="view-btn active">🖼️ Галерея</button>
             <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
             <button id="viewBtn6" class="view-btn">📊 План</button>
+            <button id="viewBtn7" class="view-btn">📈 План+задачи</button>
             <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
           </span>
         </div>
@@ -1135,6 +1153,7 @@
         <div id="galleryWrap" hidden></div>
         <div id="zrsWrap" hidden></div>
         <div id="planWrap" hidden></div>
+        <div id="planTasksWrap" hidden></div>
 
         <div id="aiAnalysisWrap" hidden>
           <div id="aiAnalysisLoading" class="loading-panel">
@@ -1232,7 +1251,9 @@
         viewBtn4: document.getElementById('viewBtn4'),
         viewBtn5: document.getElementById('viewBtn5'),
         viewBtn6: document.getElementById('viewBtn6'),
+        viewBtn7: document.getElementById('viewBtn7'),
         planWrap: document.getElementById('planWrap'),
+        planTasksWrap: document.getElementById('planTasksWrap'),
         zrsWrap: document.getElementById('zrsWrap'),
         aiAnalysisWrap: document.getElementById('aiAnalysisWrap'),
         aiAnalysisLoading: document.getElementById('aiAnalysisLoading'),
@@ -1734,6 +1755,7 @@
         ids.aiAnalysisWrap.hidden = true;
         ids.zrsWrap.hidden = true;
         if (ids.planWrap) ids.planWrap.hidden = true;
+        if (ids.planTasksWrap) ids.planTasksWrap.hidden = true;
         ids.galleryWrap.hidden = false;
         ids.tableWrap.hidden = true;
 
@@ -1771,12 +1793,90 @@
         renderStats(state.filteredRows);
       }
 
+      // ── План+задачи (Table 7) ─────────────────────────────────────────────
+      // Same cards as the gallery, but counting closed/total tasks split by whether
+      // the task belongs to the ОП 2026 project (Bitrix group 51) or not.
+      const OP_GROUP_ID = '51';
+
+      function firstNameOnly(name) {
+        const first = String(name || '').trim().split(/\s+/)[0] || '';
+        return escapeHtml(first);
+      }
+
+      function planTaskCounts() {
+        const counts = {};
+        const blank = () => ({ total: 0, done: 0, planTotal: 0, planDone: 0, offTotal: 0, offDone: 0 });
+
+        state.filteredRows.forEach(row => {
+          const name = row['Исполнитель'];
+          if (!name || name === 'Без исполнителя') return;
+          if (!counts[name]) counts[name] = blank();
+          const c = counts[name];
+
+          const done = String(row['Состояние задачи'] || '').startsWith('Закрыта');
+          const isPlan = String(row['ID проекта'] || '') === OP_GROUP_ID;
+
+          c.total++;
+          if (done) c.done++;
+          if (isPlan) { c.planTotal++; if (done) c.planDone++; }
+          else        { c.offTotal++;  if (done) c.offDone++;  }
+        });
+
+        return { counts, blank };
+      }
+
+      function renderPlanTasks() {
+        ids.aiAnalysisWrap.hidden = true;
+        ids.zrsWrap.hidden = true;
+        ids.galleryWrap.hidden = true;
+        ids.tableWrap.hidden = true;
+        if (ids.planWrap) ids.planWrap.hidden = true;
+        ids.planTasksWrap.hidden = false;
+
+        // Reuse the gallery's roster and ordering so ranks match between the two views
+        const sorted = aggregatePeople();
+        const { counts, blank } = planTaskCounts();
+
+        if (sorted.length === 0) {
+          ids.planTasksWrap.innerHTML = `<div style="text-align:center;color:var(--text-muted);padding:32px;">Нет данных</div>`;
+          renderStats(state.filteredRows);
+          return;
+        }
+
+        const line = (label, done, total, cls) => `
+          <div class="pt-row ${cls}">
+            <span class="pt-lbl">${label}</span>
+            <span class="pt-val">${done}<span class="pt-of">/${total}</span></span>
+          </div>`;
+
+        const cards = sorted.map((emp, i) => {
+          const c = counts[emp.name] || blank();
+          return `
+            <div class="g-card">
+              <span class="g-rank">#${i + 1}</span>
+              <div class="g-ava-wrap">${galleryAvatarMarkup(emp)}</div>
+              <div class="g-name">${firstNameOnly(emp.name)}</div>
+              <div class="pt-meta">
+                ${line('Всего', c.done, c.total, '')}
+                ${line('По плану', c.planDone, c.planTotal, 'is-plan')}
+                ${line('Не по плану', c.offDone, c.offTotal, 'is-off')}
+              </div>
+            </div>`;
+        }).join('');
+
+        ids.planTasksWrap.innerHTML =
+          `<div style="padding:16px;"><div class="gallery-grid">${cards}</div></div>`;
+
+        renderStats(state.filteredRows);
+      }
+
       // ── ZRS Gallery (Table 5) ─────────────────────────────────────────────
       function renderZRSGallery() {
         ids.galleryWrap.hidden = true;
         ids.aiAnalysisWrap.hidden = true;
         ids.tableWrap.hidden = true;
         if (ids.planWrap) ids.planWrap.hidden = true;
+        if (ids.planTasksWrap) ids.planTasksWrap.hidden = true;
         ids.zrsWrap.hidden = false;
 
         const ZRS_REQUIRED = 2;
@@ -1979,6 +2079,7 @@
         ids.tableWrap.hidden = true;
         ids.galleryWrap.hidden = true;
         if (ids.planWrap) ids.planWrap.hidden = true;
+        if (ids.planTasksWrap) ids.planTasksWrap.hidden = true;
         ids.aiAnalysisLoading.hidden = false;
         ids.aiAnalysisContent.innerHTML = '';
         ids.aiAnalysisError.hidden = true;
@@ -2181,6 +2282,7 @@
         ids.galleryWrap.hidden = true;
         ids.zrsWrap.hidden = true;
         ids.aiAnalysisWrap.hidden = true;
+        if (ids.planTasksWrap) ids.planTasksWrap.hidden = true;
         if (ids.planWrap) ids.planWrap.hidden = false;
 
         if (planState.loading) return;
@@ -2388,16 +2490,18 @@
 
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
-        document.body.classList.toggle('gallery-active', state.viewMode === 'table3');
+        document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7');
         document.body.classList.toggle('plan-active', state.viewMode === 'table6');
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
         if (state.viewMode === 'table5') { renderZRSGallery(); return; }
         if (state.viewMode === 'table6') { renderPlan(); return; }
+        if (state.viewMode === 'table7') { renderPlanTasks(); return; }
         if (state.viewMode === 'table3') { renderGallery(); return; }
         ids.aiAnalysisWrap.hidden = true;
         ids.galleryWrap.hidden = true;
         ids.zrsWrap.hidden = true;
         if (ids.planWrap) ids.planWrap.hidden = true;
+        if (ids.planTasksWrap) ids.planTasksWrap.hidden = true;
         if (state.viewMode === 'table2') { renderLeaderboard(); return; }
 
         const tree = {};
@@ -3418,6 +3522,7 @@
         ids.viewBtn4.classList.toggle('active', mode === 'table4');
         if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
         if (ids.viewBtn6) ids.viewBtn6.classList.toggle('active', mode === 'table6');
+        if (ids.viewBtn7) ids.viewBtn7.classList.toggle('active', mode === 'table7');
         renderTable();
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
@@ -3426,6 +3531,7 @@
       if (ids.viewBtn4) ids.viewBtn4.addEventListener('click', () => setView('table4'));
       if (ids.viewBtn5) ids.viewBtn5.addEventListener('click', () => setView('table5'));
       if (ids.viewBtn6) ids.viewBtn6.addEventListener('click', () => setView('table6'));
+      if (ids.viewBtn7) ids.viewBtn7.addEventListener('click', () => setView('table7'));
 
       loadReport('GET');
 
