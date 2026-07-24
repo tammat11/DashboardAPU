@@ -858,6 +858,30 @@
       /* Имя в одну строку, поэтому убираем резерв высоты под фамилию и поджимаем карточку */
       .pt-card { padding: 13px 10px 10px; }
       .pt-card .g-name { min-height: 0; font-size: 13px; }
+
+      /* Генеральный директор занимает всю первую строку сетки */
+      .pt-hero {
+        grid-column: 1 / -1;
+        flex-direction: row;
+        align-items: center;
+        gap: 20px;
+        padding: 16px 22px;
+        text-align: left;
+      }
+      .pt-hero .g-ava-wrap { margin-bottom: 0; flex-shrink: 0; }
+      .pt-hero .g-name { min-height: 0; font-size: 16px; font-weight: 800; align-items: flex-start; }
+      .pt-hero .pt-hero-who { display: flex; flex-direction: column; gap: 2px; flex-shrink: 0; }
+      .pt-hero .pt-hero-role { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; color: var(--text-muted); }
+      .pt-hero .pt-meta {
+        margin-top: 0; padding-top: 0; border-top: none;
+        flex: 1; flex-direction: row; gap: 30px; justify-content: flex-end;
+      }
+      .pt-hero .pt-row { flex-direction: column; align-items: flex-start; gap: 3px; }
+      .pt-hero .pt-val { font-size: 20px; }
+      @media (max-width: 720px) {
+        .pt-hero { flex-direction: column; align-items: center; text-align: center; }
+        .pt-hero .pt-meta { justify-content: space-between; width: 100%; gap: 12px; }
+      }
       .pt-meta {
         margin-top: 11px;
         padding-top: 10px;
@@ -1777,7 +1801,28 @@
             <span class="pt-val">${done}<span class="pt-of">/${total}</span></span>
           </div>`;
 
-        const cards = sorted.map((emp, i) => {
+        // CEO is kept out of the ranked roster elsewhere, so pull him from the
+        // directory and give him the whole first row of the grid.
+        const CEO_ID = '63';
+        const ceo = (state.allEmployees || []).find(e => String(e.id) === CEO_ID);
+        const heroCard = ceo ? (() => {
+          const c = counts[CEO_ID] || blank();
+          return `
+            <div class="g-card pt-card pt-hero">
+              <div class="g-ava-wrap">${galleryAvatarMarkup(ceo)}</div>
+              <div class="pt-hero-who">
+                <div class="g-name">${firstNameOnly(ceo.name)}</div>
+                <span class="pt-hero-role">Генеральный директор</span>
+              </div>
+              <div class="pt-meta">
+                ${line('Всего', c.done, c.total, '')}
+                ${line('По плану', c.planDone, c.planTotal, 'is-plan')}
+                ${line('Не по плану', c.offDone, c.offTotal, 'is-off')}
+              </div>
+            </div>`;
+        })() : '';
+
+        const cards = heroCard + sorted.map((emp, i) => {
           const c = counts[String(emp.id)] || blank();
           return `
             <div class="g-card pt-card">
