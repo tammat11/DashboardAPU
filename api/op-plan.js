@@ -1,15 +1,16 @@
 export const config = { maxDuration: 60 };
 
 const TASKS_PAGE_SIZE = 50;
+const OP_GROUP_ID = 51;
+const TAG_PREFIX = 'ОП2026:';
 
-function getBitrixBaseUrl() {
+function baseUrl() {
   const url = process.env.TASK_REPORT_WEBHOOK_URL || '';
   return url.endsWith('/') ? url : url + '/';
 }
 
 async function bx(method, params = {}) {
-  const base = getBitrixBaseUrl();
-  const res = await fetch(`${base}${method}.json`, {
+  const res = await fetch(`${baseUrl()}${method}.json`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
     body: JSON.stringify(params),
@@ -26,8 +27,8 @@ async function fetchOpTasks() {
   for (let start = 0; ; start += TASKS_PAGE_SIZE) {
     const payload = await bx('tasks.task.list', {
       order: { ID: 'asc' },
-      filter: { GROUP_ID: 51 },
-      select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID', 'RESPONSIBLE_NAME'],
+      filter: { GROUP_ID: OP_GROUP_ID },
+      select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID'],
       start
     });
     const page = payload.result?.tasks || payload.result || [];
@@ -39,41 +40,60 @@ async function fetchOpTasks() {
 
 async function fetchChecklists(taskIds) {
   const map = {};
-  // batch 45 at a time
   for (let i = 0; i < taskIds.length; i += 45) {
     const chunk = taskIds.slice(i, i + 45);
     const cmd = {};
-    chunk.forEach(id => { cmd[`cl_${id}`] = `task.checklistitem.getlist?taskId=${id}`; });
+    chunk.forEach(id => { cmd[`c${id}`] = `task.checklistitem.getlist?taskId=${id}`; });
     try {
-      const r = await bx('batch', { cmd, halt: 0 });
+      const r = await bx('batch', { halt: 0, cmd });
       const result = r.result?.result || {};
       Object.keys(result).forEach(k => {
-        const tid = k.replace('cl_', '');
         const items = result[k];
-        map[tid] = Array.isArray(items) ? items : Object.values(items || {});
+        map[k.slice(1)] = Array.isArray(items) ? items : Object.values(items || {});
       });
-    } catch { /* skip */ }
+    } catch { /* skip failed batch */ }
   }
   return map;
 }
 
-function getOpCode(tags) {
-  const arr = Array.isArray(tags) ? tags : [];
-  const tag = arr.find(t => (t || '').startsWith('ОП2026:'));
-  return tag ? tag.replace('ОП2026:', '').trim() : null;
+// Bitrix returns tags as { "101": { id, title }, … } — not an array
+function opCode(task) {
+  const tags = task.tags || task.TAGS || {};
+  const titles = Array.isArray(tags)
+    ? tags.map(t => (typeof t === 'string' ? t : t?.title || ''))
+    : Object.values(tags).map(t => (typeof t === 'string' ? t : t?.title || ''));
+  const tag = titles.find(t => t.startsWith(TAG_PREFIX));
+  return tag ? tag.slice(TAG_PREFIX.length).trim() : null;
 }
 
-const ROMAN = { I:1,II:2,III:3,IV:4,V:5,VI:6,VII:7,VIII:8,IX:9 };
+const ROMAN = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8, IX: 9 };
 
-function codeLevel(code) {
-  if (!code) return -1;
-  if (ROMAN[code] !== undefined) return 0;  // goal: I, II ...
-  const parts = code.split('.');
-  return parts.length - 1; // 1.1 → 1, 1.1.1 → 2
-}
+// Step title format: "1.1.1.1 Текст задачи · до 01.08.2026 · исполнитель: Шынырбай Б."
+function parseStep(item) {
+  const raw = String(item.TITLE || item.title || '').trim();
+  const parts = raw.split('·').map(s => s.trim());
 
-function goalNum(code) {
-  return ROMAN[code] || parseInt(code) || 0;
+  let head = parts[0] || '';
+  const codeMatch = head.match(/^(\d+(?:\.\d+)+)\s+/);
+  const code = codeMatch ? codeMatch[1] : null;
+  const text = codeMatch ? head.slice(codeMatch[0].length).trim() : head;
+
+  let deadline = null;
+  let responsible = '';
+  for (const p of parts.slice(1)) {
+    const d = p.match(/до\s+(\d{2})\.(\d{2})\.(\d{4})/);
+    if (d) { deadline = `${d[3]}-${d[2]}-${d[1]}`; continue; }
+    const r = p.match(/исполнитель:\s*(.+)$/i);
+    if (r) responsible = r[1].trim();
+  }
+
+  return {
+    code,
+    text,
+    deadline,
+    responsible,
+    done: (item.IS_COMPLETE || item.isComplete) === 'Y'
+  };
 }
 
 export default async function handler(req, res) {
@@ -83,76 +103,123 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   if (!process.env.TASK_REPORT_WEBHOOK_URL) {
-    return res.status(500).json({ ok: false, error: 'Webhook URL not configured' });
+    return res.status(500).json({ ok: false, error: 'TASK_REPORT_WEBHOOK_URL не настроен' });
   }
 
   try {
     const tasks = await fetchOpTasks();
 
-    const goals = [], stratTasks = [], tactTasks = [];
-    tasks.forEach(t => {
-      const tags = t.tags || t.TAGS || [];
-      const code = getOpCode(tags);
+    const goals = [], strat = [], tact = [];
+    for (const t of tasks) {
+      const code = opCode(t);
+      if (!code) continue;
       t._code = code;
-      const lvl = codeLevel(code);
-      if (lvl === 0) goals.push(t);
-      else if (lvl === 1) stratTasks.push(t);
-      else if (lvl === 2) tactTasks.push(t);
-    });
+      const depth = code.split('.').length - 1;
+      if (ROMAN[code] !== undefined) goals.push(t);
+      else if (depth === 1) strat.push(t);
+      else if (depth === 2) tact.push(t);
+    }
 
-    // Fetch checklists for tactical tasks
-    const tactIds = tactTasks.map(t => String(t.id || t.ID));
+    const tactIds = tact.map(t => String(t.id || t.ID));
     const checklists = tactIds.length ? await fetchChecklists(tactIds) : {};
 
+    const now = Date.now();
+    const SOON_MS = 14 * 24 * 60 * 60 * 1000;
+
+    // Build tactical task objects with their steps
+    const tactByCode = {};
+    for (const tt of tact) {
+      const id = String(tt.id || tt.ID);
+      // Only real steps — the "Тактические подзадачи" header has PARENT_ID 0
+      const items = (checklists[id] || []).filter(i => String(i.PARENT_ID || 0) !== '0');
+      const steps = items.map(parseStep);
+
+      let done = 0, overdue = 0, soon = 0;
+      for (const s of steps) {
+        if (s.done) { done++; continue; }
+        if (!s.deadline) continue;
+        const dt = new Date(s.deadline).getTime();
+        if (dt < now) overdue++;
+        else if (dt - now <= SOON_MS) soon++;
+      }
+
+      tactByCode[tt._code] = {
+        id,
+        code: tt._code,
+        title: String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, ''),
+        deadline: tt.deadline || tt.DEADLINE || null,
+        steps,
+        totalSteps: steps.length,
+        doneSteps: done,
+        overdueSteps: overdue,
+        soonSteps: soon
+      };
+    }
+
     const tree = goals.map(g => {
-      const gCode = g._code;
-      const gNum = goalNum(gCode);
+      const gNum = ROMAN[g._code] || 0;
 
-      const children = stratTasks
-        .filter(st => st._code && st._code.startsWith(gNum + '.') && st._code.split('.').length === 2)
-        .sort((a, b) => a._code.localeCompare(b._code))
-        .map(st => {
-          const stPrefix = st._code + '.';
-          const tacts = tactTasks
-            .filter(tt => tt._code && tt._code.startsWith(stPrefix) && tt._code.split('.').length === 3)
-            .sort((a, b) => a._code.localeCompare(b._code))
-            .map(tt => {
-              const ttId = String(tt.id || tt.ID);
-              const items = checklists[ttId] || [];
-              const totalSteps = items.length;
-              const doneSteps = items.filter(i => i.IS_COMPLETE === 'Y' || i.isComplete === 'Y').length;
-              const overdueSteps = items.filter(i => {
-                if (i.IS_COMPLETE === 'Y' || i.isComplete === 'Y') return false;
-                const d = i.DEADLINE || i.deadline;
-                return d && new Date(d) < new Date();
-              }).length;
-              return {
-                id: ttId,
-                code: tt._code,
-                title: String(tt.title || tt.TITLE || ''),
-                deadline: tt.deadline || tt.DEADLINE || null,
-                responsible: tt.responsibleName || tt.RESPONSIBLE_NAME || '',
-                done: (tt.realStatus || tt.REAL_STATUS) === '5',
-                totalSteps,
-                doneSteps,
-                overdueSteps
-              };
-            });
-
-          const totalSteps = tacts.reduce((a, t) => a + t.totalSteps, 0);
-          const doneSteps  = tacts.reduce((a, t) => a + t.doneSteps, 0);
-          const overdueSteps = tacts.reduce((a, t) => a + t.overdueSteps, 0);
-          return { code: st._code, title: String(st.title || st.TITLE || ''), tacts, totalSteps, doneSteps, overdueSteps };
+      const children = strat
+        .filter(s => s._code.split('.')[0] === String(gNum))
+        .sort((a, b) => a._code.localeCompare(b._code, undefined, { numeric: true }))
+        .map(s => {
+          const tacts = Object.values(tactByCode)
+            .filter(t => t.code.startsWith(s._code + '.'))
+            .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
+          return {
+            code: s._code,
+            title: String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, ''),
+            tacts,
+            totalSteps: tacts.reduce((a, t) => a + t.totalSteps, 0),
+            doneSteps: tacts.reduce((a, t) => a + t.doneSteps, 0),
+            overdueSteps: tacts.reduce((a, t) => a + t.overdueSteps, 0),
+            soonSteps: tacts.reduce((a, t) => a + t.soonSteps, 0)
+          };
         });
 
-      const totalSteps   = children.reduce((a, c) => a + c.totalSteps, 0);
-      const doneSteps    = children.reduce((a, c) => a + c.doneSteps, 0);
-      const overdueSteps = children.reduce((a, c) => a + c.overdueSteps, 0);
-
-      return { code: gCode, num: gNum, title: String(g.title || g.TITLE || ''), children, totalSteps, doneSteps, overdueSteps };
+      return {
+        code: g._code,
+        num: gNum,
+        title: String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim(),
+        children,
+        totalSteps: children.reduce((a, c) => a + c.totalSteps, 0),
+        doneSteps: children.reduce((a, c) => a + c.doneSteps, 0),
+        overdueSteps: children.reduce((a, c) => a + c.overdueSteps, 0),
+        soonSteps: children.reduce((a, c) => a + c.soonSteps, 0)
+      };
     }).sort((a, b) => a.num - b.num);
 
-    return res.status(200).json({ ok: true, goals: tree, fetchedAt: new Date().toISOString() });
+    // Flat list of open steps sorted by deadline — for the upcoming-deadlines strip
+    const upcoming = [];
+    for (const g of tree) {
+      for (const s of g.children) {
+        for (const t of s.tacts) {
+          for (const st of t.steps) {
+            if (st.done || !st.deadline) continue;
+            upcoming.push({ ...st, goal: g.code, goalTitle: g.title });
+          }
+        }
+      }
+    }
+    upcoming.sort((a, b) => a.deadline.localeCompare(b.deadline));
+
+    const totals = {
+      goals: tree.length,
+      strat: strat.length,
+      tact: tact.length,
+      steps: tree.reduce((a, g) => a + g.totalSteps, 0),
+      done: tree.reduce((a, g) => a + g.doneSteps, 0),
+      overdue: tree.reduce((a, g) => a + g.overdueSteps, 0),
+      soon: tree.reduce((a, g) => a + g.soonSteps, 0)
+    };
+
+    return res.status(200).json({
+      ok: true,
+      goals: tree,
+      upcoming: upcoming.slice(0, 40),
+      totals,
+      fetchedAt: new Date().toISOString()
+    });
   } catch (e) {
     console.error('op-plan error:', e);
     return res.status(500).json({ ok: false, error: e.message });

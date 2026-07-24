@@ -2196,60 +2196,153 @@
         }
       }
 
+      const PLAN_COLORS = { done: '#22c55e', overdue: '#ef4444', soon: '#f97316', idle: '#c9cdc6' };
+
+      function planEscape(s) {
+        return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+      }
+
+      function planDate(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        return isNaN(d) ? '' : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+      }
+
       function drawPlan(j) {
         const goals = j.goals || [];
         if (!goals.length) {
-          ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">Задач с тегом ОП2026 не найдено</div>`;
+          ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">В группе ОП 2026 нет задач с тегами вида «ОП2026:1.1»</div>`;
           return;
         }
 
-        const pct = (done, total) => total ? Math.round(done / total * 100) : 0;
+        const T = j.totals || {};
+        const pct = (d, t) => t ? Math.round(d / t * 100) : 0;
 
-        const cards = goals.map(g => {
-          const p = pct(g.doneSteps, g.totalSteps);
-          const hasOverdue = g.overdueSteps > 0;
-          const overduePct = g.totalSteps ? Math.round(g.overdueSteps / g.totalSteps * 100) : 0;
-
-          const tactRows = g.children.flatMap(st =>
-            st.tacts.slice(0, 4).map(tt => {
-              const tp = pct(tt.doneSteps, tt.totalSteps);
-              const color = tt.overdueSteps > 0 ? '#ef4444' : tp === 100 ? '#8ac43f' : 'var(--text-muted)';
-              const dl = tt.deadline ? new Date(tt.deadline).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit'}) : '';
-              return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px;border-bottom:1px solid rgba(0,0,0,.04)">
-                <span style="color:${color};font-weight:700;min-width:28px">${tp}%</span>
-                <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-main)">${tt.title}</span>
-                ${dl ? `<span style="color:var(--text-muted);flex-shrink:0">${dl}</span>` : ''}
-              </div>`;
-            })
-          ).join('');
-
-          return `<div style="
-            background:var(--surface);border-radius:16px;padding:18px;
-            border:2px solid ${hasOverdue ? '#ef4444' : 'rgba(233,235,232,.8)'};
-            box-shadow:0 4px 15px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:10px">
-            <div style="display:flex;align-items:flex-start;gap:8px">
-              <span style="background:rgba(138,196,63,.12);color:#5a9a1a;font-weight:800;font-size:12px;padding:3px 8px;border-radius:20px;flex-shrink:0">${g.code}</span>
-              <span style="font-weight:700;font-size:13px;line-height:1.3;color:var(--text-main)">${g.title}</span>
-            </div>
-            <div style="display:flex;gap:4px;height:6px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.06)">
-              <div style="width:${p}%;background:#8ac43f;transition:width .3s"></div>
-              <div style="width:${overduePct}%;background:#ef4444;transition:width .3s"></div>
-            </div>
-            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)">
-              <span>${g.doneSteps} / ${g.totalSteps} шагов</span>
-              <span style="font-weight:700;color:${hasOverdue?'#ef4444':'#5a9a1a'}">${p}%</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:0">${tactRows}</div>
+        // ── Metric strip ────────────────────────────────────────────────
+        const metric = (label, value, color) => `
+          <div style="background:var(--surface);border:1px solid rgba(233,235,232,.8);border-radius:16px;
+                      padding:14px 18px;box-shadow:0 4px 15px rgba(0,0,0,.01);flex:1;min-width:120px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted)">${label}</div>
+            <strong style="font-size:24px;font-weight:900;color:${color || 'var(--text-main)'};line-height:1.2">${value}</strong>
           </div>`;
-        });
 
-        const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '';
+        const metrics = [
+          metric('Прогресс плана', pct(T.done, T.steps) + '%', '#5a9a1a'),
+          metric('Шагов всего', T.steps ?? 0),
+          metric('Выполнено', T.done ?? 0, PLAN_COLORS.done),
+          metric('Просрочено', T.overdue ?? 0, PLAN_COLORS.overdue),
+          metric('Горит (≤14 дн)', T.soon ?? 0, PLAN_COLORS.soon)
+        ].join('');
+
+        // ── Goal cards ──────────────────────────────────────────────────
+        const cards = goals.map(g => {
+          const donePct = pct(g.doneSteps, g.totalSteps);
+          const overPct = pct(g.overdueSteps, g.totalSteps);
+          const soonPct = pct(g.soonSteps, g.totalSteps);
+          const hasOverdue = g.overdueSteps > 0;
+
+          // Up to 8 tactical tasks, nearest deadline first
+          const tacts = g.children
+            .flatMap(s => s.tacts)
+            .map(t => {
+              const next = t.steps
+                .filter(s => !s.done && s.deadline)
+                .map(s => s.deadline)
+                .sort()[0] || null;
+              return { ...t, next };
+            })
+            .sort((a, b) => (a.next || '9999').localeCompare(b.next || '9999'))
+            .slice(0, 8);
+
+          const rows = tacts.map(t => {
+            const p = pct(t.doneSteps, t.totalSteps);
+            const color = t.overdueSteps > 0 ? PLAN_COLORS.overdue
+                        : p === 100        ? PLAN_COLORS.done
+                        : t.soonSteps > 0  ? PLAN_COLORS.soon
+                        : 'var(--text-muted)';
+            return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11px;
+                                border-top:1px solid rgba(233,235,232,.7)">
+              <span style="font-weight:800;color:${color};min-width:34px;flex-shrink:0">${t.code}</span>
+              <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                           color:var(--text-main)" title="${planEscape(t.title)}">${planEscape(t.title)}</span>
+              <span style="color:var(--text-muted);flex-shrink:0;font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
+              <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.next)}</span>
+            </div>`;
+          }).join('');
+
+          return `<div style="background:var(--surface);border-radius:16px;padding:18px;
+                      border:1.5px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};
+                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:11px">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <span style="background:rgba(138,196,63,.1);color:#5a9a1a;font-weight:900;font-size:11px;
+                           padding:3px 9px;border-radius:20px;flex-shrink:0">${g.code}</span>
+              <span style="font-weight:800;font-size:12.5px;line-height:1.35;color:var(--text-main)">${planEscape(g.title)}</span>
+            </div>
+
+            <div style="display:flex;height:7px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.05)">
+              <div style="width:${donePct}%;background:${PLAN_COLORS.done}"></div>
+              <div style="width:${overPct}%;background:${PLAN_COLORS.overdue}"></div>
+              <div style="width:${soonPct}%;background:${PLAN_COLORS.soon}"></div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--text-muted)">
+              <span>${g.doneSteps} / ${g.totalSteps} шагов${g.overdueSteps ? ` · <b style="color:${PLAN_COLORS.overdue}">${g.overdueSteps} просроч.</b>` : ''}</span>
+              <strong style="font-size:15px;font-weight:900;color:${hasOverdue ? PLAN_COLORS.overdue : '#5a9a1a'}">${donePct}%</strong>
+            </div>
+
+            <div>${rows || '<div style="font-size:11px;color:var(--text-muted);padding-top:6px">Нет тактических задач</div>'}</div>
+          </div>`;
+        }).join('');
+
+        // ── Upcoming deadlines strip ────────────────────────────────────
+        const now = Date.now();
+        const upcoming = (j.upcoming || []).slice(0, 24).map(s => {
+          const dt = new Date(s.deadline).getTime();
+          const overdue = dt < now;
+          const soon = !overdue && dt - now <= 14 * 864e5;
+          const color = overdue ? PLAN_COLORS.overdue : soon ? PLAN_COLORS.soon : PLAN_COLORS.idle;
+          const bg = overdue ? '#fee2e2' : soon ? '#ffedd5' : 'rgba(233,235,232,.5)';
+          return `<div style="display:flex;align-items:center;gap:9px;padding:7px 12px;border-radius:10px;
+                              background:${bg};font-size:11px">
+            <span style="font-weight:800;color:${color};flex-shrink:0;min-width:52px">${planDate(s.deadline)}</span>
+            <span style="font-weight:700;color:var(--text-muted);flex-shrink:0;min-width:46px">${s.code || ''}</span>
+            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+                         color:var(--text-main)" title="${planEscape(s.text)}">${planEscape(s.text)}</span>
+            <span style="color:var(--text-muted);flex-shrink:0">${planEscape(s.responsible)}</span>
+          </div>`;
+        }).join('');
+
+        const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
+
         ids.planWrap.innerHTML = `
-          <div style="padding:16px 0 8px;display:flex;justify-content:space-between;align-items:center">
-            <span style="font-weight:800;font-size:16px;color:var(--text-main)">Оперативный план IC Group 2026</span>
-            <span style="font-size:11px;color:var(--text-muted)">обновлено ${updAt} <button onclick="planState.data=null;renderPlan()" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:8px;padding:2px 8px;cursor:pointer;font-size:11px;color:var(--text-muted)">↻</button></span>
+          <div style="padding:14px 0 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+            <span style="font-weight:900;font-size:16px;color:var(--text-main)">
+              Оперативный план IC Group 2026
+              <span style="font-weight:600;font-size:11px;color:var(--text-muted);margin-left:8px">
+                ${T.goals || 0} целей · ${T.strat || 0} стратзадач · ${T.tact || 0} тактических · ${T.steps || 0} шагов
+              </span>
+            </span>
+            <span style="font-size:11px;color:var(--text-muted)">обновлено ${updAt}
+              <button id="planRefresh" style="margin-left:8px;background:none;border:1px solid rgba(233,235,232,.9);
+                      border-radius:8px;padding:3px 9px;cursor:pointer;font-size:11px;color:var(--text-muted)">↻</button>
+            </span>
           </div>
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding-bottom:32px">${cards.join('')}</div>`;
+
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
+
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">${cards}</div>
+
+          ${upcoming ? `
+          <div style="margin-top:22px;padding-bottom:32px">
+            <div style="font-weight:800;font-size:13px;color:var(--text-main);margin-bottom:10px">
+              Ближайшие сроки
+              <span style="font-weight:600;font-size:11px;color:var(--text-muted);margin-left:6px">незакрытые шаги</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px">${upcoming}</div>
+          </div>` : ''}`;
+
+        const btn = document.getElementById('planRefresh');
+        if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
       }
 
       // ── Table dispatcher ──────────────────────────────────────────────
