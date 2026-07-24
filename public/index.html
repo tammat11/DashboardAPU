@@ -1763,12 +1763,14 @@
 
       function planTaskCounts() {
         const counts = {};
-        const blank = () => ({ total: 0, done: 0, planTotal: 0, planDone: 0, offTotal: 0, offDone: 0 });
+        const blank = () => ({ total: 0, done: 0, planTotal: 0, planDone: 0, offTotal: 0, offDone: 0, overdue: 0 });
 
         // ЗРС tasks are already stripped out of filteredRows, so "не по плану"
         // is simply everything here that does not belong to the ОП group.
         state.filteredRows.forEach(row => {
-          const done = String(row['Состояние задачи'] || '').startsWith('Закрыта');
+          const st = String(row['Состояние задачи'] || '');
+          const done = st.startsWith('Закрыта');
+          const isOverdue = st === 'Открыта просрочена';
           const isPlan = String(row['ID проекта'] || '') === OP_GROUP_ID;
 
           taskParticipantIds(row).forEach(id => {
@@ -1776,6 +1778,7 @@
             const c = counts[id];
             c.total++;
             if (done) c.done++;
+            if (isOverdue) c.overdue++;
             if (isPlan) { c.planTotal++; if (done) c.planDone++; }
             else        { c.offTotal++;  if (done) c.offDone++;  }
           });
@@ -1808,6 +1811,27 @@
             <span class="pt-val">${done}<span class="pt-of">/${total}</span></span>
           </div>`;
 
+        // A card reddens by the SHARE of the person's tasks that are overdue, not by
+        // the raw count — otherwise whoever simply holds more tasks always looks worst.
+        // Shares are tiny (a few overdue among dozens), so they are scaled against the
+        // worst share on screen; that person is fully red and the rest fall in behind.
+        const shareOf = c => (c.total ? c.overdue / c.total : 0);
+        const worstShare = Math.max(
+          0,
+          ...sorted.map(e => shareOf(counts[String(e.id)] || blank()))
+        );
+
+        const overdueStyle = (c) => {
+          if (!c.overdue) return '';
+          const k = worstShare ? Math.min(1, shareOf(c) / worstShare) : 0;
+          const bg = (0.04 + k * 0.16).toFixed(3);   // 4%..20% fill
+          const br = (0.30 + k * 0.55).toFixed(3);   // 30%..85% border
+          return `background:rgba(239,68,68,${bg});border-color:rgba(239,68,68,${br});`;
+        };
+        const overdueTitle = c => c.overdue
+          ? ` title="Просрочено ${c.overdue} из ${c.total} — ${Math.round(shareOf(c) * 100)}%"`
+          : '';
+
         // CEO is kept out of the ranked roster elsewhere, so pull him from the
         // directory and give him the whole first row of the grid.
         const CEO_ID = '63';
@@ -1832,7 +1856,7 @@
         const cards = heroCard + sorted.map((emp) => {
           const c = counts[String(emp.id)] || blank();
           return `
-            <div class="g-card pt-card">
+            <div class="g-card pt-card" style="${overdueStyle(c)}"${overdueTitle(c)}>
               <div class="g-ava-wrap">${galleryAvatarMarkup(emp)}</div>
               <div class="g-name">${firstNameOnly(emp.name)}</div>
               <div class="pt-meta">
