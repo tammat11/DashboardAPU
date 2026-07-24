@@ -2324,11 +2324,13 @@
                         : p === 100        ? PLAN_COLORS.done
                         : t.soonSteps > 0  ? PLAN_COLORS.soon
                         : 'var(--text-muted)';
-            return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;font-size:11px;
+            // Titles wrap over as many lines as they need; the code, counter and date
+            // stay pinned to the first line so the columns still read straight down.
+            return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:11px;
                                 border-top:1px solid rgba(233,235,232,.7)">
               <span style="font-weight:800;color:${color};min-width:34px;flex-shrink:0">${t.code}</span>
-              <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-                           color:var(--text-main)" title="${planEscape(t.title)}">${planEscape(t.title)}</span>
+              <span style="flex:1;min-width:0;line-height:1.4;overflow-wrap:anywhere;
+                           color:var(--text-main)">${planEscape(t.title)}</span>
               <span style="color:var(--text-muted);flex-shrink:0;font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
               <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.deadline)}</span>
             </div>`;
