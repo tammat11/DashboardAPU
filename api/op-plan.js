@@ -123,36 +123,20 @@ export default async function handler(req, res) {
     const tactIds = tact.map(t => String(t.id || t.ID));
     const checklists = tactIds.length ? await fetchChecklists(tactIds) : {};
 
-    const now = Date.now();
-    const SOON_MS = 14 * 24 * 60 * 60 * 1000;
-
-    // Build tactical task objects with their steps
+    // Build tactical task objects with their steps. Counters are deliberately NOT
+    // computed here: the client aggregates them so the period filter can apply.
     const tactByCode = {};
     for (const tt of tact) {
       const id = String(tt.id || tt.ID);
       // Only real steps — the "Тактические подзадачи" header has PARENT_ID 0
       const items = (checklists[id] || []).filter(i => String(i.PARENT_ID || 0) !== '0');
-      const steps = items.map(parseStep);
-
-      let done = 0, overdue = 0, soon = 0;
-      for (const s of steps) {
-        if (s.done) { done++; continue; }
-        if (!s.deadline) continue;
-        const dt = new Date(s.deadline).getTime();
-        if (dt < now) overdue++;
-        else if (dt - now <= SOON_MS) soon++;
-      }
 
       tactByCode[tt._code] = {
         id,
         code: tt._code,
         title: String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, ''),
         deadline: tt.deadline || tt.DEADLINE || null,
-        steps,
-        totalSteps: steps.length,
-        doneSteps: done,
-        overdueSteps: overdue,
-        soonSteps: soon
+        steps: items.map(parseStep)
       };
     }
 
@@ -162,62 +146,25 @@ export default async function handler(req, res) {
       const children = strat
         .filter(s => s._code.split('.')[0] === String(gNum))
         .sort((a, b) => a._code.localeCompare(b._code, undefined, { numeric: true }))
-        .map(s => {
-          const tacts = Object.values(tactByCode)
+        .map(s => ({
+          code: s._code,
+          title: String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, ''),
+          tacts: Object.values(tactByCode)
             .filter(t => t.code.startsWith(s._code + '.'))
-            .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }));
-          return {
-            code: s._code,
-            title: String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, ''),
-            tacts,
-            totalSteps: tacts.reduce((a, t) => a + t.totalSteps, 0),
-            doneSteps: tacts.reduce((a, t) => a + t.doneSteps, 0),
-            overdueSteps: tacts.reduce((a, t) => a + t.overdueSteps, 0),
-            soonSteps: tacts.reduce((a, t) => a + t.soonSteps, 0)
-          };
-        });
+            .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
+        }));
 
       return {
         code: g._code,
         num: gNum,
         title: String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim(),
-        children,
-        totalSteps: children.reduce((a, c) => a + c.totalSteps, 0),
-        doneSteps: children.reduce((a, c) => a + c.doneSteps, 0),
-        overdueSteps: children.reduce((a, c) => a + c.overdueSteps, 0),
-        soonSteps: children.reduce((a, c) => a + c.soonSteps, 0)
+        children
       };
     }).sort((a, b) => a.num - b.num);
-
-    // Flat list of open steps sorted by deadline — for the upcoming-deadlines strip
-    const upcoming = [];
-    for (const g of tree) {
-      for (const s of g.children) {
-        for (const t of s.tacts) {
-          for (const st of t.steps) {
-            if (st.done || !st.deadline) continue;
-            upcoming.push({ ...st, goal: g.code, goalTitle: g.title });
-          }
-        }
-      }
-    }
-    upcoming.sort((a, b) => a.deadline.localeCompare(b.deadline));
-
-    const totals = {
-      goals: tree.length,
-      strat: strat.length,
-      tact: tact.length,
-      steps: tree.reduce((a, g) => a + g.totalSteps, 0),
-      done: tree.reduce((a, g) => a + g.doneSteps, 0),
-      overdue: tree.reduce((a, g) => a + g.overdueSteps, 0),
-      soon: tree.reduce((a, g) => a + g.soonSteps, 0)
-    };
 
     return res.status(200).json({
       ok: true,
       goals: tree,
-      upcoming: upcoming.slice(0, 40),
-      totals,
       fetchedAt: new Date().toISOString()
     });
   } catch (e) {

@@ -54,6 +54,10 @@
         max-width: none;
         padding: 0 28px;
       }
+      /* The daily report button belongs to the task report, not to the OP plan */
+      body.plan-active #dailyReportRow {
+        display: none;
+      }
 
       /* Hero Section & TV Metadata */
       .hero {
@@ -1100,7 +1104,7 @@
       </div>
 
       <!-- Daily Report Button -->
-      <div style="padding: 0 16px 12px;">
+      <div id="dailyReportRow" style="padding: 0 16px 12px;">
         <button id="dailyReportBtn" onclick="copyDailyReport()" style="
           display:flex;align-items:center;gap:8px;
           background:#2563eb;color:#fff;border:none;border-radius:10px;
@@ -2196,7 +2200,7 @@
         }
       }
 
-      const PLAN_COLORS = { done: '#22c55e', overdue: '#ef4444', soon: '#f97316', idle: '#c9cdc6' };
+      const PLAN_COLORS = { done: '#22c55e', overdue: '#ef4444', soon: '#f97316' };
 
       function planEscape(s) {
         return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
@@ -2208,15 +2212,75 @@
         return isNaN(d) ? '' : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
       }
 
+      // Roll a tactical task's steps up into counters, honouring the selected period.
+      // A step belongs to the period when its own deadline falls inside the window.
+      function planTactStats(tact, range, now) {
+        const steps = (tact.steps || []).filter(s => {
+          if (!range) return true;
+          if (!s.deadline) return false;
+          const dt = new Date(s.deadline).getTime();
+          return dt >= range.start.getTime() && dt <= range.end.getTime();
+        });
+
+        let done = 0, overdue = 0, soon = 0, next = null;
+        for (const s of steps) {
+          if (s.done) { done++; continue; }
+          if (!s.deadline) continue;
+          const dt = new Date(s.deadline).getTime();
+          if (dt < now) overdue++;
+          else if (dt - now <= 14 * 864e5) soon++;
+          if (!next || s.deadline < next) next = s.deadline;
+        }
+
+        return { ...tact, steps, next, totalSteps: steps.length, doneSteps: done, overdueSteps: overdue, soonSteps: soon };
+      }
+
       function drawPlan(j) {
-        const goals = j.goals || [];
-        if (!goals.length) {
+        const rawGoals = j.goals || [];
+        if (!rawGoals.length) {
           ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">В группе ОП 2026 нет задач с тегами вида «ОП2026:1.1»</div>`;
           return;
         }
 
-        const T = j.totals || {};
         const pct = (d, t) => t ? Math.round(d / t * 100) : 0;
+        const sum = (arr, key) => arr.reduce((a, x) => a + x[key], 0);
+
+        const period = ids.periodSelect ? ids.periodSelect.value : 'all';
+        const range = getPeriodRange(period);
+        const now = Date.now();
+
+        // Recompute every aggregate from the filtered steps, bottom-up
+        const goals = rawGoals.map(g => {
+          const tacts = g.children
+            .flatMap(s => s.tacts || [])
+            .map(t => planTactStats(t, range, now));
+
+          return {
+            ...g,
+            tacts,
+            totalSteps: sum(tacts, 'totalSteps'),
+            doneSteps: sum(tacts, 'doneSteps'),
+            overdueSteps: sum(tacts, 'overdueSteps'),
+            soonSteps: sum(tacts, 'soonSteps')
+          };
+        });
+
+        // Header keeps the plan's full scale; the metric strip reflects the period
+        const allStrat = rawGoals.flatMap(g => g.children || []);
+        const allTacts = allStrat.flatMap(s => s.tacts || []);
+        const scale = {
+          goals: rawGoals.length,
+          strat: allStrat.length,
+          tact: allTacts.length,
+          steps: allTacts.reduce((a, t) => a + (t.steps || []).length, 0)
+        };
+
+        const T = {
+          steps: sum(goals, 'totalSteps'),
+          done: sum(goals, 'doneSteps'),
+          overdue: sum(goals, 'overdueSteps'),
+          soon: sum(goals, 'soonSteps')
+        };
 
         // ── Metric strip ────────────────────────────────────────────────
         const metric = (label, value, color) => `
@@ -2227,11 +2291,11 @@
           </div>`;
 
         const metrics = [
-          metric('Прогресс плана', pct(T.done, T.steps) + '%', '#5a9a1a'),
-          metric('Шагов всего', T.steps ?? 0),
-          metric('Выполнено', T.done ?? 0, PLAN_COLORS.done),
-          metric('Просрочено', T.overdue ?? 0, PLAN_COLORS.overdue),
-          metric('Горит (≤14 дн)', T.soon ?? 0, PLAN_COLORS.soon)
+          metric('Прогресс плана', T.steps ? pct(T.done, T.steps) + '%' : '—', '#5a9a1a'),
+          metric(range ? 'Шагов в периоде' : 'Шагов всего', T.steps),
+          metric('Выполнено', T.done, PLAN_COLORS.done),
+          metric('Просрочено', T.overdue, PLAN_COLORS.overdue),
+          metric('Горит (≤14 дн)', T.soon, PLAN_COLORS.soon)
         ].join('');
 
         // ── Goal cards ──────────────────────────────────────────────────
@@ -2240,17 +2304,11 @@
           const overPct = pct(g.overdueSteps, g.totalSteps);
           const soonPct = pct(g.soonSteps, g.totalSteps);
           const hasOverdue = g.overdueSteps > 0;
+          const empty = g.totalSteps === 0;
 
-          // Up to 8 tactical tasks, nearest deadline first
-          const tacts = g.children
-            .flatMap(s => s.tacts)
-            .map(t => {
-              const next = t.steps
-                .filter(s => !s.done && s.deadline)
-                .map(s => s.deadline)
-                .sort()[0] || null;
-              return { ...t, next };
-            })
+          // Up to 8 tactical tasks that have steps in the period, nearest deadline first
+          const tacts = g.tacts
+            .filter(t => t.totalSteps > 0)
             .sort((a, b) => (a.next || '9999').localeCompare(b.next || '9999'))
             .slice(0, 8);
 
@@ -2279,6 +2337,9 @@
               <span style="font-weight:800;font-size:12.5px;line-height:1.35;color:var(--text-main)">${planEscape(g.title)}</span>
             </div>
 
+            ${empty ? `
+            <div style="font-size:11px;color:var(--text-muted);padding:4px 0 2px">Нет шагов в периоде</div>
+            ` : `
             <div style="display:flex;height:7px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.05)">
               <div style="width:${donePct}%;background:${PLAN_COLORS.done}"></div>
               <div style="width:${overPct}%;background:${PLAN_COLORS.overdue}"></div>
@@ -2290,25 +2351,8 @@
               <strong style="font-size:15px;font-weight:900;color:${hasOverdue ? PLAN_COLORS.overdue : '#5a9a1a'}">${donePct}%</strong>
             </div>
 
-            <div>${rows || '<div style="font-size:11px;color:var(--text-muted);padding-top:6px">Нет тактических задач</div>'}</div>
-          </div>`;
-        }).join('');
-
-        // ── Upcoming deadlines strip ────────────────────────────────────
-        const now = Date.now();
-        const upcoming = (j.upcoming || []).slice(0, 24).map(s => {
-          const dt = new Date(s.deadline).getTime();
-          const overdue = dt < now;
-          const soon = !overdue && dt - now <= 14 * 864e5;
-          const color = overdue ? PLAN_COLORS.overdue : soon ? PLAN_COLORS.soon : PLAN_COLORS.idle;
-          const bg = overdue ? '#fee2e2' : soon ? '#ffedd5' : 'rgba(233,235,232,.5)';
-          return `<div style="display:flex;align-items:center;gap:9px;padding:7px 12px;border-radius:10px;
-                              background:${bg};font-size:11px">
-            <span style="font-weight:800;color:${color};flex-shrink:0;min-width:52px">${planDate(s.deadline)}</span>
-            <span style="font-weight:700;color:var(--text-muted);flex-shrink:0;min-width:46px">${s.code || ''}</span>
-            <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-                         color:var(--text-main)" title="${planEscape(s.text)}">${planEscape(s.text)}</span>
-            <span style="color:var(--text-muted);flex-shrink:0">${planEscape(s.responsible)}</span>
+            <div>${rows}</div>
+            `}
           </div>`;
         }).join('');
 
@@ -2319,7 +2363,7 @@
             <span style="font-weight:900;font-size:16px;color:var(--text-main)">
               Оперативный план IC Group 2026
               <span style="font-weight:600;font-size:11px;color:var(--text-muted);margin-left:8px">
-                ${T.goals || 0} целей · ${T.strat || 0} стратзадач · ${T.tact || 0} тактических · ${T.steps || 0} шагов
+                ${scale.goals} целей · ${scale.strat} стратзадач · ${scale.tact} тактических · ${scale.steps} шагов
               </span>
             </span>
             <span style="font-size:11px;color:var(--text-muted)">обновлено ${updAt}
@@ -2330,16 +2374,7 @@
 
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">${cards}</div>
-
-          ${upcoming ? `
-          <div style="margin-top:22px;padding-bottom:32px">
-            <div style="font-weight:800;font-size:13px;color:var(--text-main);margin-bottom:10px">
-              Ближайшие сроки
-              <span style="font-weight:600;font-size:11px;color:var(--text-muted);margin-left:6px">незакрытые шаги</span>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:5px">${upcoming}</div>
-          </div>` : ''}`;
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding-bottom:32px">${cards}</div>`;
 
         const btn = document.getElementById('planRefresh');
         if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
@@ -2348,6 +2383,7 @@
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3');
+        document.body.classList.toggle('plan-active', state.viewMode === 'table6');
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
         if (state.viewMode === 'table5') { renderZRSGallery(); return; }
         if (state.viewMode === 'table6') { renderPlan(); return; }
@@ -3067,10 +3103,38 @@
           .replace(/'/g, '&#039;');
       }
 
+      // Period boundaries in the user's local time. Returns null for "all time".
+      function getPeriodRange(period) {
+        if (!period || period === 'all') return null;
+
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = now.getMonth();
+        const d = now.getDate();
+
+        const day = now.getDay();
+        const diffToMonday = d - day + (day === 0 ? -6 : 1);
+        const startWeek = new Date(y, m, diffToMonday, 0, 0, 0, 0);
+
+        switch (period) {
+          case 'today':
+            return { start: new Date(y, m, d, 0, 0, 0, 0), end: new Date(y, m, d, 23, 59, 59, 999) };
+          case 'week':
+            return { start: startWeek, end: new Date(startWeek.getTime() + 7 * 864e5 - 1) };
+          case 'lastWeek':
+            return { start: new Date(startWeek.getTime() - 7 * 864e5), end: new Date(startWeek.getTime() - 1) };
+          case 'month':
+            return { start: new Date(y, m, 1, 0, 0, 0, 0), end: new Date(y, m + 1, 0, 23, 59, 59, 999) };
+          case 'lastMonth':
+            return { start: new Date(y, m - 1, 1, 0, 0, 0, 0), end: new Date(y, m, 0, 23, 59, 59, 999) };
+          default:
+            return null;
+        }
+      }
+
       function applyFilters() {
         const period = ids.periodSelect ? ids.periodSelect.value : 'all';
-        const now = new Date();
-        
+
         let filtered = state.rows.filter(r => !(r['Название задачи'] || '').startsWith('ЗРС'));
 
         // Keep only АУП (ID: 157) and its descendants in the department structure
@@ -3097,42 +3161,9 @@
           filtered = filtered.filter(row => allowedDeptNames.has(row['Отдел']));
         }
         
-        if (period !== 'all') {
-          // Prepare period boundaries in user's browser local time
-          const startToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-          const endToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
-
-          const day = now.getDay();
-          const diffToMonday = now.getDate() - day + (day === 0 ? -6 : 1);
-          const startWeek = new Date(now.getFullYear(), now.getMonth(), diffToMonday, 0, 0, 0, 0);
-          const endWeek = new Date(startWeek.getTime() + 7 * 24 * 60 * 60 * 1000 - 1);
-
-          const startMonth = new Date(now.getFullYear(), now.getMonth(), 1, 0, 0, 0, 0);
-          const endMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
-
-          const startLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1, 0, 0, 0, 0);
-          const endLastMonth = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
-
-          const startLastWeek = new Date(startWeek.getTime() - 7 * 24 * 60 * 60 * 1000);
-          const endLastWeek = new Date(startWeek.getTime() - 1);
-
-          let start, end;
-          if (period === 'today') {
-            start = startToday;
-            end = endToday;
-          } else if (period === 'week') {
-            start = startWeek;
-            end = endWeek;
-          } else if (period === 'lastWeek') {
-            start = startLastWeek;
-            end = endLastWeek;
-          } else if (period === 'month') {
-            start = startMonth;
-            end = endMonth;
-          } else if (period === 'lastMonth') {
-            start = startLastMonth;
-            end = endLastMonth;
-          }
+        const range = getPeriodRange(period);
+        if (range) {
+          const { start, end } = range;
 
           filtered = state.rows.filter((row) => {
             const parseDate = (rawKey, strKey) => {
