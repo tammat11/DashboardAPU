@@ -1523,6 +1523,23 @@
       // Aggregate filtered rows into sorted people (shared by Rating & Gallery)
       function aggregatePeople() {
         const empMap = {};
+        // Pre-seed with all АУП employees so gallery shows them even with 0 tasks
+        (state.allEmployees || []).forEach(emp => {
+          if (emp.id && !isExcludedPerson(emp.name)) {
+            empMap[emp.name] = {
+              name: emp.name,
+              id: emp.id,
+              dept: emp.dept || '',
+              avatar: emp.avatar || '',
+              tasks: 0,
+              active: 0,
+              overdue: 0,
+              score: 0,
+              assignedCount: 0,
+              assignedToOtherDepts: 0
+            };
+          }
+        });
         state.filteredRows.forEach(row => {
           const name = row['Исполнитель'] || 'Без исполнителя';
           const id   = String(row['ID исполнителя'] || '');
@@ -3085,6 +3102,7 @@
           state.rows = payload.rows;
           await mergeAiScores();
           state.departments = payload.departments || [];
+          state.allEmployees = payload.allEmployees || [];
           state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
           state.portalHost = payload.portalHost || null;
 
