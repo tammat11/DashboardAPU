@@ -1050,6 +1050,7 @@
             <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
             <button id="viewBtn3" class="view-btn active">🖼️ Галерея</button>
             <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
+            <button id="viewBtn6" class="view-btn">📊 План</button>
             <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
           </span>
         </div>
@@ -1129,6 +1130,7 @@
 
         <div id="galleryWrap" hidden></div>
         <div id="zrsWrap" hidden></div>
+        <div id="planWrap" hidden></div>
 
         <div id="aiAnalysisWrap" hidden>
           <div id="aiAnalysisLoading" class="loading-panel">
@@ -1224,6 +1226,8 @@
         viewBtn3: document.getElementById('viewBtn3'),
         viewBtn4: document.getElementById('viewBtn4'),
         viewBtn5: document.getElementById('viewBtn5'),
+        viewBtn6: document.getElementById('viewBtn6'),
+        planWrap: document.getElementById('planWrap'),
         zrsWrap: document.getElementById('zrsWrap'),
         aiAnalysisWrap: document.getElementById('aiAnalysisWrap'),
         aiAnalysisLoading: document.getElementById('aiAnalysisLoading'),
@@ -1724,6 +1728,7 @@
       function renderGallery() {
         ids.aiAnalysisWrap.hidden = true;
         ids.zrsWrap.hidden = true;
+        if (ids.planWrap) ids.planWrap.hidden = true;
         ids.galleryWrap.hidden = false;
         ids.tableWrap.hidden = true;
 
@@ -1766,6 +1771,7 @@
         ids.galleryWrap.hidden = true;
         ids.aiAnalysisWrap.hidden = true;
         ids.tableWrap.hidden = true;
+        if (ids.planWrap) ids.planWrap.hidden = true;
         ids.zrsWrap.hidden = false;
 
         const ZRS_REQUIRED = 2;
@@ -1967,6 +1973,7 @@
         ids.aiAnalysisWrap.hidden = false;
         ids.tableWrap.hidden = true;
         ids.galleryWrap.hidden = true;
+        if (ids.planWrap) ids.planWrap.hidden = true;
         ids.aiAnalysisLoading.hidden = false;
         ids.aiAnalysisContent.innerHTML = '';
         ids.aiAnalysisError.hidden = true;
@@ -2161,15 +2168,101 @@
       if (ids.chatFab) ids.chatFab.addEventListener('click', openChat);
       if (ids.chatClose) ids.chatClose.addEventListener('click', closeChat);
 
+      // ── ОП 2026 Plan dashboard ───────────────────────────────────────────
+      const planState = { loading: false, data: null, error: null };
+
+      async function renderPlan() {
+        ids.tableWrap.hidden = true;
+        ids.galleryWrap.hidden = true;
+        ids.zrsWrap.hidden = true;
+        ids.aiAnalysisWrap.hidden = true;
+        if (ids.planWrap) ids.planWrap.hidden = false;
+
+        if (planState.loading) return;
+        if (planState.data) { drawPlan(planState.data); return; }
+
+        ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">Загружаем план ОП 2026…</div>`;
+        planState.loading = true;
+        try {
+          const r = await fetch('/api/op-plan');
+          const j = await r.json();
+          if (!j.ok) throw new Error(j.error || 'Ошибка загрузки');
+          planState.data = j;
+          drawPlan(j);
+        } catch (e) {
+          ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:#ef4444">Ошибка: ${e.message}</div>`;
+        } finally {
+          planState.loading = false;
+        }
+      }
+
+      function drawPlan(j) {
+        const goals = j.goals || [];
+        if (!goals.length) {
+          ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">Задач с тегом ОП2026 не найдено</div>`;
+          return;
+        }
+
+        const pct = (done, total) => total ? Math.round(done / total * 100) : 0;
+
+        const cards = goals.map(g => {
+          const p = pct(g.doneSteps, g.totalSteps);
+          const hasOverdue = g.overdueSteps > 0;
+          const overduePct = g.totalSteps ? Math.round(g.overdueSteps / g.totalSteps * 100) : 0;
+
+          const tactRows = g.children.flatMap(st =>
+            st.tacts.slice(0, 4).map(tt => {
+              const tp = pct(tt.doneSteps, tt.totalSteps);
+              const color = tt.overdueSteps > 0 ? '#ef4444' : tp === 100 ? '#8ac43f' : 'var(--text-muted)';
+              const dl = tt.deadline ? new Date(tt.deadline).toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit'}) : '';
+              return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;font-size:11px;border-bottom:1px solid rgba(0,0,0,.04)">
+                <span style="color:${color};font-weight:700;min-width:28px">${tp}%</span>
+                <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text-main)">${tt.title}</span>
+                ${dl ? `<span style="color:var(--text-muted);flex-shrink:0">${dl}</span>` : ''}
+              </div>`;
+            })
+          ).join('');
+
+          return `<div style="
+            background:var(--surface);border-radius:16px;padding:18px;
+            border:2px solid ${hasOverdue ? '#ef4444' : 'rgba(233,235,232,.8)'};
+            box-shadow:0 4px 15px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <span style="background:rgba(138,196,63,.12);color:#5a9a1a;font-weight:800;font-size:12px;padding:3px 8px;border-radius:20px;flex-shrink:0">${g.code}</span>
+              <span style="font-weight:700;font-size:13px;line-height:1.3;color:var(--text-main)">${g.title}</span>
+            </div>
+            <div style="display:flex;gap:4px;height:6px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.06)">
+              <div style="width:${p}%;background:#8ac43f;transition:width .3s"></div>
+              <div style="width:${overduePct}%;background:#ef4444;transition:width .3s"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)">
+              <span>${g.doneSteps} / ${g.totalSteps} шагов</span>
+              <span style="font-weight:700;color:${hasOverdue?'#ef4444':'#5a9a1a'}">${p}%</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0">${tactRows}</div>
+          </div>`;
+        });
+
+        const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'}) : '';
+        ids.planWrap.innerHTML = `
+          <div style="padding:16px 0 8px;display:flex;justify-content:space-between;align-items:center">
+            <span style="font-weight:800;font-size:16px;color:var(--text-main)">Оперативный план IC Group 2026</span>
+            <span style="font-size:11px;color:var(--text-muted)">обновлено ${updAt} <button onclick="planState.data=null;renderPlan()" style="margin-left:8px;background:none;border:1px solid var(--border);border-radius:8px;padding:2px 8px;cursor:pointer;font-size:11px;color:var(--text-muted)">↻</button></span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding-bottom:32px">${cards.join('')}</div>`;
+      }
+
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3');
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
         if (state.viewMode === 'table5') { renderZRSGallery(); return; }
+        if (state.viewMode === 'table6') { renderPlan(); return; }
         if (state.viewMode === 'table3') { renderGallery(); return; }
         ids.aiAnalysisWrap.hidden = true;
         ids.galleryWrap.hidden = true;
         ids.zrsWrap.hidden = true;
+        if (ids.planWrap) ids.planWrap.hidden = true;
         if (state.viewMode === 'table2') { renderLeaderboard(); return; }
 
         const tree = {};
@@ -3192,6 +3285,7 @@
         ids.viewBtn3.classList.toggle('active', mode === 'table3');
         ids.viewBtn4.classList.toggle('active', mode === 'table4');
         if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
+        if (ids.viewBtn6) ids.viewBtn6.classList.toggle('active', mode === 'table6');
         renderTable();
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
@@ -3199,6 +3293,7 @@
       if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
       if (ids.viewBtn4) ids.viewBtn4.addEventListener('click', () => setView('table4'));
       if (ids.viewBtn5) ids.viewBtn5.addEventListener('click', () => setView('table5'));
+      if (ids.viewBtn6) ids.viewBtn6.addEventListener('click', () => setView('table6'));
 
       loadReport('GET');
 
