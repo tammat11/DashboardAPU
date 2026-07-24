@@ -1092,10 +1092,10 @@
           <span class="view-switcher">
             <button id="viewBtn1" class="view-btn">🏗️ Структура</button>
             <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
-            <button id="viewBtn3" class="view-btn active">🖼️ Галерея</button>
+            <button id="viewBtn3" class="view-btn">🖼️ Галерея</button>
             <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
             <button id="viewBtn6" class="view-btn">📊 План</button>
-            <button id="viewBtn7" class="view-btn">📈 План+задачи</button>
+            <button id="viewBtn7" class="view-btn active">📈 План+задачи</button>
             <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
           </span>
         </div>
@@ -1221,7 +1221,7 @@
         refreshIntervalMs: 5 * 60 * 1000,
         portalHost: null,
         searchQuery: '',
-        viewMode: 'table3', // 'table1' | 'table2' | 'table3'
+        viewMode: 'table7', // 'table1' | 'table2' | 'table3' | 'table5' | 'table6' | 'table7'
         expandedNodes: new Set()
       };
 
@@ -3448,13 +3448,16 @@
         const lastMonthOpt = ids.periodSelect.querySelector('option[value="lastMonth"]');
         if (lastMonthOpt) lastMonthOpt.textContent = prevMonthName;
 
-        // Restore saved period preference
+        // Restore saved period preference. Default is «Все время»: the OP plan runs
+        // to 2027, so a month-wide window hides most of it.
         let savedPeriod = localStorage.getItem('dashboard_period');
-        // Migrate old default 'all' (Все время) to new default 'month' (Июнь)
-        if (savedPeriod === 'all' || !savedPeriod) {
-          savedPeriod = 'month';
-          localStorage.setItem('dashboard_period', 'month');
+        // One-time reset for anyone still carrying the previous 'month' default
+        if (!localStorage.getItem('dashboard_period_default_all')) {
+          savedPeriod = 'all';
+          localStorage.setItem('dashboard_period', 'all');
+          localStorage.setItem('dashboard_period_default_all', '1');
         }
+        if (!savedPeriod) savedPeriod = 'all';
         
         ids.periodSelect.value = savedPeriod;
         
