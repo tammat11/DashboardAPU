@@ -1822,11 +1822,10 @@
             </div>`;
         })() : '';
 
-        const cards = heroCard + sorted.map((emp, i) => {
+        const cards = heroCard + sorted.map((emp) => {
           const c = counts[String(emp.id)] || blank();
           return `
             <div class="g-card pt-card">
-              <span class="g-rank">#${i + 1}</span>
               <div class="g-ava-wrap">${galleryAvatarMarkup(emp)}</div>
               <div class="g-name">${firstNameOnly(emp.name)}</div>
               <div class="pt-meta">
