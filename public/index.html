@@ -858,6 +858,11 @@
       /* Имя в одну строку, поэтому убираем резерв высоты под фамилию и поджимаем карточку */
       .pt-card { padding: 13px 10px 10px; }
       .pt-card .g-name { min-height: 0; font-size: 13px; }
+      /* Источник 630–959px, а кружок был 80px — снимок ужимался в 8 раз и мылил.
+         Увеличиваем и обёртку, и само изображение: одну обёртку нельзя — имя наедет. */
+      .pt-card .g-ava-wrap { width: 104px; height: 104px; margin-bottom: 8px; }
+      .pt-card .g-avatar,
+      .pt-card .g-avatar-fallback { width: 104px; height: 104px; font-size: 38px; }
 
       /* Генеральный директор занимает всю первую строку сетки */
       .pt-hero {
