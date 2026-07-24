@@ -2212,27 +2212,28 @@
         return isNaN(d) ? '' : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
       }
 
-      // Roll a tactical task's steps up into counters, honouring the selected period.
-      // A step belongs to the period when its own deadline falls inside the window.
-      function planTactStats(tact, range, now) {
-        const steps = (tact.steps || []).filter(s => {
-          if (!range) return true;
-          if (!s.deadline) return false;
-          const dt = new Date(s.deadline).getTime();
-          return dt >= range.start.getTime() && dt <= range.end.getTime();
-        });
+      // A tactical task belongs to the period when its own "Крайний срок" (the Bitrix
+      // DEADLINE field) falls inside the window — not when its steps happen to.
+      function planTactInPeriod(tact, range) {
+        if (!range) return true;
+        if (!tact.deadline) return false;
+        const dt = new Date(tact.deadline).getTime();
+        return dt >= range.start.getTime() && dt <= range.end.getTime();
+      }
 
-        let done = 0, overdue = 0, soon = 0, next = null;
+      // Roll the task's steps up into counters. Every step counts: the period selects
+      // whole tasks, so a task in the window is shown with all of its progress.
+      function planTactStats(tact, now) {
+        const steps = tact.steps || [];
+        let done = 0, overdue = 0, soon = 0;
         for (const s of steps) {
           if (s.done) { done++; continue; }
           if (!s.deadline) continue;
           const dt = new Date(s.deadline).getTime();
           if (dt < now) overdue++;
           else if (dt - now <= 14 * 864e5) soon++;
-          if (!next || s.deadline < next) next = s.deadline;
         }
-
-        return { ...tact, steps, next, totalSteps: steps.length, doneSteps: done, overdueSteps: overdue, soonSteps: soon };
+        return { ...tact, totalSteps: steps.length, doneSteps: done, overdueSteps: overdue, soonSteps: soon };
       }
 
       function drawPlan(j) {
@@ -2249,11 +2250,12 @@
         const range = getPeriodRange(period);
         const now = Date.now();
 
-        // Recompute every aggregate from the filtered steps, bottom-up
+        // Recompute every aggregate from the tasks in the period, bottom-up
         const goals = rawGoals.map(g => {
           const tacts = g.children
             .flatMap(s => s.tacts || [])
-            .map(t => planTactStats(t, range, now));
+            .filter(t => planTactInPeriod(t, range))
+            .map(t => planTactStats(t, now));
 
           return {
             ...g,
@@ -2276,6 +2278,7 @@
         };
 
         const T = {
+          tact: goals.reduce((a, g) => a + g.tacts.length, 0),
           steps: sum(goals, 'totalSteps'),
           done: sum(goals, 'doneSteps'),
           overdue: sum(goals, 'overdueSteps'),
@@ -2292,7 +2295,7 @@
 
         const metrics = [
           metric('Прогресс плана', T.steps ? pct(T.done, T.steps) + '%' : '—', '#5a9a1a'),
-          metric(range ? 'Шагов в периоде' : 'Шагов всего', T.steps),
+          metric(range ? 'Задач в периоде' : 'Задач всего', T.tact),
           metric('Выполнено', T.done, PLAN_COLORS.done),
           metric('Просрочено', T.overdue, PLAN_COLORS.overdue),
           metric('Горит (≤14 дн)', T.soon, PLAN_COLORS.soon)
@@ -2304,12 +2307,12 @@
           const overPct = pct(g.overdueSteps, g.totalSteps);
           const soonPct = pct(g.soonSteps, g.totalSteps);
           const hasOverdue = g.overdueSteps > 0;
-          const empty = g.totalSteps === 0;
+          const empty = g.tacts.length === 0;
 
-          // Up to 8 tactical tasks that have steps in the period, nearest deadline first
+          // Up to 8 tactical tasks, nearest "Крайний срок" first
           const tacts = g.tacts
-            .filter(t => t.totalSteps > 0)
-            .sort((a, b) => (a.next || '9999').localeCompare(b.next || '9999'))
+            .slice()
+            .sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')))
             .slice(0, 8);
 
           const rows = tacts.map(t => {
@@ -2324,7 +2327,7 @@
               <span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
                            color:var(--text-main)" title="${planEscape(t.title)}">${planEscape(t.title)}</span>
               <span style="color:var(--text-muted);flex-shrink:0;font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.next)}</span>
+              <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.deadline)}</span>
             </div>`;
           }).join('');
 
@@ -2338,7 +2341,7 @@
             </div>
 
             ${empty ? `
-            <div style="font-size:11px;color:var(--text-muted);padding:4px 0 2px">Нет шагов в периоде</div>
+            <div style="font-size:11px;color:var(--text-muted);padding:4px 0 2px">Нет задач в периоде</div>
             ` : `
             <div style="display:flex;height:7px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.05)">
               <div style="width:${donePct}%;background:${PLAN_COLORS.done}"></div>
