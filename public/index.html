@@ -2302,12 +2302,14 @@
         ].join('');
 
         // ── Goal cards ──────────────────────────────────────────────────
-        const cards = goals.map(g => {
+        // Goals with nothing due in the period are dropped, not shown empty
+        const shownGoals = goals.filter(g => g.tacts.length > 0);
+
+        const cards = shownGoals.map(g => {
           const donePct = pct(g.doneSteps, g.totalSteps);
           const overPct = pct(g.overdueSteps, g.totalSteps);
           const soonPct = pct(g.soonSteps, g.totalSteps);
           const hasOverdue = g.overdueSteps > 0;
-          const empty = g.tacts.length === 0;
 
           // Up to 8 tactical tasks, nearest "Крайний срок" first
           const tacts = g.tacts
@@ -2340,9 +2342,6 @@
               <span style="font-weight:800;font-size:12.5px;line-height:1.35;color:var(--text-main)">${planEscape(g.title)}</span>
             </div>
 
-            ${empty ? `
-            <div style="font-size:11px;color:var(--text-muted);padding:4px 0 2px">Нет задач в периоде</div>
-            ` : `
             <div style="display:flex;height:7px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.05)">
               <div style="width:${donePct}%;background:${PLAN_COLORS.done}"></div>
               <div style="width:${overPct}%;background:${PLAN_COLORS.overdue}"></div>
@@ -2355,7 +2354,6 @@
             </div>
 
             <div>${rows}</div>
-            `}
           </div>`;
         }).join('');
 
@@ -2377,7 +2375,9 @@
 
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
-          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding-bottom:32px">${cards}</div>`;
+          ${shownGoals.length
+            ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;padding-bottom:32px">${cards}</div>`
+            : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px">Нет задач с крайним сроком в выбранном периоде</div>`}`;
 
         const btn = document.getElementById('planRefresh');
         if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
@@ -3168,7 +3168,9 @@
         if (range) {
           const { start, end } = range;
 
-          filtered = state.rows.filter((row) => {
+          // Narrow what is already department-filtered — never restart from state.rows,
+          // or non-АУП people leak back in whenever a period is selected.
+          filtered = filtered.filter((row) => {
             const parseDate = (rawKey, strKey) => {
               if (row[rawKey]) {
                 const d = new Date(row[rawKey]);
