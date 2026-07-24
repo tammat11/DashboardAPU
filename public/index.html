@@ -1320,11 +1320,9 @@
         // --- Task counts (same logic as dashboard stat cards) ---
         const total = new Set(state.filteredRows.map(r => r['ID задачи']).filter(Boolean)).size;
         const closed = state.filteredRows.filter(r => (r['Состояние задачи'] || '').startsWith('Закрыта')).length;
-        const nonZrsRows = state.filteredRows.filter(r => !(r['Название задачи'] || '').startsWith('ЗРС'));
-
         // --- Count tasks per executor (filtered rows, no ZRS) ---
         const taskCountByName = {};
-        nonZrsRows.forEach(row => {
+        state.filteredRows.forEach(row => {
           const name = row['Исполнитель'];
           if (!name || isExcludedPerson(name)) return;
           taskCountByName[name] = (taskCountByName[name] || 0) + 1;
@@ -1526,7 +1524,6 @@
       function aggregatePeople() {
         const empMap = {};
         state.filteredRows.forEach(row => {
-          if ((row['Название задачи'] || '').startsWith('ЗРС')) return;
           const name = row['Исполнитель'] || 'Без исполнителя';
           const id   = String(row['ID исполнителя'] || '');
           const dept = row['Отдел'] || '';
@@ -2871,7 +2868,7 @@
         const period = ids.periodSelect ? ids.periodSelect.value : 'all';
         const now = new Date();
         
-        let filtered = state.rows.slice();
+        let filtered = state.rows.filter(r => !(r['Название задачи'] || '').startsWith('ЗРС'));
 
         // Keep only АУП (ID: 157) and its descendants in the department structure
         if (state.departments && state.departments.length > 0) {
