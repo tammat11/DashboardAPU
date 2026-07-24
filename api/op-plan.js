@@ -26,7 +26,7 @@ async function fetchOpTasks() {
   for (let start = 0; ; start += TASKS_PAGE_SIZE) {
     const payload = await bx('tasks.task.list', {
       order: { ID: 'asc' },
-      filter: { TAG: 'ОП2026' },
+      filter: { GROUP_ID: 51 },
       select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID', 'RESPONSIBLE_NAME'],
       start
     });
