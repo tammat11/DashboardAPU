@@ -1708,23 +1708,46 @@
         return escapeHtml(first);
       }
 
+      function parsePeopleField(value) {
+        try {
+          const arr = typeof value === 'string' ? JSON.parse(value || '[]') : (value || []);
+          return Array.isArray(arr) ? arr : [];
+        } catch { return []; }
+      }
+
+      // Everyone taking part in a task, in any of the four Bitrix roles — the same
+      // set Bitrix itself counts under «Все роли». Deduplicated, so somebody who is
+      // both исполнитель and наблюдатель on one task is counted once.
+      function taskParticipantIds(row) {
+        const ids = new Set();
+        const add = v => { const s = String(v || ''); if (s && /^\d+$/.test(s) && s !== '0') ids.add(s); };
+
+        add(row['ID исполнителя']);
+        add(row['ID постановщика']);
+        parsePeopleField(row['Соисполнители']).forEach(p => add(p.id));
+        parsePeopleField(row['Наблюдатели']).forEach(p => add(p.id));
+
+        return ids;
+      }
+
       function planTaskCounts() {
         const counts = {};
         const blank = () => ({ total: 0, done: 0, planTotal: 0, planDone: 0, offTotal: 0, offDone: 0 });
 
+        // ЗРС tasks are already stripped out of filteredRows, so "не по плану"
+        // is simply everything here that does not belong to the ОП group.
         state.filteredRows.forEach(row => {
-          const name = row['Исполнитель'];
-          if (!name || name === 'Без исполнителя') return;
-          if (!counts[name]) counts[name] = blank();
-          const c = counts[name];
-
           const done = String(row['Состояние задачи'] || '').startsWith('Закрыта');
           const isPlan = String(row['ID проекта'] || '') === OP_GROUP_ID;
 
-          c.total++;
-          if (done) c.done++;
-          if (isPlan) { c.planTotal++; if (done) c.planDone++; }
-          else        { c.offTotal++;  if (done) c.offDone++;  }
+          taskParticipantIds(row).forEach(id => {
+            if (!counts[id]) counts[id] = blank();
+            const c = counts[id];
+            c.total++;
+            if (done) c.done++;
+            if (isPlan) { c.planTotal++; if (done) c.planDone++; }
+            else        { c.offTotal++;  if (done) c.offDone++;  }
+          });
         });
 
         return { counts, blank };
@@ -1755,7 +1778,7 @@
           </div>`;
 
         const cards = sorted.map((emp, i) => {
-          const c = counts[emp.name] || blank();
+          const c = counts[String(emp.id)] || blank();
           return `
             <div class="g-card pt-card">
               <span class="g-rank">#${i + 1}</span>
