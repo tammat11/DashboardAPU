@@ -3,6 +3,23 @@ export const config = { maxDuration: 60 };
 const TASKS_PAGE_SIZE = 50;
 const OP_GROUP_ID = 51;
 const TAG_PREFIX = 'ОП2026:';
+const EXCLUDED_USER_IDS = new Set(['57']);
+
+function isExcludedPerson(value) {
+  const name = String(value || '').toLocaleLowerCase('ru-RU').replace(/ё/g, 'е');
+  return name.includes('арайлым') && name.includes('ташенова');
+}
+
+function redactExcludedPerson(value) {
+  return String(value || '')
+    .replace(/Арайлым\s+Ташенова/giu, '')
+    .replace(/Ташенова\s+Арайлым/giu, '');
+}
+
+function isExcludedTask(task) {
+  const responsibleId = task.responsibleId || task.RESPONSIBLE_ID || '';
+  return EXCLUDED_USER_IDS.has(String(responsibleId));
+}
 
 function baseUrl() {
   const url = process.env.TASK_REPORT_WEBHOOK_URL || '';
@@ -76,7 +93,7 @@ function parseStep(item) {
   let head = parts[0] || '';
   const codeMatch = head.match(/^(\d+(?:\.\d+)+)\s+/);
   const code = codeMatch ? codeMatch[1] : null;
-  const text = codeMatch ? head.slice(codeMatch[0].length).trim() : head;
+  const text = redactExcludedPerson(codeMatch ? head.slice(codeMatch[0].length).trim() : head);
 
   let deadline = null;
   let responsible = '';
@@ -107,7 +124,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const tasks = await fetchOpTasks();
+    const tasks = (await fetchOpTasks()).filter(task => !isExcludedTask(task));
 
     const goals = [], strat = [], tact = [];
     for (const t of tasks) {
@@ -134,9 +151,9 @@ export default async function handler(req, res) {
       tactByCode[tt._code] = {
         id,
         code: tt._code,
-        title: String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, ''),
+        title: redactExcludedPerson(String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, '')),
         deadline: tt.deadline || tt.DEADLINE || null,
-        steps: items.map(parseStep)
+        steps: items.map(parseStep).filter(step => !isExcludedPerson(step.responsible))
       };
     }
 
@@ -148,7 +165,7 @@ export default async function handler(req, res) {
         .sort((a, b) => a._code.localeCompare(b._code, undefined, { numeric: true }))
         .map(s => ({
           code: s._code,
-          title: String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, ''),
+          title: redactExcludedPerson(String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, '')),
           tacts: Object.values(tactByCode)
             .filter(t => t.code.startsWith(s._code + '.'))
             .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
@@ -157,7 +174,7 @@ export default async function handler(req, res) {
       return {
         code: g._code,
         num: gNum,
-        title: String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim(),
+        title: redactExcludedPerson(String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim()),
         children
       };
     }).sort((a, b) => a.num - b.num);
