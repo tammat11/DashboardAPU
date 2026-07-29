@@ -75,6 +75,8 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
 - total overdue days by department;
 - expandable department cards with employee task counts, overdue days, and a
   0–100 score.
+- expandable employee rows with the selected period's task names, statuses,
+  deadlines, and links back to Bitrix24.
 
 Department and employee scores use 60% deadline discipline and 40% relative
 task volume. Child departments are rolled up to the direct children of the AУП

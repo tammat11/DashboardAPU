@@ -5,8 +5,10 @@
   - `/Users/tammat/Library/Containers/net.whatsapp.WhatsApp/Data/tmp/documents/200E035B-4B2C-40DC-945E-3100F7D688F2/PHOTO-2026-07-29-10-24-09.jpg`
 - Implementation screenshot:
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-implementation-v1.png`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-implementation-v2.jpg`
 - Combined comparison:
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v1.png`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v2.jpg`
 - Viewport: 1280 × 720 CSS px, device scale 1
 - Source pixels: 927 × 437 and 902 × 531
 - Implementation pixels: 1280 × 1107 full-page capture
@@ -45,6 +47,10 @@ width. No additional focused crop was required.
 - Structure is the last visible navigation tab.
 - Clicking a collapsed department opens its employee detail.
 - Two department cards can remain open simultaneously.
+- Clicking an employee opens that employee's task list; the live check exposed
+  69 task rows with Bitrix links, statuses, and deadlines.
+- Long employee task lists scroll inside a 320px-high nested card, keeping the
+  department overview compact.
 - No browser console errors were reported.
 
 ## Findings
@@ -57,5 +63,7 @@ width. No additional focused crop was required.
 ## Comparison history
 
 - Pass 1: no P0/P1/P2 findings; no corrective iteration required.
+- Pass 2: aligned the sections with the dashboard card system and verified the
+  new employee disclosure state; no P0/P1/P2 findings.
 
 final result: passed
