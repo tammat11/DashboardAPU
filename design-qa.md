@@ -124,5 +124,9 @@ width. No additional focused crop was required.
   `Вне плана` groups, retaining separate `Исполняет` and `Помогает` lists
   inside each group. Verified employees containing both groups. No P0/P1/P2
   findings.
+- Pass 12: increased the workload chart plot height and strengthened the task
+  grouping with bordered `По плану · проект 51` and `Вне плана · другие
+  проекты` containers. Verified both labels against live local data. No
+  P0/P1/P2 findings.
 
 final result: passed
