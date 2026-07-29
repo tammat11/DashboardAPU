@@ -156,5 +156,9 @@ width. No additional focused crop was required.
   rows, and pinned four `UF_HEAD` managers with avatars and green highlighting.
   Increased department-header spacing for the workload ratio. No P0/P1/P2
   findings.
+- Pass 21: added expandable unfinished-task lists to overdue department bars
+  and strengthened department summary pills. Verified 31 unfinished tasks in
+  the first current-week department. Added server/client exclusion for the
+  `Закрывающий документ` tag. No P0/P1/P2 findings.
 
 final result: passed

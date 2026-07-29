@@ -1110,18 +1110,27 @@
       .sd-lowload-meta { display: none; }
       .sd-lowload-empty { padding: 12px; color: #687068; font-size: 12px; text-align: center; }
       .sd-chart { display: flex; flex-direction: column; gap: 12px; padding: 8px 4px 2px; }
+      .sd-overdue-dept summary { list-style: none; cursor: pointer; }
+      .sd-overdue-dept summary::-webkit-details-marker { display: none; }
+      .sd-overdue-dept[open] .sd-bar-name { color: #b6363b; }
       .sd-bar-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
       .sd-bar-name { font-size: 14px; font-weight: 650; color: #656b64; text-align: right; }
       .sd-bar-track { height: 18px; background: #f0f2ef; border-radius: 999px; overflow: hidden; }
       .sd-bar-fill { height: 100%; min-width: 2px; background: linear-gradient(90deg, #ee5b60, #df454a); border-radius: 999px; }
       .sd-bar-value { font-size: 14px; font-weight: 700; color: #697069; }
+      .sd-overdue-tasks { max-height: 190px; margin: 1px 44px 3px 120px; overflow-y: auto; border: 1px solid #eadcdc; border-radius: 10px; background: #fffafa; }
+      .sd-overdue-task { display: grid; grid-template-columns: minmax(180px,1fr) 120px; gap: 10px; padding: 7px 10px; align-items: center; border-bottom: 1px solid #f0e5e5; font-size: 11px; }
+      .sd-overdue-task:last-child { border-bottom: 0; }
+      .sd-overdue-task .task-link { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+      .sd-overdue-task span { color: #a04b4f; text-align: right; white-space: nowrap; }
+      .sd-overdue-empty { padding: 10px; color: #777f78; font-size: 11px; text-align: center; }
       .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 11px; }
       .sd-subtitle { margin: -5px 0 12px; font-size: 12px; color: var(--text-muted); }
       .sd-departments { display: flex; flex-direction: column; gap: 8px; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
       .sd-dept summary::-webkit-details-marker { display: none; }
-      .sd-dept-head { min-height: 58px; padding: 0 17px; display: grid; grid-template-columns: minmax(220px,1fr) auto 88px; align-items: center; gap: 18px; background: rgba(138,196,63,.045); }
+      .sd-dept-head { min-height: 62px; padding: 0 17px; display: grid; grid-template-columns: minmax(220px,1fr) auto 88px; align-items: center; gap: 18px; background: linear-gradient(90deg, rgba(138,196,63,.11), rgba(138,196,63,.035)); }
       .sd-dept-who { display: flex; align-items: center; gap: 9px; min-width: 0; }
       .sd-chevron { font-size: 10px; color: #869087; transition: transform .16s ease; }
       .sd-dept[open] .sd-chevron { transform: rotate(90deg); }
@@ -1131,8 +1140,8 @@
       .sd-health.stable { color: #32628b; background: #dcebf8; }
       .sd-health.overload { color: #8a6522; background: #f7e8c6; }
       .sd-health.risk { color: #9f3e43; background: #f8dfe1; }
-      .sd-dept-meta { padding-right: 4px; font-size: 12px; color: #777f78; white-space: nowrap; }
-      .sd-score { display: flex; flex-direction: column; align-items: flex-end; color: var(--brand-green); text-align: right; white-space: nowrap; }
+      .sd-dept-meta { padding: 6px 9px; border: 1px solid #e1eadc; border-radius: 9px; color: #596259; background: rgba(255,255,255,.8); font-size: 12px; font-weight: 700; white-space: nowrap; }
+      .sd-score { display: flex; padding: 6px 8px; flex-direction: column; align-items: flex-end; border: 1px solid #d8e8ce; border-radius: 9px; color: var(--brand-green); background: #fff; text-align: right; white-space: nowrap; }
       .sd-score strong { font-size: 18px; line-height: 1; font-weight: 800; }
       .sd-score small { margin-top: 3px; color: #788078; font-size: 10px; line-height: 1; font-weight: 650; }
       .sd-people { padding: 0 12px 11px; }
@@ -2885,11 +2894,29 @@
         const bars = depts
           .slice()
           .sort((a, b) => b.overdueDays - a.overdueDays)
-          .map(d => `<div class="sd-bar-row">
-            <span class="sd-bar-name">${escapeHtml(d.name)}</span>
-            <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(d.overdueDays / maxOverdue * 100).toFixed(1)}%"></div></div>
-            <span class="sd-bar-value">${d.overdueDays}</span>
-          </div>`).join('');
+          .map(d => {
+            const unfinished = d.rows
+              .filter(row => !String(row['Состояние задачи'] || '').startsWith('Закрыта'))
+              .sort((a, b) => String(a.deadlineRaw || '9999').localeCompare(String(b.deadlineRaw || '9999')));
+            const unfinishedRows = unfinished.length
+              ? unfinished.map(row => {
+                  const taskId = String(row['ID задачи'] || '');
+                  const title = escapeHtml(row['Название задачи'] || 'Без названия');
+                  const titleHtml = state.portalHost && /^\d+$/.test(taskId)
+                    ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${taskId}/">${title}</a>`
+                    : title;
+                  return `<div class="sd-overdue-task">${titleHtml}<span>${escapeHtml(row['Дедлайн'] || 'Без срока')}</span></div>`;
+                }).join('')
+              : '<div class="sd-overdue-empty">Незавершённых задач нет</div>';
+            return `<details class="sd-overdue-dept">
+              <summary class="sd-bar-row" title="Показать ${unfinished.length} незавершённых задач">
+                <span class="sd-bar-name">${escapeHtml(d.name)}</span>
+                <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(d.overdueDays / maxOverdue * 100).toFixed(1)}%"></div></div>
+                <span class="sd-bar-value">${d.overdueDays}</span>
+              </summary>
+              <div class="sd-overdue-tasks">${unfinishedRows}</div>
+            </details>`;
+          }).join('');
 
         const healthFor = d => {
           if (d.score === null) return ['Нет оценки', 'stable'];
@@ -3793,7 +3820,13 @@
       function applyFilters() {
         const period = ids.periodSelect ? ids.periodSelect.value : 'all';
 
-        let filtered = state.rows.filter(r => !(r['Название задачи'] || '').startsWith('ЗРС'));
+        const hasClosingDocumentTag = row => String(row['Теги'] || '')
+          .split(/[,;|]/)
+          .some(tag => tag.trim().toLocaleLowerCase('ru-RU').replace(/ё/g, 'е') === 'закрывающий документ');
+        let filtered = state.rows.filter(r =>
+          !(r['Название задачи'] || '').startsWith('ЗРС')
+          && !hasClosingDocumentTag(r)
+        );
 
         // Keep only АУП (ID: 157) and its descendants in the department structure
         if (state.departments && state.departments.length > 0) {

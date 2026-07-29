@@ -71,6 +71,9 @@ TV employee directory and their assigned tasks.
 The `Отчёт` tab is the last visible tab in the view switcher. Its TV layout
 is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
 
+- tasks tagged exactly `Закрывающий документ` are removed in
+  `lib/task-report.js` before any dashboard counts and are also filtered in the
+  client as a defensive fallback;
 - proportional task distribution by top-level department;
 - workload ratio by department: filtered-period primary tasks divided by the
   full visible employee roster of that top-level department; `ТБУ` is the
@@ -78,7 +81,8 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
   line diagram with department points and a separate horizontal TBU line.
   Staffed departments remain visible with ratio `0.0` when the selected period
   contains no tasks;
-- total overdue days by department;
+- total overdue days by department; clicking a department bar opens its
+  unfinished task list with Bitrix links and deadlines;
 - a compact `Отклонения нагрузки` section with avatars: one list contains
   employees whose primary task count is above TBU, and the other contains those
   below 40% of their department's selected-period average (minimum comparison
