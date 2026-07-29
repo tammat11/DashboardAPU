@@ -954,6 +954,9 @@
         background: #fff;
       }
       .pt-person { display: flex; align-items: center; gap: 5px; min-width: 0; }
+      .pt-person .g-ava-wrap { width: 24px; height: 24px; margin: 0; flex: 0 0 24px; }
+      .pt-person .g-avatar,
+      .pt-person .g-avatar-fallback { width: 24px; height: 24px; font-size: 8px; }
       .pt-person-name { font-size: 10.5px; font-weight: 800; color: var(--text-dark); line-height: 1.2; }
       .pt-person-caption { display: none; }
       .pt-person-metrics { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; justify-content: flex-end; }
@@ -1949,6 +1952,7 @@
               <summary class="pt-employee-head">
                 <div class="pt-person">
                   <span class="pt-chevron">▶</span>
+                  <div class="g-ava-wrap">${galleryAvatarMarkup(emp)}</div>
                   <div>
                     <div class="pt-person-name">${escapeHtml(emp.name)}</div>
                     <div class="pt-person-caption">Сотрудник · нажмите для детализации</div>
