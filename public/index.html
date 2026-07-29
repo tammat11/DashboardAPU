@@ -1059,16 +1059,16 @@
       }
 
       /* Structure analytics */
-      .sd-page { padding: 4px 0 22px; color: var(--text-dark); display: flex; flex-direction: column; gap: 10px; }
+      .sd-page { padding: 4px 0 18px; color: var(--text-dark); display: flex; flex-direction: column; gap: 8px; }
       .sd-section {
         margin: 0;
-        padding: 14px;
+        padding: 12px;
         background: var(--surface);
         border: 1px solid var(--border-color);
         border-radius: 16px;
         box-shadow: var(--shadow-soft);
       }
-      .sd-title { font-size: 16px; font-weight: 900; margin: 0 0 13px; }
+      .sd-title { font-size: 16px; font-weight: 750; margin: 0 0 10px; }
       .sd-note { margin: 9px 0 0; color: var(--text-muted); font-size: 11px; }
       .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 9px; background: #eef0ed; }
       .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
@@ -1076,11 +1076,11 @@
       .sd-stack-label { margin-top: 4px; font-size: 10px; font-weight: 750; opacity: .92; }
       .sd-ratio-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .sd-tbu { padding: 5px 10px; border-radius: 9px; color: #32628b; background: #dcebf8; font-size: 11px; font-weight: 850; white-space: nowrap; }
-      .sd-ratio-chart { width: 100%; min-height: 190px; }
-      .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 190px; overflow: visible; }
+      .sd-ratio-chart { width: 100%; min-height: 145px; }
+      .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 145px; overflow: visible; }
       .sd-ratio-formulas { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 3px; }
-      .sd-ratio-formula { padding: 5px 9px; border: 1px solid var(--border-color); border-radius: 9px; color: #555c55; background: #fafbfa; font-size: 11px; font-weight: 750; }
-      .sd-ratio-formula strong { color: #317fd4; font-size: 13px; }
+      .sd-ratio-formula { padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 9px; color: #555c55; background: #fafbfa; font-size: 10.5px; font-weight: 600; }
+      .sd-ratio-formula strong { color: #317fd4; font-size: 12px; font-weight: 700; }
       .sd-ratio-legend { display: flex; justify-content: flex-end; gap: 14px; margin-top: 5px; color: var(--text-muted); font-size: 10px; }
       .sd-ratio-legend span { display: inline-flex; align-items: center; gap: 5px; }
       .sd-ratio-key { width: 15px; height: 4px; border-radius: 4px; background: #317fd4; }
@@ -1101,28 +1101,28 @@
       .sd-dept-who { display: flex; align-items: center; gap: 9px; min-width: 0; }
       .sd-chevron { font-size: 10px; color: #869087; transition: transform .16s ease; }
       .sd-dept[open] .sd-chevron { transform: rotate(90deg); }
-      .sd-dept-name { font-size: 14px; font-weight: 900; }
+      .sd-dept-name { font-size: 14px; font-weight: 750; }
       .sd-health { padding: 3px 8px; border-radius: 8px; font-size: 10px; white-space: nowrap; }
       .sd-health.leader { color: #28713d; background: #dff1df; }
       .sd-health.stable { color: #32628b; background: #dcebf8; }
       .sd-health.overload { color: #8a6522; background: #f7e8c6; }
       .sd-health.risk { color: #9f3e43; background: #f8dfe1; }
       .sd-dept-meta { font-size: 11px; color: #777f78; white-space: nowrap; }
-      .sd-score { font-size: 21px; font-weight: 900; color: var(--brand-green); text-align: right; }
+      .sd-score { font-size: 21px; font-weight: 800; color: var(--brand-green); text-align: right; }
       .sd-people { padding: 0 12px 11px; }
       .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(180px,1fr) 62px 68px 75px minmax(150px,1fr) 34px; align-items: center; gap: 9px; }
-      .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 8px 0 7px; color: #687068; font-size: 11.5px; font-weight: 800; }
+      .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 6px; color: #687068; font-size: 11.5px; font-weight: 650; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
       .sd-person-card > summary { list-style: none; cursor: pointer; }
       .sd-person-card > summary::-webkit-details-marker { display: none; }
-      .sd-person { padding: 10px 2px; font-size: 12.5px; transition: background .15s ease; }
+      .sd-person { padding: 8px 2px; font-size: 12.5px; transition: background .15s ease; }
       .sd-person:hover { background: rgba(138,196,63,.045); }
-      .sd-person-name { display: flex; align-items: center; gap: 6px; font-weight: 750; }
+      .sd-person-name { display: flex; align-items: center; gap: 6px; font-weight: 650; }
       .sd-person-chevron { color: var(--brand-green); font-size: 10px; transition: transform .15s ease; }
       .sd-person-card[open] .sd-person-chevron { transform: rotate(90deg); }
-      .sd-help-count { color: #245c89; font-size: 12.5px; font-weight: 900; }
-      .sd-person-num { color: #3f463f; font-size: 12.5px; font-weight: 800; }
+      .sd-help-count { color: #245c89; font-size: 12.5px; font-weight: 700; }
+      .sd-person-num { color: #3f463f; font-size: 12.5px; font-weight: 650; }
       .sd-person-scores { display: flex; flex-direction: column; gap: 4px; }
       .sd-score-line { display: grid; grid-template-columns: 43px 1fr; align-items: center; gap: 5px; }
       .sd-score-label { color: #7c837c; font-size: 8.5px; font-weight: 750; white-space: nowrap; }
@@ -2770,8 +2770,8 @@
         const chartMax = Math.max(1, Math.ceil(Math.max(tbu, ...ratioSorted.map(d => d.workloadRatio)) * 1.2));
         const chartLeft = 70;
         const chartRight = 930;
-        const chartTop = 24;
-        const chartBottom = 148;
+        const chartTop = 20;
+        const chartBottom = 105;
         const chartWidth = chartRight - chartLeft;
         const chartHeight = chartBottom - chartTop;
         const xFor = index => ratioSorted.length === 1
@@ -2782,22 +2782,22 @@
         const ratioGrid = gridValues.map(value => {
           const y = yFor(value);
           return `<line x1="${chartLeft}" y1="${y.toFixed(1)}" x2="${chartRight}" y2="${y.toFixed(1)}" stroke="#dfe3de" stroke-width="1"/>
-            <text x="${chartLeft - 14}" y="${(y + 5).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="15">${value.toFixed(1)}</text>`;
+            <text x="${chartLeft - 14}" y="${(y + 5).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="14">${value.toFixed(1)}</text>`;
         }).join('');
         const ratioPath = ratioSorted.map((d, index) => `${xFor(index).toFixed(1)},${yFor(d.workloadRatio).toFixed(1)}`).join(' ');
         const ratioPoints = ratioSorted.map((d, index) => {
           const x = xFor(index);
           const y = yFor(d.workloadRatio);
           return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="#317fd4" stroke="#ffffff" stroke-width="3"/>
-            <text x="${x.toFixed(1)}" y="${(y - 16).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="19" font-weight="800">${d.workloadRatio.toFixed(1)}</text>
-            <text x="${x.toFixed(1)}" y="${chartBottom + 27}" text-anchor="middle" fill="#243024" font-size="17" font-weight="750">${escapeHtml(d.name)}</text>`;
+            <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="17" font-weight="650">${d.workloadRatio.toFixed(1)}</text>
+            <text x="${x.toFixed(1)}" y="${chartBottom + 24}" text-anchor="middle" fill="#243024" font-size="16" font-weight="600">${escapeHtml(d.name)}</text>`;
         }).join('');
         const tbuY = yFor(tbu);
-        const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 200" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
+        const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 155" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
           ${ratioGrid}
           <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="#aeb5ae" stroke-width="1.5"/>
           <line x1="${chartLeft}" y1="${tbuY.toFixed(1)}" x2="${chartRight}" y2="${tbuY.toFixed(1)}" stroke="#e54c50" stroke-width="3" stroke-dasharray="9 7"/>
-          <text x="${chartRight}" y="${(tbuY - 9).toFixed(1)}" text-anchor="end" fill="#c63e43" font-size="17" font-weight="800">ТБУ ${tbu.toFixed(1)}</text>
+          <text x="${chartRight}" y="${(tbuY - 7).toFixed(1)}" text-anchor="end" fill="#c63e43" font-size="16" font-weight="650">ТБУ ${tbu.toFixed(1)}</text>
           <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
           ${ratioPoints}
         </svg>`;
