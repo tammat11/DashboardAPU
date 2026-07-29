@@ -1132,6 +1132,10 @@
       .sd-person-score { display: flex; min-height: 25px; flex-direction: column; justify-content: space-between; font-weight: 850; text-align: right; }
       .sd-person-score .plan { color: #317fd4; font-size: 10px; }
       .sd-task-list { max-height: 320px; margin: 0 0 8px 22px; border: 1px solid rgba(0,0,0,.055); border-radius: 9px; overflow-y: auto; background: #fafbfa; }
+      .sd-task-plan-title { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px 22px; color: #2f7d32; font-size: 11px; font-weight: 750; text-transform: uppercase; letter-spacing: .04em; }
+      .sd-task-plan-title::after { content: ""; height: 1px; flex: 1; margin-right: 12px; background: #dcebd8; }
+      .sd-task-plan-title.outside { color: #777d77; }
+      .sd-task-plan-title.outside::after { background: #e2e5e2; }
       .sd-task-section-title { margin: 8px 0 5px 22px; color: #687068; font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
       .sd-task-section-title.help { color: #32628b; }
       .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 120px 115px; align-items: center; gap: 10px; padding: 8px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 10px; }
@@ -2857,18 +2861,31 @@
                 <span class="sd-task-deadline">${escapeHtml(row['Дедлайн'] || 'Без срока')}</span>
               </div>`;
             };
-            const ownTaskRows = sortedRows(emp.rows).map(row => renderTaskRow(row)).join('');
             const helpingItems = Array.from((emp.helping || new Map()).values());
-            const helpingRows = sortedRows(helpingItems.map(item => item.row)).map(row => {
-              const item = helpingItems.find(value => value.row === row);
-              return renderTaskRow(row, item ? item.roles : []);
-            }).join('');
-            const ownSection = ownTaskRows
-              ? `<div class="sd-task-section-title">Исполняет</div><div class="sd-task-list">${ownTaskRows}</div>`
-              : '';
-            const helpingSection = helpingRows
-              ? `<div class="sd-task-section-title help">Помогает</div><div class="sd-task-list">${helpingRows}</div>`
-              : '';
+            const isPlanRow = row => String(row['ID проекта'] || '') === OP_GROUP_ID;
+            const renderTaskGroup = (title, ownRows, helpItems, outside = false) => {
+              const ownTaskRows = sortedRows(ownRows).map(row => renderTaskRow(row)).join('');
+              const helpingRows = sortedRows(helpItems.map(item => item.row)).map(row => {
+                const item = helpItems.find(value => value.row === row);
+                return renderTaskRow(row, item ? item.roles : []);
+              }).join('');
+              if (!ownTaskRows && !helpingRows) return '';
+              return `<div class="sd-task-plan-title${outside ? ' outside' : ''}">${title}</div>
+                ${ownTaskRows ? `<div class="sd-task-section-title">Исполняет</div><div class="sd-task-list">${ownTaskRows}</div>` : ''}
+                ${helpingRows ? `<div class="sd-task-section-title help">Помогает</div><div class="sd-task-list">${helpingRows}</div>` : ''}`;
+            };
+            const taskSections =
+              renderTaskGroup(
+                'По плану',
+                emp.rows.filter(isPlanRow),
+                helpingItems.filter(item => isPlanRow(item.row))
+              ) +
+              renderTaskGroup(
+                'Вне плана',
+                emp.rows.filter(row => !isPlanRow(row)),
+                helpingItems.filter(item => !isPlanRow(item.row)),
+                true
+              );
             return `<details class="sd-person-card">
               <summary class="sd-person">
                 <span class="sd-person-name"><span class="sd-person-chevron">›</span>${escapeHtml(emp.name)}</span>
@@ -2881,7 +2898,7 @@
                 </div>
                 <span class="sd-person-score"><span>${emp.score ?? '—'}</span><span class="plan">${emp.planScore ?? '—'}</span></span>
               </summary>
-              ${ownSection}${helpingSection}
+              ${taskSections}
             </details>`;
           }).join('');
           return `<details class="sd-dept"${index === 0 ? ' open' : ''}>

@@ -120,5 +120,9 @@ width. No additional focused crop was required.
 - Pass 10: reduced point-label weight and chart stroke widths, and changed the
   TBU badge to red. Verified five points and the live TBU value. No P0/P1/P2
   findings.
+- Pass 11: split each employee disclosure into project-51 `По плану` and
+  `Вне плана` groups, retaining separate `Исполняет` and `Помогает` lists
+  inside each group. Verified employees containing both groups. No P0/P1/P2
+  findings.
 
 final result: passed
