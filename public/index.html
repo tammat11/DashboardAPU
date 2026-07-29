@@ -942,20 +942,16 @@
       .pt-chevron { color: var(--brand-green); font-size: 12px; transition: transform .18s ease; }
       details[open] > summary .pt-chevron { transform: rotate(90deg); }
       .pt-dept-name { font-size: 12px; font-weight: 850; color: var(--text-dark); }
-      .pt-dept-lead {
-        display: inline-flex;
-        align-items: center;
-        padding: 3px 6px;
-        border-radius: 7px;
-        background: rgba(138,196,63,.18);
-        color: #466f18;
-        font-size: 8px;
-        font-weight: 800;
-        white-space: nowrap;
-      }
       .pt-dept-stats { font-size: 8px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
       .pt-employees { padding: 0 6px 6px; display: flex; flex-direction: column; gap: 4px; }
       .pt-employee { border: 1px solid rgba(0,0,0,.07); border-radius: 9px; overflow: hidden; }
+      .pt-employee.is-head {
+        border-color: rgba(138,196,63,.65);
+        box-shadow: inset 3px 0 0 var(--brand-green);
+      }
+      .pt-employee.is-head .pt-employee-head {
+        background: rgba(138,196,63,.07);
+      }
       .pt-employee-head {
         display: grid;
         grid-template-columns: minmax(120px, 1fr) auto;
@@ -1911,7 +1907,7 @@
           const id = String(emp.id);
           const c = counts[id] || blank();
           return `
-            <div class="pt-employee">
+            <div class="pt-employee${emp.isDepartmentHead ? ' is-head' : ''}">
               <div class="pt-employee-head">
                 <div class="pt-person">
                   <div class="g-ava-wrap">${galleryAvatarMarkup(emp)}</div>
@@ -1956,10 +1952,13 @@
         const departmentMarkup = topDepartments
           .map(dept => [dept, byDept.get(dept)])
           .map(([dept, employees]) => {
-            employees.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
             const deptInfo = departmentByName.get(dept);
             const headId = String(deptInfo?.UF_HEAD || '');
-            const head = (state.allEmployees || []).find(emp => String(emp.id) === headId);
+            employees.forEach(emp => { emp.isDepartmentHead = String(emp.id) === headId; });
+            employees.sort((a, b) => {
+              if (a.isDepartmentHead !== b.isDepartmentHead) return a.isDepartmentHead ? -1 : 1;
+              return a.name.localeCompare(b.name, 'ru');
+            });
             const deptCounts = employees.reduce((acc, emp) => {
               const c = counts[String(emp.id)] || blank();
               acc.total += c.total;
@@ -1973,7 +1972,6 @@
                   <div class="pt-dept-title">
                     <span class="pt-chevron">▶</span>
                     <span class="pt-dept-name">${escapeHtml(dept)}</span>
-                    ${head ? `<span class="pt-dept-lead">Руководитель: ${escapeHtml(head.name)}</span>` : ''}
                   </div>
                   <span class="pt-dept-stats">${employees.length} сотрудников · выполнено ${deptCounts.done}/${deptCounts.total}${deptCounts.overdue ? ` · просрочено ${deptCounts.overdue}` : ''}</span>
                 </summary>
