@@ -143,5 +143,9 @@ width. No additional focused crop was required.
 - Pass 17: consolidated report typography into a three-level scale: 15px section
   headings, 12-13px primary data, and 10-11px supporting labels. Verified chart,
   bar, and employee-table consistency. No P0/P1/P2 findings.
+- Pass 18: enlarged report typography by 1-2px, widened the period selector,
+  simplified score labels to `Все`/`План`, added department headcount and
+  workload ratio, and increased overdue-chart spacing. Verified live local data
+  and full-page alignment. No P0/P1/P2 findings.
 
 final result: passed

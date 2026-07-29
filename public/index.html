@@ -194,11 +194,12 @@
       .search-clear:hover { color: var(--text-dark); }
 
       .compact-select {
+        min-width: 155px;
         background: transparent;
         border: none;
         color: var(--text-dark);
         font-family: 'Montserrat', sans-serif;
-        font-size: 10px;
+        font-size: 11px;
         font-weight: 800;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -216,6 +217,12 @@
       
       .compact-select:hover, .compact-select:focus {
         background-color: rgba(0, 0, 0, 0.04);
+      }
+      .compact-select option {
+        min-height: 34px;
+        padding: 8px 10px;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 13px;
       }
 
       /* Stats Grid */
@@ -1068,34 +1075,34 @@
         border-radius: 18px;
         box-shadow: 0 5px 18px rgba(35, 48, 35, .045);
       }
-      .sd-title { display: flex; width: 100%; margin: 0 0 12px; align-items: center; gap: 12px; color: #303a30; font-size: 15px; font-weight: 700; text-align: center; letter-spacing: .015em; }
+      .sd-title { display: flex; width: 100%; margin: 0 0 12px; align-items: center; gap: 12px; color: #303a30; font-size: 16px; font-weight: 700; text-align: center; letter-spacing: .015em; }
       .sd-title::before, .sd-title::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #dce4da); }
       .sd-title::after { background: linear-gradient(90deg, #dce4da, transparent); }
-      .sd-note { margin: 9px 0 0; color: var(--text-muted); font-size: 11px; }
+      .sd-note { margin: 9px 0 0; color: var(--text-muted); font-size: 12px; }
       .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 12px; background: #eef0ed; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
       .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
-      .sd-stack-value { font-size: 15px; line-height: 1; font-weight: 800; }
-      .sd-stack-label { margin-top: 4px; font-size: 11px; font-weight: 700; opacity: .92; }
+      .sd-stack-value { font-size: 16px; line-height: 1; font-weight: 800; }
+      .sd-stack-label { margin-top: 4px; font-size: 12px; font-weight: 700; opacity: .92; }
       .sd-ratio-head { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; }
       .sd-ratio-head .sd-tbu { position: absolute; top: 0; right: 0; }
-      .sd-tbu { padding: 5px 10px; border: 1px solid #f7d2d2; border-radius: 10px; color: #c63e43; background: #fff0f0; font-size: 11px; font-weight: 750; white-space: nowrap; }
+      .sd-tbu { padding: 5px 10px; border: 1px solid #f7d2d2; border-radius: 10px; color: #c63e43; background: #fff0f0; font-size: 12px; font-weight: 750; white-space: nowrap; }
       .sd-ratio-chart { width: 100%; min-height: 190px; }
       .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 190px; overflow: visible; }
       .sd-ratio-formulas { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 3px; }
-      .sd-ratio-formula { padding: 4px 9px; border: 1px solid #e2e7e1; border-radius: 999px; color: #555c55; background: #f8faf8; font-size: 11px; font-weight: 600; }
-      .sd-ratio-formula strong { color: #317fd4; font-size: 11px; font-weight: 700; }
-      .sd-ratio-legend { display: flex; justify-content: flex-end; gap: 14px; margin-top: 5px; color: var(--text-muted); font-size: 11px; }
+      .sd-ratio-formula { padding: 4px 9px; border: 1px solid #e2e7e1; border-radius: 999px; color: #555c55; background: #f8faf8; font-size: 12px; font-weight: 600; }
+      .sd-ratio-formula strong { color: #317fd4; font-size: 12px; font-weight: 700; }
+      .sd-ratio-legend { display: flex; justify-content: flex-end; gap: 14px; margin-top: 5px; color: var(--text-muted); font-size: 12px; }
       .sd-ratio-legend span { display: inline-flex; align-items: center; gap: 5px; }
       .sd-ratio-key { width: 15px; height: 4px; border-radius: 4px; background: #317fd4; }
       .sd-ratio-key.tbu { width: 15px; height: 2px; background: #e54c50; }
-      .sd-chart { display: flex; flex-direction: column; gap: 9px; padding: 4px 0 0; }
+      .sd-chart { display: flex; flex-direction: column; gap: 12px; padding: 8px 4px 2px; }
       .sd-bar-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
-      .sd-bar-name { font-size: 13px; font-weight: 650; color: #656b64; text-align: right; }
-      .sd-bar-track { height: 16px; background: #f0f2ef; border-radius: 999px; overflow: hidden; }
+      .sd-bar-name { font-size: 14px; font-weight: 650; color: #656b64; text-align: right; }
+      .sd-bar-track { height: 18px; background: #f0f2ef; border-radius: 999px; overflow: hidden; }
       .sd-bar-fill { height: 100%; min-width: 2px; background: linear-gradient(90deg, #ee5b60, #df454a); border-radius: 999px; }
-      .sd-bar-value { font-size: 13px; font-weight: 700; color: #697069; }
+      .sd-bar-value { font-size: 14px; font-weight: 700; color: #697069; }
       .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 11px; }
-      .sd-subtitle { margin: -5px 0 12px; font-size: 11px; color: var(--text-muted); }
+      .sd-subtitle { margin: -5px 0 12px; font-size: 12px; color: var(--text-muted); }
       .sd-departments { display: flex; flex-direction: column; gap: 8px; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
@@ -1104,31 +1111,33 @@
       .sd-dept-who { display: flex; align-items: center; gap: 9px; min-width: 0; }
       .sd-chevron { font-size: 10px; color: #869087; transition: transform .16s ease; }
       .sd-dept[open] .sd-chevron { transform: rotate(90deg); }
-      .sd-dept-name { font-size: 13px; font-weight: 700; }
+      .sd-dept-name { font-size: 14px; font-weight: 700; }
       .sd-health { padding: 3px 8px; border-radius: 8px; font-size: 10px; white-space: nowrap; }
       .sd-health.leader { color: #28713d; background: #dff1df; }
       .sd-health.stable { color: #32628b; background: #dcebf8; }
       .sd-health.overload { color: #8a6522; background: #f7e8c6; }
       .sd-health.risk { color: #9f3e43; background: #f8dfe1; }
-      .sd-dept-meta { font-size: 11px; color: #777f78; white-space: nowrap; }
-      .sd-score { font-size: 21px; font-weight: 800; color: var(--brand-green); text-align: right; }
+      .sd-dept-meta { font-size: 12px; color: #777f78; white-space: nowrap; }
+      .sd-score { display: flex; flex-direction: column; align-items: flex-end; color: var(--brand-green); text-align: right; white-space: nowrap; }
+      .sd-score strong { font-size: 18px; line-height: 1; font-weight: 800; }
+      .sd-score small { margin-top: 3px; color: #788078; font-size: 10px; line-height: 1; font-weight: 650; }
       .sd-people { padding: 0 12px 11px; }
       .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(170px,1fr) 66px 72px 68px 75px minmax(150px,1fr) 34px; align-items: center; gap: 8px; }
-      .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 6px; color: #687068; font-size: 11px; font-weight: 650; }
+      .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 6px; color: #687068; font-size: 12px; font-weight: 650; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
       .sd-person-card > summary { list-style: none; cursor: pointer; }
       .sd-person-card > summary::-webkit-details-marker { display: none; }
-      .sd-person { padding: 8px 2px; font-size: 12px; transition: background .15s ease; }
+      .sd-person { padding: 8px 2px; font-size: 13px; transition: background .15s ease; }
       .sd-person:hover { background: rgba(138,196,63,.045); }
       .sd-person-name { display: flex; align-items: center; gap: 6px; font-weight: 650; }
       .sd-person-chevron { color: var(--brand-green); font-size: 10px; transition: transform .15s ease; }
       .sd-person-card[open] .sd-person-chevron { transform: rotate(90deg); }
-      .sd-help-count { color: #245c89; font-size: 12px; font-weight: 700; }
-      .sd-person-num { color: #3f463f; font-size: 12px; font-weight: 650; }
+      .sd-help-count { color: #245c89; font-size: 13px; font-weight: 700; }
+      .sd-person-num { color: #3f463f; font-size: 13px; font-weight: 650; }
       .sd-person-scores { display: flex; flex-direction: column; gap: 4px; }
-      .sd-score-line { display: grid; grid-template-columns: 43px 1fr; align-items: center; gap: 5px; }
-      .sd-score-label { color: #7c837c; font-size: 10px; font-weight: 700; white-space: nowrap; }
+      .sd-score-line { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 7px; }
+      .sd-score-label { color: #697169; font-size: 11px; line-height: 1.1; font-weight: 700; white-space: nowrap; }
       .sd-person-bar { height: 5px; border-radius: 5px; background: #f0f2ef; overflow: hidden; }
       .sd-person-fill { height: 100%; border-radius: 5px; background: var(--brand-green); }
       .sd-person-fill.plan { background: #317fd4; }
@@ -1147,7 +1156,7 @@
       .sd-task-plan-group .sd-task-list { margin-left: 10px; margin-right: 10px; }
       .sd-task-section-title { margin: 8px 0 5px 22px; color: #687068; font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
       .sd-task-section-title.help { color: #32628b; }
-      .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 120px 115px; align-items: center; gap: 10px; padding: 8px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 11px; }
+      .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 120px 115px; align-items: center; gap: 10px; padding: 8px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 12px; }
       .sd-task:last-child { border-bottom: 0; }
       .sd-task-title { min-width: 0; line-height: 1.3; }
       .sd-task-title .task-link { font-weight: 650; }
@@ -2795,15 +2804,15 @@
         const ratioGrid = gridValues.map(value => {
           const y = yFor(value);
           return `<line x1="${chartLeft}" y1="${y.toFixed(1)}" x2="${chartRight}" y2="${y.toFixed(1)}" stroke="#dfe3de" stroke-width="1"/>
-            <text x="${chartLeft - 18}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="11">${value.toFixed(1)}</text>`;
+            <text x="${chartLeft - 18}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="12">${value.toFixed(1)}</text>`;
         }).join('');
         const ratioPath = ratioSorted.map((d, index) => `${xFor(index).toFixed(1)},${yFor(d.workloadRatio).toFixed(1)}`).join(' ');
         const ratioPoints = ratioSorted.map((d, index) => {
           const x = xFor(index);
           const y = yFor(d.workloadRatio);
           return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="#317fd4" stroke="#ffffff" stroke-width="2"/>
-            <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="13" font-weight="600">${d.workloadRatio.toFixed(1)}</text>
-            <text x="${x.toFixed(1)}" y="${chartBottom + 24}" text-anchor="middle" fill="#243024" font-size="13" font-weight="600">${escapeHtml(d.name)}</text>`;
+            <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="14" font-weight="600">${d.workloadRatio.toFixed(1)}</text>
+            <text x="${x.toFixed(1)}" y="${chartBottom + 24}" text-anchor="middle" fill="#243024" font-size="14" font-weight="600">${escapeHtml(d.name)}</text>`;
         }).join('');
         const tbuY = yFor(tbu);
         const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 195" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
@@ -2908,7 +2917,7 @@
                 <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
                 <div class="sd-person-scores">
                   <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
-                  <div class="sd-score-line"><span class="sd-score-label">По плану</span><div class="sd-person-bar"><div class="sd-person-fill plan" style="width:${emp.planScore ?? 0}%"></div></div></div>
+                  <div class="sd-score-line"><span class="sd-score-label">План</span><div class="sd-person-bar"><div class="sd-person-fill plan" style="width:${emp.planScore ?? 0}%"></div></div></div>
                 </div>
                 <span class="sd-person-score"><span>${emp.score ?? '—'}</span><span class="plan">${emp.planScore ?? '—'}</span></span>
               </summary>
@@ -2922,8 +2931,11 @@
                 <span class="sd-dept-name">${escapeHtml(d.name)}</span>
                 <span class="sd-health ${healthClass}">${health}</span>
               </div>
-              <span class="sd-dept-meta">${d.rows.length} зад. · ${d.overdueDays} дн.</span>
-              <span class="sd-score">${d.score ?? '—'}</span>
+              <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад. · ${d.overdueDays} дн.</span>
+              <span class="sd-score" title="${d.rows.length} задач ÷ ${d.employeeCount} сотрудников">
+                <strong>${d.workloadRatio.toFixed(1)}</strong>
+                <small>задач/сотр.</small>
+              </span>
             </summary>
             <div class="sd-people">
               <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span>Вне плана</span><span>Помогает</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>

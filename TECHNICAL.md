@@ -66,9 +66,9 @@ Users with the Bitrix boolean field `UF_USR_1785305377085`
 (`Не показывать на телевизоре`) enabled are automatically excluded from the
 TV employee directory and their assigned tasks.
 
-## Structure analytics view
+## Report analytics view
 
-The `Структура` tab is the last visible tab in the view switcher. Its TV layout
+The `Отчёт` tab is the last visible tab in the view switcher. Its TV layout
 is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
 
 - proportional task distribution by top-level department;
@@ -80,7 +80,8 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
   contains no tasks;
 - total overdue days by department;
 - expandable department cards with employee task counts, overdue days, and a
-  0–100 score.
+  workload header showing visible employee count and
+  `filtered primary tasks / visible employees`.
 - expandable employee rows with the selected period's task names, statuses,
   deadlines, and links back to Bitrix24.
 - employee rows include a separate `Помогает` count column; the nested
