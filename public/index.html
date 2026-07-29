@@ -1068,13 +1068,14 @@
         border-radius: 16px;
         box-shadow: var(--shadow-soft);
       }
-      .sd-title { font-size: 16px; font-weight: 750; margin: 0 0 10px; }
+      .sd-title { width: 100%; margin: 0 0 10px; font-size: 16px; font-weight: 750; text-align: center; }
       .sd-note { margin: 9px 0 0; color: var(--text-muted); font-size: 11px; }
       .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 9px; background: #eef0ed; }
       .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
       .sd-stack-value { font-size: 18px; line-height: 1; font-weight: 900; }
       .sd-stack-label { margin-top: 4px; font-size: 10px; font-weight: 750; opacity: .92; }
-      .sd-ratio-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .sd-ratio-head { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; }
+      .sd-ratio-head .sd-tbu { position: absolute; top: 0; right: 0; }
       .sd-tbu { padding: 5px 10px; border-radius: 9px; color: #c63e43; background: #fde8e8; font-size: 11px; font-weight: 750; white-space: nowrap; }
       .sd-ratio-chart { width: 100%; min-height: 190px; }
       .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 190px; overflow: visible; }
@@ -2931,13 +2932,13 @@
 
         ids.structureWrap.innerHTML = `<div class="sd-page">
           <section class="sd-section">
-            <h2 class="sd-title">1. Распределение задач по отделам</h2>
+            <h2 class="sd-title">1. Распределение</h2>
             <div class="sd-stack">${stack}</div>
             <p class="sd-note">Ширина блока — доля отдела в общем объёме ${totalTasks} задач.</p>
           </section>
           <section class="sd-section">
             <div class="sd-ratio-head">
-              <h2 class="sd-title">2. Нагрузка: задач на одного сотрудника</h2>
+              <h2 class="sd-title">2. Нагрузка</h2>
               <span class="sd-tbu">ТБУ: ${tbu.toFixed(1)}</span>
             </div>
             <div class="sd-ratio-chart">${ratioDiagram}</div>
@@ -2949,12 +2950,12 @@
             <p class="sd-note">Коэффициент = задачи выбранного периода / количество сотрудников отдела.</p>
           </section>
           <section class="sd-section">
-            <h2 class="sd-title">3. Текущая открытая просрочка по отделам, дней</h2>
+            <h2 class="sd-title">3. Просрочка</h2>
             <div class="sd-chart">${bars}</div>
             <div class="sd-axis"><span>0</span><span>${Math.round(maxOverdue / 2)}</span><span>${maxOverdue}</span></div>
           </section>
           <section class="sd-section">
-            <h2 class="sd-title">4. Структура и итоговая оценка</h2>
+            <h2 class="sd-title">4. Оценка</h2>
             <p class="sd-subtitle">Оценка 0–100: 70% качество исполнения + 30% текущая дисциплина. Открытая просрочка снижает балл независимо от общего числа задач; объём не даёт бонуса.</p>
             <div class="sd-departments">${cards}</div>
           </section>

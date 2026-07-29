@@ -134,5 +134,8 @@ width. No additional focused crop was required.
 - Pass 14: suppressed zero values in employee task, helper, and overdue cells.
   Verified that non-zero values remain visible and zero cells render empty. No
   P0/P1/P2 findings.
+- Pass 15: shortened the four report section headings to one-word labels and
+  centered them while keeping the TBU badge right-aligned. No P0/P1/P2
+  findings.
 
 final result: passed
