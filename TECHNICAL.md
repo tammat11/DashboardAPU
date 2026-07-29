@@ -156,3 +156,21 @@ identify concrete Bitrix users.
 performed by the four-level checklist number. The script updates only `TITLE`,
 then rereads the item and verifies that its complete `MEMBERS` ID/type set did
 not change. It is dry-run by default and requires `--apply` for writes.
+
+## Project 51 checklist reminders
+
+`scripts/checklist-reminder-worker.mjs` runs daily and finds checklist items
+whose title contains `до DD.MM.YYYY`. It sends a task-chat comment one calendar
+day before the date only when `IS_COMPLETE` is not `Y`. Checklist members
+(executors and observers) are mentioned in the comment.
+
+The worker keeps an idempotency state file, so the same checklist item and
+deadline are never notified twice. Production deployment:
+
+- server: `tammat@185.98.7.103`;
+- directory: `/home/tammat/checklist-reminder`;
+- schedule: every day at 09:00 `Asia/Almaty`;
+- state: `/home/tammat/checklist-reminder/state.json`;
+- log: `/home/tammat/checklist-reminder/reminder.log`.
+
+The webhook is stored only in the server-side `.env` with mode `600`.
