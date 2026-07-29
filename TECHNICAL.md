@@ -72,6 +72,9 @@ The `Структура` tab is the last visible tab in the view switcher. Its T
 is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
 
 - proportional task distribution by top-level department;
+- workload ratio by department: filtered-period primary tasks divided by the
+  full visible employee roster of that top-level department; `ТБУ` is the
+  arithmetic mean of these department ratios;
 - total overdue days by department;
 - expandable department cards with employee task counts, overdue days, and a
   0–100 score.

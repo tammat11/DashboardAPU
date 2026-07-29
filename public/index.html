@@ -1068,20 +1068,34 @@
         border-radius: 16px;
         box-shadow: var(--shadow-soft);
       }
-      .sd-title { font-size: 14px; font-weight: 900; margin: 0 0 12px; }
-      .sd-note { margin: 9px 0 0; color: var(--text-muted); font-size: 9.5px; }
+      .sd-title { font-size: 16px; font-weight: 900; margin: 0 0 13px; }
+      .sd-note { margin: 9px 0 0; color: var(--text-muted); font-size: 11px; }
       .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 9px; background: #eef0ed; }
       .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
-      .sd-stack-value { font-size: 15px; line-height: 1; font-weight: 900; }
-      .sd-stack-label { margin-top: 4px; font-size: 8px; font-weight: 750; opacity: .92; }
+      .sd-stack-value { font-size: 18px; line-height: 1; font-weight: 900; }
+      .sd-stack-label { margin-top: 4px; font-size: 10px; font-weight: 750; opacity: .92; }
+      .sd-ratio-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .sd-tbu { padding: 5px 10px; border-radius: 9px; color: #32628b; background: #dcebf8; font-size: 11px; font-weight: 850; white-space: nowrap; }
+      .sd-ratio-chart { display: flex; flex-direction: column; gap: 9px; padding-top: 4px; }
+      .sd-ratio-row { display: grid; grid-template-columns: 110px 1fr 112px; align-items: center; gap: 10px; }
+      .sd-ratio-name { color: #656b64; font-size: 12px; font-weight: 650; text-align: right; }
+      .sd-ratio-track { position: relative; height: 20px; border-radius: 4px; background: #f0f2ef; overflow: visible; }
+      .sd-ratio-fill { height: 100%; border-radius: 4px; background: #317fd4; }
+      .sd-ratio-tbu-line { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 2px; background: #e54c50; transform: translateX(-1px); }
+      .sd-ratio-value { color: #555c55; font-size: 11px; font-weight: 800; white-space: nowrap; }
+      .sd-ratio-value strong { color: var(--text-dark); font-size: 13px; }
+      .sd-ratio-legend { display: flex; justify-content: flex-end; gap: 14px; margin-top: 8px; color: var(--text-muted); font-size: 10px; }
+      .sd-ratio-legend span { display: inline-flex; align-items: center; gap: 5px; }
+      .sd-ratio-key { width: 15px; height: 4px; border-radius: 4px; background: #317fd4; }
+      .sd-ratio-key.tbu { width: 2px; height: 11px; background: #e54c50; }
       .sd-chart { display: flex; flex-direction: column; gap: 9px; padding: 4px 0 0; }
       .sd-bar-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
-      .sd-bar-name { font-size: 10px; font-weight: 650; color: #656b64; text-align: right; }
+      .sd-bar-name { font-size: 12px; font-weight: 650; color: #656b64; text-align: right; }
       .sd-bar-track { height: 18px; background: #f0f2ef; border-radius: 3px; overflow: hidden; }
       .sd-bar-fill { height: 100%; min-width: 2px; background: #e54c50; border-radius: 3px; }
-      .sd-bar-value { font-size: 9px; font-weight: 800; color: #697069; }
-      .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 8px; }
-      .sd-subtitle { margin: -5px 0 12px; font-size: 9.5px; color: var(--text-muted); }
+      .sd-bar-value { font-size: 11px; font-weight: 800; color: #697069; }
+      .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 10px; }
+      .sd-subtitle { margin: -5px 0 12px; font-size: 11px; color: var(--text-muted); }
       .sd-departments { display: flex; flex-direction: column; gap: 8px; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
@@ -1090,22 +1104,22 @@
       .sd-dept-who { display: flex; align-items: center; gap: 9px; min-width: 0; }
       .sd-chevron { font-size: 10px; color: #869087; transition: transform .16s ease; }
       .sd-dept[open] .sd-chevron { transform: rotate(90deg); }
-      .sd-dept-name { font-size: 12px; font-weight: 900; }
-      .sd-health { padding: 3px 8px; border-radius: 8px; font-size: 8px; white-space: nowrap; }
+      .sd-dept-name { font-size: 14px; font-weight: 900; }
+      .sd-health { padding: 3px 8px; border-radius: 8px; font-size: 10px; white-space: nowrap; }
       .sd-health.leader { color: #28713d; background: #dff1df; }
       .sd-health.stable { color: #32628b; background: #dcebf8; }
       .sd-health.overload { color: #8a6522; background: #f7e8c6; }
       .sd-health.risk { color: #9f3e43; background: #f8dfe1; }
-      .sd-dept-meta { font-size: 9px; color: #777f78; white-space: nowrap; }
-      .sd-score { font-size: 18px; font-weight: 900; color: var(--brand-green); text-align: right; }
+      .sd-dept-meta { font-size: 11px; color: #777f78; white-space: nowrap; }
+      .sd-score { font-size: 21px; font-weight: 900; color: var(--brand-green); text-align: right; }
       .sd-people { padding: 0 12px 11px; }
       .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(180px,1fr) 62px 68px 75px minmax(150px,1fr) 34px; align-items: center; gap: 9px; }
-      .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 5px; color: #888f88; font-size: 8px; }
+      .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 5px; color: #888f88; font-size: 10px; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
       .sd-person-card > summary { list-style: none; cursor: pointer; }
       .sd-person-card > summary::-webkit-details-marker { display: none; }
-      .sd-person { padding: 8px 2px; font-size: 9.5px; transition: background .15s ease; }
+      .sd-person { padding: 9px 2px; font-size: 11.5px; transition: background .15s ease; }
       .sd-person:hover { background: rgba(138,196,63,.045); }
       .sd-person-name { display: flex; align-items: center; gap: 6px; font-weight: 750; }
       .sd-person-chevron { color: var(--brand-green); font-size: 10px; transition: transform .15s ease; }
@@ -1114,16 +1128,16 @@
       .sd-person-num { color: #555c55; }
       .sd-person-scores { display: flex; flex-direction: column; gap: 4px; }
       .sd-score-line { display: grid; grid-template-columns: 43px 1fr; align-items: center; gap: 5px; }
-      .sd-score-label { color: #7c837c; font-size: 7px; font-weight: 750; white-space: nowrap; }
+      .sd-score-label { color: #7c837c; font-size: 8.5px; font-weight: 750; white-space: nowrap; }
       .sd-person-bar { height: 5px; border-radius: 5px; background: #f0f2ef; overflow: hidden; }
       .sd-person-fill { height: 100%; border-radius: 5px; background: var(--brand-green); }
       .sd-person-fill.plan { background: #317fd4; }
       .sd-person-score { display: flex; min-height: 25px; flex-direction: column; justify-content: space-between; font-weight: 850; text-align: right; }
-      .sd-person-score .plan { color: #317fd4; font-size: 8px; }
+      .sd-person-score .plan { color: #317fd4; font-size: 10px; }
       .sd-task-list { max-height: 320px; margin: 0 0 8px 22px; border: 1px solid rgba(0,0,0,.055); border-radius: 9px; overflow-y: auto; background: #fafbfa; }
-      .sd-task-section-title { margin: 8px 0 5px 22px; color: #687068; font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
+      .sd-task-section-title { margin: 8px 0 5px 22px; color: #687068; font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
       .sd-task-section-title.help { color: #32628b; }
-      .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 110px 105px; align-items: center; gap: 10px; padding: 7px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 8.5px; }
+      .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 120px 115px; align-items: center; gap: 10px; padding: 8px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 10px; }
       .sd-task:last-child { border-bottom: 0; }
       .sd-task-title { min-width: 0; line-height: 1.3; }
       .sd-task-title .task-link { font-weight: 650; }
@@ -1131,9 +1145,10 @@
       .sd-task-status.danger { color: #dc2626; }
       .sd-task-status.success { color: #168a4b; }
       .sd-task-deadline { color: var(--text-muted); text-align: right; white-space: nowrap; }
-      .sd-task-role { display: block; margin-top: 2px; color: #32628b; font-size: 7.5px; font-weight: 700; }
+      .sd-task-role { display: block; margin-top: 2px; color: #32628b; font-size: 9px; font-weight: 700; }
       @media (max-width: 760px) {
         .sd-bar-row { grid-template-columns: 78px 1fr 34px; }
+        .sd-ratio-row { grid-template-columns: 78px 1fr 90px; gap: 6px; }
         .sd-axis { margin-left: 88px; }
         .sd-dept-head { grid-template-columns: minmax(150px,1fr) auto 36px; }
         .sd-dept-meta { display: none; }
@@ -2707,13 +2722,40 @@
           const currentDiscipline = Math.max(0, 100 - currentOverdue.length * 20 - currentOverdueDays * 2);
           return Math.round(executionQuality * .7 + currentDiscipline * .3);
         };
+        const rosterByDept = new Map();
+        (state.allEmployees || []).forEach(emp => {
+          if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
+          const deptName = rootFor(emp.dept);
+          if (deptName === 'Без отдела') return;
+          if (!rosterByDept.has(deptName)) rosterByDept.set(deptName, new Set());
+          rosterByDept.get(deptName).add(String(emp.id || emp.name));
+        });
         depts.forEach(d => {
           d.score = scoreForRows(d.rows);
+          d.employeeCount = rosterByDept.get(d.name)?.size || d.people.size;
+          d.workloadRatio = d.employeeCount ? d.rows.length / d.employeeCount : 0;
           d.people.forEach(e => {
             e.score = scoreForRows(e.rows);
             e.planScore = scoreForRows(e.rows.filter(row => String(row['ID проекта'] || '') === OP_GROUP_ID));
           });
         });
+        const ratioDepts = depts.filter(d => d.employeeCount > 0);
+        const tbu = ratioDepts.length
+          ? ratioDepts.reduce((sum, d) => sum + d.workloadRatio, 0) / ratioDepts.length
+          : 0;
+        const ratioMax = Math.max(1, tbu, ...ratioDepts.map(d => d.workloadRatio)) * 1.1;
+        const tbuPct = Math.min(100, tbu / ratioMax * 100);
+        const ratioRows = ratioDepts
+          .slice()
+          .sort((a, b) => b.workloadRatio - a.workloadRatio)
+          .map(d => `<div class="sd-ratio-row">
+            <span class="sd-ratio-name">${escapeHtml(d.name)}</span>
+            <div class="sd-ratio-track">
+              <div class="sd-ratio-fill" style="width:${Math.min(100, d.workloadRatio / ratioMax * 100).toFixed(1)}%"></div>
+              <span class="sd-ratio-tbu-line" style="left:${tbuPct.toFixed(1)}%"></span>
+            </div>
+            <span class="sd-ratio-value">${d.rows.length} / ${d.employeeCount} = <strong>${d.workloadRatio.toFixed(1)}</strong></span>
+          </div>`).join('');
 
         const palette = ['#317fd4', '#92938c', '#5141aa', '#1eae79', '#f26a3d', '#7666c8', '#2c9db1'];
         const totalTasks = depts.reduce((sum, d) => sum + d.rows.length, 0);
@@ -2819,12 +2861,24 @@
             <p class="sd-note">Ширина блока — доля отдела в общем объёме ${totalTasks} задач.</p>
           </section>
           <section class="sd-section">
-            <h2 class="sd-title">2. Текущая открытая просрочка по отделам, дней</h2>
+            <div class="sd-ratio-head">
+              <h2 class="sd-title">2. Нагрузка: задач на одного сотрудника</h2>
+              <span class="sd-tbu">ТБУ: ${tbu.toFixed(1)}</span>
+            </div>
+            <div class="sd-ratio-chart">${ratioRows}</div>
+            <div class="sd-ratio-legend">
+              <span><i class="sd-ratio-key"></i>Коэффициент отдела</span>
+              <span><i class="sd-ratio-key tbu"></i>ТБУ — среднее по отделам</span>
+            </div>
+            <p class="sd-note">Коэффициент = задачи выбранного периода / количество сотрудников отдела.</p>
+          </section>
+          <section class="sd-section">
+            <h2 class="sd-title">3. Текущая открытая просрочка по отделам, дней</h2>
             <div class="sd-chart">${bars}</div>
             <div class="sd-axis"><span>0</span><span>${Math.round(maxOverdue / 2)}</span><span>${maxOverdue}</span></div>
           </section>
           <section class="sd-section">
-            <h2 class="sd-title">3. Структура и итоговая оценка</h2>
+            <h2 class="sd-title">4. Структура и итоговая оценка</h2>
             <p class="sd-subtitle">Оценка 0–100: 70% качество исполнения + 30% текущая дисциплина. Открытая просрочка снижает балл независимо от общего числа задач; объём не даёт бонуса.</p>
             <div class="sd-departments">${cards}</div>
           </section>

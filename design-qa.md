@@ -8,11 +8,13 @@
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-implementation-v2.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-help-column-v3.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-plan-score-v4.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-tbu-v5.jpg`
 - Combined comparison:
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v1.png`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v2.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-help-column-comparison-v3.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-plan-score-comparison-v4.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-tbu-comparison-v5.jpg`
 - Viewport: 1280 × 720 CSS px, device scale 1
 - Source pixels: 927 × 437 and 902 × 531
 - Implementation pixels: 1280 × 1107 full-page capture
@@ -58,6 +60,11 @@ width. No additional focused crop was required.
 - Each employee renders aligned `Все` and `По плану` score bars; the second bar
   is filtered to project 51 and uses a distinct blue token. A missing project
   score renders as `—`.
+- The workload chart shows filtered-period tasks per full department roster,
+  with a red TBU mean marker. At the current-week state, AУ is `45 / 7 = 6.4`
+  and TBU is `3.8`.
+- Structure typography was increased across section titles, charts, department
+  headers, employee rows, score labels, and task details for TV readability.
 - Long employee task lists scroll inside a 320px-high nested card, keeping the
   department overview compact.
 - No browser console errors were reported.
@@ -79,5 +86,8 @@ width. No additional focused crop was required.
   no P0/P1/P2 findings.
 - Pass 4: added the project-51 `По плану` score bar and verified the two-line
   score layout at the TV viewport; no P0/P1/P2 findings.
+- Pass 5: added the workload/TBU diagram and enlarged the Structure typography;
+  verified the current-week state and full-roster denominators. No P0/P1/P2
+  findings.
 
 final result: passed
