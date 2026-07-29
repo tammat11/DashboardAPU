@@ -149,3 +149,10 @@ current verified aliases are stored in `config/checklist-user-aliases.json`.
 Role-only placeholders such as `Все директора`, `Внешний тренер`,
 `Технический директор`, and `CEO i1c` are intentionally skipped until they
 identify concrete Bitrix users.
+
+`scripts/sync-bitrix-checklist-results.mjs` replaces the legacy
+`исполнитель: ...` suffix in project-51 checklist item titles with the shorter
+`результат: ...` label populated from the plan's `resultForm` value. Matching is
+performed by the four-level checklist number. The script updates only `TITLE`,
+then rereads the item and verifies that its complete `MEMBERS` ID/type set did
+not change. It is dry-run by default and requires `--apply` for writes.
