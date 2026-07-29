@@ -2768,8 +2768,8 @@
           return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
         });
         const chartMax = Math.max(1, Math.ceil(Math.max(tbu, ...ratioSorted.map(d => d.workloadRatio)) * 1.2));
-        const chartLeft = 70;
-        const chartRight = 930;
+        const chartLeft = 95;
+        const chartRight = 895;
         const chartTop = 20;
         const chartBottom = 105;
         const chartWidth = chartRight - chartLeft;
@@ -2782,7 +2782,7 @@
         const ratioGrid = gridValues.map(value => {
           const y = yFor(value);
           return `<line x1="${chartLeft}" y1="${y.toFixed(1)}" x2="${chartRight}" y2="${y.toFixed(1)}" stroke="#dfe3de" stroke-width="1"/>
-            <text x="${chartLeft - 14}" y="${(y + 5).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="14">${value.toFixed(1)}</text>`;
+            <text x="${chartLeft - 18}" y="${(y + 5).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="14">${value.toFixed(1)}</text>`;
         }).join('');
         const ratioPath = ratioSorted.map((d, index) => `${xFor(index).toFixed(1)},${yFor(d.workloadRatio).toFixed(1)}`).join(' ');
         const ratioPoints = ratioSorted.map((d, index) => {
@@ -2797,7 +2797,6 @@
           ${ratioGrid}
           <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="#aeb5ae" stroke-width="1.5"/>
           <line x1="${chartLeft}" y1="${tbuY.toFixed(1)}" x2="${chartRight}" y2="${tbuY.toFixed(1)}" stroke="#e54c50" stroke-width="3" stroke-dasharray="9 7"/>
-          <text x="${chartRight}" y="${(tbuY - 7).toFixed(1)}" text-anchor="end" fill="#c63e43" font-size="16" font-weight="650">ТБУ ${tbu.toFixed(1)}</text>
           <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
           ${ratioPoints}
         </svg>`;

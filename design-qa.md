@@ -12,6 +12,7 @@
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-diagram-v6.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-compact-urb-v7.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-extra-compact-v8.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-tidy-v9.jpg`
 - Combined comparison:
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v1.png`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v2.jpg`
@@ -21,6 +22,7 @@
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-diagram-comparison-v6.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-compact-urb-comparison-v7.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-extra-compact-comparison-v8.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-tidy-comparison-v9.jpg`
 - Viewport: 1280 × 720 CSS px, device scale 1
 - Source pixels: 927 × 437 and 902 × 531
 - Implementation pixels: 1280 × 1107 full-page capture
@@ -78,6 +80,8 @@ width. No additional focused crop was required.
   `0 / 3 = 0.0`; TBU is recalculated across all five departments.
 - Section padding, graph height, and employee row spacing were tightened again;
   heavy weights were reduced while preserving the enlarged readable sizes.
+- The chart plot now has balanced left/right insets and a single TBU value in
+  the header, eliminating edge and TBU-label collisions.
 - Long employee task lists scroll inside a 320px-high nested card, keeping the
   department overview compact.
 - No browser console errors were reported.
@@ -111,5 +115,7 @@ width. No additional focused crop was required.
 - Pass 8: reduced vertical density and font weight across the Structure view;
   verified that chart labels, five points, formulas, and employee columns remain
   readable. No P0/P1/P2 findings.
+- Pass 9: removed the duplicate in-plot TBU label and widened plot insets;
+  verified clean edge labels and five department points. No P0/P1/P2 findings.
 
 final result: passed
