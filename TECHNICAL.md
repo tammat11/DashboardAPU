@@ -139,3 +139,13 @@ provide a current `/api/task-report` response through `BITRIX_USERS_FILE`; the
 script builds the user directory from `allEmployees`, task executors,
 task creators, co-executors, and observers. Generic labels such as `Аудитор`
 remain unresolved by design because they do not identify a specific user.
+
+When `BITRIX_WORKING_GROUPS_FILE` points to extracted plan rows, the same script
+switches to working-group mode. It matches the four-level checklist number
+(`1.1.1.1`) to `tacticalNumber`, preserves existing checklist participants
+(`TYPE=A`), and adds the resolved `workingGroup` users as observers (`TYPE=U`).
+Optional name/ID corrections are read from `BITRIX_USER_ALIASES_FILE`; the
+current verified aliases are stored in `config/checklist-user-aliases.json`.
+Role-only placeholders such as `Все директора`, `Внешний тренер`,
+`Технический директор`, and `CEO i1c` are intentionally skipped until they
+identify concrete Bitrix users.

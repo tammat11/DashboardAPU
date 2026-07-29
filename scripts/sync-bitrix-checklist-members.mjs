@@ -5,6 +5,10 @@ import {readFile} from 'node:fs/promises';
 const webhook = String(process.env.BITRIX_WEBHOOK_URL || '').replace(/\/+$/, '') + '/';
 const apply = process.argv.includes('--apply');
 const projectId = Number(process.env.BITRIX_PROJECT_ID || 51);
+const workingGroupsFile = process.env.BITRIX_WORKING_GROUPS_FILE || '';
+const userAliasesFile = process.env.BITRIX_USER_ALIASES_FILE || '';
+const mode = workingGroupsFile ? 'working-group-observers' : 'title-executors';
+const targetMemberType = workingGroupsFile ? 'U' : 'A';
 
 if (!process.env.BITRIX_WEBHOOK_URL) {
   throw new Error('Set BITRIX_WEBHOOK_URL');
@@ -68,6 +72,11 @@ function normalize(value) {
 function executorLabel(title) {
   const match = String(title || '').match(/исполнитель\s*:\s*(.+?)\s*$/iu);
   return match ? match[1].trim() : '';
+}
+
+function checklistNumber(title) {
+  const match = String(title || '').match(/^\s*(\d+(?:\.\d+){3})\b/u);
+  return match ? match[1] : '';
 }
 
 function levenshtein(a, b) {
@@ -182,6 +191,21 @@ async function loadUsers() {
 
 const usersRaw = await loadUsers();
 const users = buildUserIndex(usersRaw);
+const userAliases = userAliasesFile
+  ? new Map(
+      JSON.parse(await readFile(userAliasesFile, 'utf8'))
+        .map((alias) => [normalize(alias.label), {
+          id: String(alias.id),
+          name: String(alias.name || alias.label),
+        }]),
+    )
+  : new Map();
+const workingGroups = workingGroupsFile
+  ? new Map(
+      JSON.parse(await readFile(workingGroupsFile, 'utf8'))
+        .map((row) => [String(row.tacticalNumber || '').trim(), row]),
+    )
+  : new Map();
 const tasks = await paged(
   'tasks.task.list',
   {filter: {GROUP_ID: projectId}, select: ['ID', 'TITLE']},
@@ -189,16 +213,22 @@ const tasks = await paged(
 );
 
 const audit = {
+  mode,
   projectId,
+  sourceRows: workingGroups.size,
   tasks: tasks.length,
   checklistItems: 0,
   withExecutorText: 0,
+  matchedSourceItems: 0,
   alreadyAssigned: 0,
   plannedUpdates: 0,
   updated: 0,
+  unmatchedChecklistNumbers: [],
+  unusedSourceNumbers: [],
   unresolved: [],
   failures: [],
 };
+const usedSourceNumbers = new Set();
 
 for (const task of tasks) {
   const taskId = String(task.id || task.ID);
@@ -206,14 +236,31 @@ for (const task of tasks) {
   audit.checklistItems += checklist.length;
 
   for (const item of checklist) {
-    const label = executorLabel(item.TITLE);
+    const number = checklistNumber(item.TITLE);
+    const sourceRow = workingGroupsFile && number ? workingGroups.get(number) : null;
+    const label = workingGroupsFile ? String(sourceRow?.workingGroup || '').trim() : executorLabel(item.TITLE);
+    if (workingGroupsFile && number && !sourceRow) {
+      audit.unmatchedChecklistNumbers.push({
+        taskId,
+        itemId: String(item.ID),
+        number,
+        title: item.TITLE,
+      });
+    }
     if (!label) continue;
+    if (workingGroupsFile) {
+      audit.matchedSourceItems += 1;
+      usedSourceNumbers.add(number);
+    }
     audit.withExecutorText += 1;
 
     const labels = label.split(/\s*,\s*/).filter(Boolean);
     const resolvedUsers = [];
     for (const part of labels) {
-      const resolved = resolveUser(part, users);
+      const aliasUser = userAliases.get(normalize(part));
+      const resolved = aliasUser
+        ? {user: aliasUser, reason: 'alias'}
+        : resolveUser(part, users);
       if (resolved.user) {
         if (!resolvedUsers.some((user) => user.id === resolved.user.id)) {
           resolvedUsers.push(resolved.user);
@@ -249,7 +296,7 @@ for (const task of tasks) {
         FIELDS: {
           MEMBERS: [
             ...(item.MEMBERS || []).map((member) => ({ID: member.ID, TYPE: member.TYPE || 'A'})),
-            ...missingUsers.map((user) => ({ID: user.id, TYPE: 'A'})),
+            ...missingUsers.map((user) => ({ID: user.id, TYPE: targetMemberType})),
           ],
         },
       });
@@ -257,8 +304,14 @@ for (const task of tasks) {
         TASKID: taskId,
         ITEMID: item.ID,
       });
-      const rereadIds = (reread.result?.MEMBERS || []).map((member) => String(member.ID));
-      const verified = missingUsers.every((user) => rereadIds.includes(user.id));
+      const rereadMembers = reread.result?.MEMBERS || [];
+      const verified = missingUsers.every((user) =>
+        rereadMembers.some(
+          (member) =>
+            String(member.ID) === user.id &&
+            String(member.TYPE || '') === targetMemberType,
+        ),
+      );
       if (!verified) throw new Error('member missing after reread');
       audit.updated += 1;
       await sleep(80);
@@ -272,6 +325,11 @@ for (const task of tasks) {
       });
     }
   }
+}
+
+if (workingGroupsFile) {
+  audit.unusedSourceNumbers = [...workingGroups.keys()]
+    .filter((number) => !usedSourceNumbers.has(number));
 }
 
 console.log(JSON.stringify(audit, null, 2));
