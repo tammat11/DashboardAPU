@@ -77,6 +77,9 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
   0–100 score.
 - expandable employee rows with the selected period's task names, statuses,
   deadlines, and links back to Bitrix24.
+- employee rows also show `Помогает N`; the nested `Помогает` section contains
+  tasks where that person is a Bitrix24 co-executor or observer but not the
+  primary executor. Duplicate roles on the same task are merged.
 
 Department and employee scores use 60% deadline discipline and 40% relative
 task volume. Child departments are rolled up to the direct children of the AУП

@@ -1110,11 +1110,14 @@
       .sd-person-name { display: flex; align-items: center; gap: 6px; font-weight: 750; }
       .sd-person-chevron { color: var(--brand-green); font-size: 10px; transition: transform .15s ease; }
       .sd-person-card[open] .sd-person-chevron { transform: rotate(90deg); }
+      .sd-help-badge { padding: 2px 6px; border-radius: 7px; color: #32628b; background: #dcebf8; font-size: 7.5px; font-weight: 800; white-space: nowrap; }
       .sd-person-num { color: #555c55; }
       .sd-person-bar { height: 5px; border-radius: 5px; background: #f0f2ef; overflow: hidden; }
       .sd-person-fill { height: 100%; border-radius: 5px; background: var(--brand-green); }
       .sd-person-score { font-weight: 850; text-align: right; }
       .sd-task-list { max-height: 320px; margin: 0 0 8px 22px; border: 1px solid rgba(0,0,0,.055); border-radius: 9px; overflow-y: auto; background: #fafbfa; }
+      .sd-task-section-title { margin: 8px 0 5px 22px; color: #687068; font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
+      .sd-task-section-title.help { color: #32628b; }
       .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 110px 105px; align-items: center; gap: 10px; padding: 7px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 8.5px; }
       .sd-task:last-child { border-bottom: 0; }
       .sd-task-title { min-width: 0; line-height: 1.3; }
@@ -1123,6 +1126,7 @@
       .sd-task-status.danger { color: #dc2626; }
       .sd-task-status.success { color: #168a4b; }
       .sd-task-deadline { color: var(--text-muted); text-align: right; white-space: nowrap; }
+      .sd-task-role { display: block; margin-top: 2px; color: #32628b; font-size: 7.5px; font-weight: 700; }
       @media (max-width: 760px) {
         .sd-bar-row { grid-template-columns: 78px 1fr 34px; }
         .sd-axis { margin-left: 88px; }
@@ -2614,6 +2618,7 @@
               id: String(row['ID исполнителя'] || ''),
               avatar: row['Аватар'] || '',
               rows: [],
+              helping: new Map(),
               overdueDays: 0,
               overdueTasks: 0
             });
@@ -2622,6 +2627,50 @@
           emp.rows.push(row);
           emp.overdueDays += overdue;
           if (overdue > 0) emp.overdueTasks++;
+        });
+
+        // Add tasks where the employee participates without being the main
+        // executor. One task is shown once even if the person has both roles.
+        state.filteredRows.forEach((row, rowIndex) => {
+          const executorId = String(row['ID исполнителя'] || '');
+          const executorName = String(row['Исполнитель'] || '');
+          const helpers = new Map();
+          const addHelpers = (field, role) => {
+            parsePeopleField(row[field]).forEach(person => {
+              const id = String(person.id || '');
+              const name = String(person.name || '');
+              if (!name || (id && id === executorId) || name === executorName || isExcludedPerson(name)) return;
+              const key = id || name;
+              if (!helpers.has(key)) helpers.set(key, { ...person, roles: new Set() });
+              helpers.get(key).roles.add(role);
+            });
+          };
+          addHelpers('Соисполнители', 'Соисполнитель');
+          addHelpers('Наблюдатели', 'Наблюдатель');
+
+          helpers.forEach(person => {
+            const deptName = rootFor(person.dept);
+            if (deptName === 'Без отдела') return;
+            if (!groups.has(deptName)) {
+              groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
+            }
+            const group = groups.get(deptName);
+            if (!group.people.has(person.name)) {
+              group.people.set(person.name, {
+                name: person.name,
+                id: String(person.id || ''),
+                avatar: person.avatar || '',
+                rows: [],
+                helping: new Map(),
+                overdueDays: 0,
+                overdueTasks: 0
+              });
+            }
+            const emp = group.people.get(person.name);
+            if (!emp.helping) emp.helping = new Map();
+            const taskKey = String(row['ID задачи'] || rowIndex);
+            emp.helping.set(taskKey, { row, roles: Array.from(person.roles) });
+          });
         });
 
         const depts = Array.from(groups.values()).sort((a, b) => b.rows.length - a.rows.length);
@@ -2675,12 +2724,13 @@
           const [health, healthClass] = healthFor(d);
           const people = Array.from(d.people.values()).sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'ru'));
           const peopleRows = people.map(emp => {
-            const taskRows = emp.rows.slice().sort((a, b) => {
+            const sortedRows = rows => rows.slice().sort((a, b) => {
               const aOverdue = a['Состояние задачи'] === 'Открыта просрочена' ? 0 : 1;
               const bOverdue = b['Состояние задачи'] === 'Открыта просрочена' ? 0 : 1;
               if (aOverdue !== bOverdue) return aOverdue - bOverdue;
               return String(a.deadlineRaw || '9999').localeCompare(String(b.deadlineRaw || '9999'));
-            }).map(row => {
+            });
+            const renderTaskRow = (row, roles = []) => {
               const taskId = String(row['ID задачи'] || '');
               const title = escapeHtml(row['Название задачи'] || 'Без названия');
               const titleHtml = state.portalHost && /^\d+$/.test(taskId)
@@ -2691,20 +2741,32 @@
                 ? 'danger'
                 : (status.startsWith('Закрыта') ? 'success' : '');
               return `<div class="sd-task">
-                <div class="sd-task-title">${titleHtml}</div>
+                <div class="sd-task-title">${titleHtml}${roles.length ? `<span class="sd-task-role">${escapeHtml(roles.join(' · '))}</span>` : ''}</div>
                 <span class="sd-task-status ${statusClass}">${escapeHtml(status)}</span>
                 <span class="sd-task-deadline">${escapeHtml(row['Дедлайн'] || 'Без срока')}</span>
               </div>`;
+            };
+            const ownTaskRows = sortedRows(emp.rows).map(row => renderTaskRow(row)).join('');
+            const helpingItems = Array.from((emp.helping || new Map()).values());
+            const helpingRows = sortedRows(helpingItems.map(item => item.row)).map(row => {
+              const item = helpingItems.find(value => value.row === row);
+              return renderTaskRow(row, item ? item.roles : []);
             }).join('');
+            const ownSection = ownTaskRows
+              ? `<div class="sd-task-section-title">Исполняет</div><div class="sd-task-list">${ownTaskRows}</div>`
+              : '';
+            const helpingSection = helpingRows
+              ? `<div class="sd-task-section-title help">Помогает</div><div class="sd-task-list">${helpingRows}</div>`
+              : '';
             return `<details class="sd-person-card">
               <summary class="sd-person">
-                <span class="sd-person-name"><span class="sd-person-chevron">›</span>${escapeHtml(emp.name)}</span>
+                <span class="sd-person-name"><span class="sd-person-chevron">›</span>${escapeHtml(emp.name)}${helpingItems.length ? `<span class="sd-help-badge">Помогает ${helpingItems.length}</span>` : ''}</span>
                 <span class="sd-person-num">${emp.rows.length} зад.</span>
                 <span class="sd-person-num">${emp.overdueDays} дн.</span>
                 <div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score}%"></div></div>
                 <span class="sd-person-score">${emp.score}</span>
               </summary>
-              <div class="sd-task-list">${taskRows}</div>
+              ${ownSection}${helpingSection}
             </details>`;
           }).join('');
           return `<details class="sd-dept"${index === 0 ? ' open' : ''}>
