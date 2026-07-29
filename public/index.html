@@ -1145,7 +1145,7 @@
       .sd-score strong { font-size: 18px; line-height: 1; font-weight: 800; }
       .sd-score small { margin-top: 3px; color: #788078; font-size: 10px; line-height: 1; font-weight: 650; }
       .sd-people { padding: 0 12px 11px; }
-      .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(170px,1fr) 66px 72px 68px 75px minmax(150px,1fr) 34px; align-items: center; gap: 8px; }
+      .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(170px,1fr) 66px 72px 68px 74px 75px minmax(150px,1fr) 34px; align-items: center; gap: 8px; }
       .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 6px; color: #687068; font-size: 12px; font-weight: 650; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
@@ -1197,7 +1197,7 @@
         .sd-axis { margin-left: 88px; }
         .sd-dept-head { grid-template-columns: minmax(150px,1fr) auto 72px; gap: 8px; }
         .sd-dept-meta { display: none; }
-        .sd-person-head, .sd-person { grid-template-columns: minmax(108px,1fr) 44px 48px 46px 50px 72px 28px; gap: 4px; }
+        .sd-person-head, .sd-person { grid-template-columns: minmax(108px,1fr) 44px 48px 46px 52px 50px 72px 28px; gap: 4px; }
         .sd-task { grid-template-columns: minmax(150px,1fr) 90px; }
         .sd-task-deadline { grid-column: 2; }
       }
@@ -2682,6 +2682,7 @@
               avatar: emp.avatar || '',
               rows: [],
               helping: new Map(),
+              checklist: new Map(),
               overdueDays: 0,
               overdueTasks: 0
             });
@@ -2707,6 +2708,7 @@
               avatar: row['Аватар'] || '',
               rows: [],
               helping: new Map(),
+              checklist: new Map(),
               overdueDays: 0,
               overdueTasks: 0
             });
@@ -2750,6 +2752,7 @@
                 avatar: person.avatar || '',
                 rows: [],
                 helping: new Map(),
+                checklist: new Map(),
                 overdueDays: 0,
                 overdueTasks: 0
               });
@@ -2758,6 +2761,50 @@
             if (!emp.helping) emp.helping = new Map();
             const taskKey = String(row['ID задачи'] || rowIndex);
             emp.helping.set(taskKey, { row, roles: Array.from(person.roles) });
+          });
+        });
+
+        // Count project-51 checklist items separately from their parent tasks.
+        // Each executor or observer assigned to an item receives one checklist unit.
+        const employeeById = new Map(
+          (state.allEmployees || []).map(employee => [String(employee.id || ''), employee])
+        );
+        state.filteredRows.forEach(row => {
+          let items = [];
+          try {
+            items = JSON.parse(row['Чек-лист'] || '[]');
+          } catch {}
+          if (!Array.isArray(items)) return;
+          const taskId = String(row['ID задачи'] || '');
+          items.forEach(item => {
+            (item.members || []).forEach(member => {
+              const memberId = String(member.id || '');
+              const employee = employeeById.get(memberId);
+              if (!employee || isExcludedPerson(employee.name)) return;
+              const deptName = rootFor(employee.dept);
+              if (deptName === 'Без отдела') return;
+              if (!groups.has(deptName)) {
+                groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
+              }
+              const group = groups.get(deptName);
+              if (!group.people.has(employee.name)) {
+                group.people.set(employee.name, {
+                  name: employee.name,
+                  id: memberId,
+                  avatar: employee.avatar || '',
+                  rows: [],
+                  helping: new Map(),
+                  checklist: new Map(),
+                  overdueDays: 0,
+                  overdueTasks: 0
+                });
+              }
+              const person = group.people.get(employee.name);
+              if (!person.checklist) person.checklist = new Map();
+              person.checklist.set(`${taskId}:${item.id}`, {
+                complete: item.complete === true
+              });
+            });
           });
         });
 
@@ -2959,6 +3006,8 @@
               </div>`;
             };
             const helpingItems = Array.from((emp.helping || new Map()).values());
+            const checklistItems = Array.from((emp.checklist || new Map()).values());
+            const completedChecklistItems = checklistItems.filter(item => item.complete).length;
             const isPlanRow = row => String(row['ID проекта'] || '') === OP_GROUP_ID;
             const planTaskCount = emp.rows.filter(isPlanRow).length;
             const outsideTaskCount = emp.rows.length - planTaskCount;
@@ -2993,6 +3042,7 @@
                 <span class="sd-person-num">${planTaskCount ? `${planTaskCount} зад.` : ''}</span>
                 <span class="sd-person-num">${outsideTaskCount ? `${outsideTaskCount} зад.` : ''}</span>
                 <span class="sd-help-count">${helpingItems.length || ''}</span>
+                <span class="sd-person-num" title="Выполнено / всего пунктов чек-листа">${checklistItems.length ? `${completedChecklistItems}/${checklistItems.length}` : ''}</span>
                 <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
                 <div class="sd-person-scores">
                   <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
@@ -3017,7 +3067,7 @@
               </span>
             </summary>
             <div class="sd-people">
-              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span>Вне плана</span><span>Помогает</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
+              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span>Вне плана</span><span>Помогает</span><span>Чек-лист</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
               ${peopleRows}
             </div>
           </details>`;

@@ -174,3 +174,9 @@ deadline are never notified twice. Production deployment:
 - log: `/home/tammat/checklist-reminder/reminder.log`.
 
 The webhook is stored only in the server-side `.env` with mode `600`.
+
+The task-report API also batch-loads project-51 checklist items and exposes
+them in each task row as the JSON field `Чек-лист`. The report's `Оценка`
+table attributes every item to all of its Bitrix checklist members (`A` and
+`U`) and shows the employee column as `completed / total`. The active report
+period still applies through the parent task.
