@@ -1076,18 +1076,15 @@
       .sd-stack-label { margin-top: 4px; font-size: 10px; font-weight: 750; opacity: .92; }
       .sd-ratio-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
       .sd-tbu { padding: 5px 10px; border-radius: 9px; color: #32628b; background: #dcebf8; font-size: 11px; font-weight: 850; white-space: nowrap; }
-      .sd-ratio-chart { display: flex; flex-direction: column; gap: 9px; padding-top: 4px; }
-      .sd-ratio-row { display: grid; grid-template-columns: 110px 1fr 112px; align-items: center; gap: 10px; }
-      .sd-ratio-name { color: #656b64; font-size: 12px; font-weight: 650; text-align: right; }
-      .sd-ratio-track { position: relative; height: 20px; border-radius: 4px; background: #f0f2ef; overflow: visible; }
-      .sd-ratio-fill { height: 100%; border-radius: 4px; background: #317fd4; }
-      .sd-ratio-tbu-line { position: absolute; top: -3px; bottom: -3px; width: 2px; border-radius: 2px; background: #e54c50; transform: translateX(-1px); }
-      .sd-ratio-value { color: #555c55; font-size: 11px; font-weight: 800; white-space: nowrap; }
-      .sd-ratio-value strong { color: var(--text-dark); font-size: 13px; }
+      .sd-ratio-chart { width: 100%; min-height: 260px; }
+      .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 260px; overflow: visible; }
+      .sd-ratio-formulas { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 6px; }
+      .sd-ratio-formula { padding: 5px 9px; border: 1px solid var(--border-color); border-radius: 9px; color: #555c55; background: #fafbfa; font-size: 11px; font-weight: 750; }
+      .sd-ratio-formula strong { color: #317fd4; font-size: 13px; }
       .sd-ratio-legend { display: flex; justify-content: flex-end; gap: 14px; margin-top: 8px; color: var(--text-muted); font-size: 10px; }
       .sd-ratio-legend span { display: inline-flex; align-items: center; gap: 5px; }
       .sd-ratio-key { width: 15px; height: 4px; border-radius: 4px; background: #317fd4; }
-      .sd-ratio-key.tbu { width: 2px; height: 11px; background: #e54c50; }
+      .sd-ratio-key.tbu { width: 15px; height: 2px; background: #e54c50; }
       .sd-chart { display: flex; flex-direction: column; gap: 9px; padding: 4px 0 0; }
       .sd-bar-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
       .sd-bar-name { font-size: 12px; font-weight: 650; color: #656b64; text-align: right; }
@@ -1148,7 +1145,6 @@
       .sd-task-role { display: block; margin-top: 2px; color: #32628b; font-size: 9px; font-weight: 700; }
       @media (max-width: 760px) {
         .sd-bar-row { grid-template-columns: 78px 1fr 34px; }
-        .sd-ratio-row { grid-template-columns: 78px 1fr 90px; gap: 6px; }
         .sd-axis { margin-left: 88px; }
         .sd-dept-head { grid-template-columns: minmax(150px,1fr) auto 36px; }
         .sd-dept-meta { display: none; }
@@ -2743,19 +2739,49 @@
         const tbu = ratioDepts.length
           ? ratioDepts.reduce((sum, d) => sum + d.workloadRatio, 0) / ratioDepts.length
           : 0;
-        const ratioMax = Math.max(1, tbu, ...ratioDepts.map(d => d.workloadRatio)) * 1.1;
-        const tbuPct = Math.min(100, tbu / ratioMax * 100);
-        const ratioRows = ratioDepts
-          .slice()
-          .sort((a, b) => b.workloadRatio - a.workloadRatio)
-          .map(d => `<div class="sd-ratio-row">
-            <span class="sd-ratio-name">${escapeHtml(d.name)}</span>
-            <div class="sd-ratio-track">
-              <div class="sd-ratio-fill" style="width:${Math.min(100, d.workloadRatio / ratioMax * 100).toFixed(1)}%"></div>
-              <span class="sd-ratio-tbu-line" style="left:${tbuPct.toFixed(1)}%"></span>
-            </div>
-            <span class="sd-ratio-value">${d.rows.length} / ${d.employeeCount} = <strong>${d.workloadRatio.toFixed(1)}</strong></span>
-          </div>`).join('');
+        const deptOrder = ['АУ', 'ФУ', 'УРК', 'УРБ', 'Оптимизация'];
+        const ratioSorted = ratioDepts.slice().sort((a, b) => {
+          const ai = deptOrder.indexOf(a.name);
+          const bi = deptOrder.indexOf(b.name);
+          return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
+        });
+        const chartMax = Math.max(1, Math.ceil(Math.max(tbu, ...ratioSorted.map(d => d.workloadRatio)) * 1.2));
+        const chartLeft = 70;
+        const chartRight = 930;
+        const chartTop = 30;
+        const chartBottom = 220;
+        const chartWidth = chartRight - chartLeft;
+        const chartHeight = chartBottom - chartTop;
+        const xFor = index => ratioSorted.length === 1
+          ? (chartLeft + chartRight) / 2
+          : chartLeft + index * chartWidth / (ratioSorted.length - 1);
+        const yFor = value => chartBottom - value / chartMax * chartHeight;
+        const gridValues = [0, chartMax / 2, chartMax];
+        const ratioGrid = gridValues.map(value => {
+          const y = yFor(value);
+          return `<line x1="${chartLeft}" y1="${y.toFixed(1)}" x2="${chartRight}" y2="${y.toFixed(1)}" stroke="#dfe3de" stroke-width="1"/>
+            <text x="${chartLeft - 14}" y="${(y + 5).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="15">${value.toFixed(1)}</text>`;
+        }).join('');
+        const ratioPath = ratioSorted.map((d, index) => `${xFor(index).toFixed(1)},${yFor(d.workloadRatio).toFixed(1)}`).join(' ');
+        const ratioPoints = ratioSorted.map((d, index) => {
+          const x = xFor(index);
+          const y = yFor(d.workloadRatio);
+          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="#317fd4" stroke="#ffffff" stroke-width="3"/>
+            <text x="${x.toFixed(1)}" y="${(y - 16).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="19" font-weight="800">${d.workloadRatio.toFixed(1)}</text>
+            <text x="${x.toFixed(1)}" y="${chartBottom + 30}" text-anchor="middle" fill="#243024" font-size="17" font-weight="750">${escapeHtml(d.name)}</text>`;
+        }).join('');
+        const tbuY = yFor(tbu);
+        const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 270" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
+          ${ratioGrid}
+          <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="#aeb5ae" stroke-width="1.5"/>
+          <line x1="${chartLeft}" y1="${tbuY.toFixed(1)}" x2="${chartRight}" y2="${tbuY.toFixed(1)}" stroke="#e54c50" stroke-width="3" stroke-dasharray="9 7"/>
+          <text x="${chartRight}" y="${(tbuY - 9).toFixed(1)}" text-anchor="end" fill="#c63e43" font-size="17" font-weight="800">ТБУ ${tbu.toFixed(1)}</text>
+          <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          ${ratioPoints}
+        </svg>`;
+        const ratioFormulas = ratioSorted.map(d =>
+          `<span class="sd-ratio-formula">${escapeHtml(d.name)}: ${d.rows.length} / ${d.employeeCount} = <strong>${d.workloadRatio.toFixed(1)}</strong></span>`
+        ).join('');
 
         const palette = ['#317fd4', '#92938c', '#5141aa', '#1eae79', '#f26a3d', '#7666c8', '#2c9db1'];
         const totalTasks = depts.reduce((sum, d) => sum + d.rows.length, 0);
@@ -2865,9 +2891,10 @@
               <h2 class="sd-title">2. Нагрузка: задач на одного сотрудника</h2>
               <span class="sd-tbu">ТБУ: ${tbu.toFixed(1)}</span>
             </div>
-            <div class="sd-ratio-chart">${ratioRows}</div>
+            <div class="sd-ratio-chart">${ratioDiagram}</div>
+            <div class="sd-ratio-formulas">${ratioFormulas}</div>
             <div class="sd-ratio-legend">
-              <span><i class="sd-ratio-key"></i>Коэффициент отдела</span>
+              <span><i class="sd-ratio-key"></i>Коэффициенты отделов</span>
               <span><i class="sd-ratio-key tbu"></i>ТБУ — среднее по отделам</span>
             </div>
             <p class="sd-note">Коэффициент = задачи выбранного периода / количество сотрудников отдела.</p>
