@@ -1057,6 +1057,57 @@
         overflow-y: auto;
         line-height: 1.4;
       }
+
+      /* Structure analytics */
+      .sd-page { padding: 4px 2px 28px; color: var(--text-dark); }
+      .sd-section { margin-bottom: 24px; }
+      .sd-title { font-size: 13px; font-weight: 850; margin: 0 0 10px; }
+      .sd-note { margin: 8px 0 0; color: var(--text-muted); font-size: 9px; }
+      .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 9px; background: #eef0ed; }
+      .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
+      .sd-stack-value { font-size: 15px; line-height: 1; font-weight: 900; }
+      .sd-stack-label { margin-top: 4px; font-size: 8px; font-weight: 750; opacity: .92; }
+      .sd-chart { display: flex; flex-direction: column; gap: 9px; padding: 4px 0 0; }
+      .sd-bar-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
+      .sd-bar-name { font-size: 9.5px; color: #656b64; text-align: right; }
+      .sd-bar-track { height: 18px; background: #f0f2ef; border-radius: 3px; overflow: hidden; }
+      .sd-bar-fill { height: 100%; min-width: 2px; background: #e54c50; border-radius: 3px; }
+      .sd-bar-value { font-size: 9px; font-weight: 800; color: #697069; }
+      .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 8px; }
+      .sd-subtitle { margin: -5px 0 10px; font-size: 9.5px; color: var(--text-muted); }
+      .sd-departments { display: flex; flex-direction: column; gap: 8px; }
+      .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 11px; overflow: hidden; }
+      .sd-dept summary { list-style: none; cursor: pointer; }
+      .sd-dept summary::-webkit-details-marker { display: none; }
+      .sd-dept-head { min-height: 47px; padding: 0 14px; display: grid; grid-template-columns: minmax(220px,1fr) auto 42px; align-items: center; gap: 12px; }
+      .sd-dept-who { display: flex; align-items: center; gap: 9px; min-width: 0; }
+      .sd-chevron { font-size: 10px; color: #869087; transition: transform .16s ease; }
+      .sd-dept[open] .sd-chevron { transform: rotate(90deg); }
+      .sd-dept-name { font-size: 11px; font-weight: 850; }
+      .sd-health { padding: 3px 8px; border-radius: 8px; font-size: 8px; white-space: nowrap; }
+      .sd-health.leader { color: #28713d; background: #dff1df; }
+      .sd-health.stable { color: #32628b; background: #dcebf8; }
+      .sd-health.overload { color: #8a6522; background: #f7e8c6; }
+      .sd-health.risk { color: #9f3e43; background: #f8dfe1; }
+      .sd-dept-meta { font-size: 9px; color: #777f78; white-space: nowrap; }
+      .sd-score { font-size: 17px; font-weight: 900; color: #2f7fce; text-align: right; }
+      .sd-people { padding: 0 14px 10px; }
+      .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(180px,1fr) 70px 75px minmax(150px,1fr) 34px; align-items: center; gap: 9px; }
+      .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 5px; color: #888f88; font-size: 8px; }
+      .sd-person { padding: 7px 0; font-size: 9px; }
+      .sd-person-name { font-weight: 650; }
+      .sd-person-num { color: #555c55; }
+      .sd-person-bar { height: 5px; border-radius: 5px; background: #f0f2ef; overflow: hidden; }
+      .sd-person-fill { height: 100%; border-radius: 5px; background: #3282d4; }
+      .sd-person:first-of-type .sd-person-fill { background: #24ae80; }
+      .sd-person-score { font-weight: 850; text-align: right; }
+      @media (max-width: 760px) {
+        .sd-bar-row { grid-template-columns: 78px 1fr 34px; }
+        .sd-axis { margin-left: 88px; }
+        .sd-dept-head { grid-template-columns: minmax(150px,1fr) auto 36px; }
+        .sd-dept-meta { display: none; }
+        .sd-person-head, .sd-person { grid-template-columns: minmax(130px,1fr) 52px 58px 80px 28px; gap: 5px; }
+      }
     </style>
   </head>
   <body>
@@ -1097,12 +1148,12 @@
           </span>
           <span class="divider"></span>
           <span class="view-switcher">
-            <button id="viewBtn1" class="view-btn">🏗️ Структура</button>
             <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
             <button id="viewBtn3" class="view-btn">🖼️ Галерея</button>
             <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
             <button id="viewBtn6" class="view-btn">📊 План</button>
             <button id="viewBtn7" class="view-btn active">📈 План+задачи</button>
+            <button id="viewBtn1" class="view-btn">🏗️ Структура</button>
             <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
           </span>
         </div>
@@ -1172,6 +1223,7 @@
         <div id="zrsWrap" hidden></div>
         <div id="planWrap" hidden></div>
         <div id="planTasksWrap" hidden></div>
+        <div id="structureWrap" hidden></div>
 
         <div id="aiAnalysisWrap" hidden>
           <div id="aiAnalysisLoading" class="loading-panel">
@@ -1272,6 +1324,7 @@
         viewBtn7: document.getElementById('viewBtn7'),
         planWrap: document.getElementById('planWrap'),
         planTasksWrap: document.getElementById('planTasksWrap'),
+        structureWrap: document.getElementById('structureWrap'),
         zrsWrap: document.getElementById('zrsWrap'),
         aiAnalysisWrap: document.getElementById('aiAnalysisWrap'),
         aiAnalysisLoading: document.getElementById('aiAnalysisLoading'),
@@ -2491,9 +2544,156 @@
         if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
       }
 
+      function renderStructureDashboard() {
+        ids.aiAnalysisWrap.hidden = true;
+        ids.galleryWrap.hidden = true;
+        ids.zrsWrap.hidden = true;
+        ids.tableWrap.hidden = true;
+        if (ids.planWrap) ids.planWrap.hidden = true;
+        if (ids.planTasksWrap) ids.planTasksWrap.hidden = true;
+        ids.structureWrap.hidden = false;
+
+        const depById = new Map((state.departments || []).map(d => [String(d.ID), d]));
+        const depByName = new Map((state.departments || []).map(d => [String(d.NAME), d]));
+        const rootNames = new Set(
+          (state.departments || [])
+            .filter(d => String(d.PARENT) === '157')
+            .map(d => String(d.NAME))
+        );
+        const rootFor = name => {
+          let dept = depByName.get(String(name || ''));
+          const visited = new Set();
+          while (dept && !visited.has(String(dept.ID))) {
+            if (rootNames.has(String(dept.NAME))) return String(dept.NAME);
+            visited.add(String(dept.ID));
+            dept = depById.get(String(dept.PARENT || ''));
+          }
+          return 'Без отдела';
+        };
+
+        const groups = new Map();
+        state.filteredRows.forEach(row => {
+          const person = row['Исполнитель'] || '';
+          if (!person || isExcludedPerson(person)) return;
+          const deptName = rootFor(row['Отдел']);
+          if (!groups.has(deptName)) {
+            groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
+          }
+          const group = groups.get(deptName);
+          const overdue = Math.max(0, parseInt(row['Просрочка, дней']) || 0);
+          group.rows.push(row);
+          group.overdueDays += overdue;
+          if (overdue > 0) group.overdueTasks++;
+          if (!group.people.has(person)) {
+            group.people.set(person, { name: person, rows: [], overdueDays: 0, overdueTasks: 0 });
+          }
+          const emp = group.people.get(person);
+          emp.rows.push(row);
+          emp.overdueDays += overdue;
+          if (overdue > 0) emp.overdueTasks++;
+        });
+
+        const depts = Array.from(groups.values()).sort((a, b) => b.rows.length - a.rows.length);
+        if (!depts.length) {
+          ids.structureWrap.innerHTML = '<div class="loading-panel">Нет данных для структуры</div>';
+          renderStats(state.filteredRows);
+          return;
+        }
+
+        const maxTasks = Math.max(...depts.map(d => d.rows.length), 1);
+        const maxOverdue = Math.max(...depts.map(d => d.overdueDays), 1);
+        const scoreFor = (total, overdueTasks, volumeMax) => {
+          const discipline = total ? Math.max(0, 100 - overdueTasks / total * 100) : 100;
+          const volume = volumeMax ? Math.min(100, total / volumeMax * 100) : 0;
+          return Math.round(discipline * .6 + volume * .4);
+        };
+        depts.forEach(d => {
+          d.score = scoreFor(d.rows.length, d.overdueTasks, maxTasks);
+          const employeeMax = Math.max(...Array.from(d.people.values()).map(e => e.rows.length), 1);
+          d.people.forEach(e => { e.score = scoreFor(e.rows.length, e.overdueTasks, employeeMax); });
+        });
+
+        const palette = ['#317fd4', '#92938c', '#5141aa', '#1eae79', '#f26a3d', '#7666c8', '#2c9db1'];
+        const totalTasks = depts.reduce((sum, d) => sum + d.rows.length, 0);
+        const stack = depts.map((d, index) => {
+          const width = totalTasks ? d.rows.length / totalTasks * 100 : 0;
+          return `<div class="sd-stack-item" style="width:${width.toFixed(2)}%;background:${palette[index % palette.length]}">
+            <span class="sd-stack-value">${d.rows.length}</span>
+            <span class="sd-stack-label">${escapeHtml(d.name)}</span>
+          </div>`;
+        }).join('');
+
+        const bars = depts
+          .slice()
+          .sort((a, b) => b.overdueDays - a.overdueDays)
+          .map(d => `<div class="sd-bar-row">
+            <span class="sd-bar-name">${escapeHtml(d.name)}</span>
+            <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(d.overdueDays / maxOverdue * 100).toFixed(1)}%"></div></div>
+            <span class="sd-bar-value">${d.overdueDays}</span>
+          </div>`).join('');
+
+        const healthFor = d => {
+          const pressure = d.rows.length ? d.overdueDays / d.rows.length : 0;
+          if (pressure <= .5) return ['Лидер', 'leader'];
+          if (pressure <= .8) return ['Стабильно', 'stable'];
+          if (pressure <= 1.2) return ['Перегруз', 'overload'];
+          return ['Риск', 'risk'];
+        };
+
+        const cards = depts.map((d, index) => {
+          const [health, healthClass] = healthFor(d);
+          const people = Array.from(d.people.values()).sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'ru'));
+          const peopleRows = people.map(emp => `
+            <div class="sd-person">
+              <span class="sd-person-name">${escapeHtml(emp.name)}</span>
+              <span class="sd-person-num">${emp.rows.length} зад.</span>
+              <span class="sd-person-num">${emp.overdueDays} дн.</span>
+              <div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score}%"></div></div>
+              <span class="sd-person-score">${emp.score}</span>
+            </div>`).join('');
+          return `<details class="sd-dept"${index === 0 ? ' open' : ''}>
+            <summary class="sd-dept-head">
+              <div class="sd-dept-who">
+                <span class="sd-chevron">›</span>
+                <span class="sd-dept-name">${escapeHtml(d.name)}</span>
+                <span class="sd-health ${healthClass}">${health}</span>
+              </div>
+              <span class="sd-dept-meta">${d.rows.length} зад. · ${d.overdueDays} дн.</span>
+              <span class="sd-score">${d.score}</span>
+            </summary>
+            <div class="sd-people">
+              <div class="sd-person-head"><span>Исполнитель</span><span>Задач</span><span>Проср.</span><span>Оценка</span><span></span></div>
+              ${peopleRows}
+            </div>
+          </details>`;
+        }).join('');
+
+        ids.structureWrap.innerHTML = `<div class="sd-page">
+          <section class="sd-section">
+            <h2 class="sd-title">1. Распределение задач по отделам</h2>
+            <div class="sd-stack">${stack}</div>
+            <p class="sd-note">Ширина блока — доля отдела в общем объёме ${totalTasks} задач.</p>
+          </section>
+          <section class="sd-section">
+            <h2 class="sd-title">2. Просрочка по отделам, всего дней</h2>
+            <div class="sd-chart">${bars}</div>
+            <div class="sd-axis"><span>0</span><span>${Math.round(maxOverdue / 2)}</span><span>${maxOverdue}</span></div>
+          </section>
+          <section class="sd-section">
+            <h2 class="sd-title">3. Структура и итоговая оценка</h2>
+            <p class="sd-subtitle">Оценка 0–100: 60% дисциплина сроков + 40% объём. Нажмите на отдел — детализация по людям.</p>
+            <div class="sd-departments">${cards}</div>
+          </section>
+        </div>`;
+
+        renderStats(state.filteredRows);
+      }
+
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7');
+        if (ids.structureWrap) ids.structureWrap.hidden = true;
+        if (state.viewMode === 'table1') { renderStructureDashboard(); return; }
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
         if (state.viewMode === 'table5') { renderZRSGallery(); return; }
         if (state.viewMode === 'table6') { renderPlan(); return; }

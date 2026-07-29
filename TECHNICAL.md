@@ -65,3 +65,18 @@ If the dashboard breaks only on specific devices, inspect `public/index.html` fi
 Users with the Bitrix boolean field `UF_USR_1785305377085`
 (`Не показывать на телевизоре`) enabled are automatically excluded from the
 TV employee directory and their assigned tasks.
+
+## Structure analytics view
+
+The `Структура` tab is the last visible tab in the view switcher. Its TV layout
+is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
+
+- proportional task distribution by top-level department;
+- total overdue days by department;
+- expandable department cards with employee task counts, overdue days, and a
+  0–100 score.
+
+Department and employee scores use 60% deadline discipline and 40% relative
+task volume. Child departments are rolled up to the direct children of the AУП
+department (`157`). The view follows the global period and employee search
+filters.
