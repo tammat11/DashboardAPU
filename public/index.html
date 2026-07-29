@@ -2608,10 +2608,11 @@
             groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
           }
           const group = groups.get(deptName);
-          const overdue = Math.max(0, parseInt(row['Просрочка, дней']) || 0);
+          const isOpenOverdue = row['Состояние задачи'] === 'Открыта просрочена';
+          const overdue = isOpenOverdue ? Math.max(0, parseInt(row['Просрочка, дней']) || 0) : 0;
           group.rows.push(row);
           group.overdueDays += overdue;
-          if (overdue > 0) group.overdueTasks++;
+          if (isOpenOverdue) group.overdueTasks++;
           if (!group.people.has(person)) {
             group.people.set(person, {
               name: person,
@@ -2626,7 +2627,7 @@
           const emp = group.people.get(person);
           emp.rows.push(row);
           emp.overdueDays += overdue;
-          if (overdue > 0) emp.overdueTasks++;
+          if (isOpenOverdue) emp.overdueTasks++;
         });
 
         // Add tasks where the employee participates without being the main
@@ -2680,17 +2681,30 @@
           return;
         }
 
-        const maxTasks = Math.max(...depts.map(d => d.rows.length), 1);
         const maxOverdue = Math.max(...depts.map(d => d.overdueDays), 1);
-        const scoreFor = (total, overdueTasks, volumeMax) => {
-          const discipline = total ? Math.max(0, 100 - overdueTasks / total * 100) : 100;
-          const volume = volumeMax ? Math.min(100, total / volumeMax * 100) : 0;
-          return Math.round(discipline * .6 + volume * .4);
+        const taskQuality = row => {
+          const status = String(row['Состояние задачи'] || '');
+          const days = Math.max(0, parseInt(row['Просрочка, дней']) || 0);
+          if (status === 'Закрыта в срок' || status === 'Открыта в срок') return 100;
+          if (status === 'Закрыта с просрочкой') return Math.max(50, 100 - Math.min(days, 25) * 2);
+          if (status === 'Открыта просрочена') return Math.max(0, 70 - Math.min(days, 14) * 5);
+          if (status === 'Без дедлайна') return 75;
+          return 75;
+        };
+        const scoreForRows = rows => {
+          if (!rows.length) return null;
+          const executionQuality = rows.reduce((sum, row) => sum + taskQuality(row), 0) / rows.length;
+          const currentOverdue = rows.filter(row => row['Состояние задачи'] === 'Открыта просрочена');
+          const currentOverdueDays = currentOverdue.reduce(
+            (sum, row) => sum + Math.max(0, parseInt(row['Просрочка, дней']) || 0),
+            0
+          );
+          const currentDiscipline = Math.max(0, 100 - currentOverdue.length * 20 - currentOverdueDays * 2);
+          return Math.round(executionQuality * .7 + currentDiscipline * .3);
         };
         depts.forEach(d => {
-          d.score = scoreFor(d.rows.length, d.overdueTasks, maxTasks);
-          const employeeMax = Math.max(...Array.from(d.people.values()).map(e => e.rows.length), 1);
-          d.people.forEach(e => { e.score = scoreFor(e.rows.length, e.overdueTasks, employeeMax); });
+          d.score = scoreForRows(d.rows);
+          d.people.forEach(e => { e.score = scoreForRows(e.rows); });
         });
 
         const palette = ['#317fd4', '#92938c', '#5141aa', '#1eae79', '#f26a3d', '#7666c8', '#2c9db1'];
@@ -2713,16 +2727,16 @@
           </div>`).join('');
 
         const healthFor = d => {
-          const pressure = d.rows.length ? d.overdueDays / d.rows.length : 0;
-          if (pressure <= .5) return ['Лидер', 'leader'];
-          if (pressure <= .8) return ['Стабильно', 'stable'];
-          if (pressure <= 1.2) return ['Перегруз', 'overload'];
+          if (d.score === null) return ['Нет оценки', 'stable'];
+          if (d.score >= 90) return ['Лидер', 'leader'];
+          if (d.score >= 75) return ['Стабильно', 'stable'];
+          if (d.score >= 60) return ['Перегруз', 'overload'];
           return ['Риск', 'risk'];
         };
 
         const cards = depts.map((d, index) => {
           const [health, healthClass] = healthFor(d);
-          const people = Array.from(d.people.values()).sort((a, b) => b.score - a.score || a.name.localeCompare(b.name, 'ru'));
+          const people = Array.from(d.people.values()).sort((a, b) => (b.score ?? -1) - (a.score ?? -1) || a.name.localeCompare(b.name, 'ru'));
           const peopleRows = people.map(emp => {
             const sortedRows = rows => rows.slice().sort((a, b) => {
               const aOverdue = a['Состояние задачи'] === 'Открыта просрочена' ? 0 : 1;
@@ -2763,8 +2777,8 @@
                 <span class="sd-person-name"><span class="sd-person-chevron">›</span>${escapeHtml(emp.name)}${helpingItems.length ? `<span class="sd-help-badge">Помогает ${helpingItems.length}</span>` : ''}</span>
                 <span class="sd-person-num">${emp.rows.length} зад.</span>
                 <span class="sd-person-num">${emp.overdueDays} дн.</span>
-                <div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score}%"></div></div>
-                <span class="sd-person-score">${emp.score}</span>
+                <div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div>
+                <span class="sd-person-score">${emp.score ?? '—'}</span>
               </summary>
               ${ownSection}${helpingSection}
             </details>`;
@@ -2777,7 +2791,7 @@
                 <span class="sd-health ${healthClass}">${health}</span>
               </div>
               <span class="sd-dept-meta">${d.rows.length} зад. · ${d.overdueDays} дн.</span>
-              <span class="sd-score">${d.score}</span>
+              <span class="sd-score">${d.score ?? '—'}</span>
             </summary>
             <div class="sd-people">
               <div class="sd-person-head"><span>Исполнитель</span><span>Задач</span><span>Проср.</span><span>Оценка</span><span></span></div>
@@ -2793,13 +2807,13 @@
             <p class="sd-note">Ширина блока — доля отдела в общем объёме ${totalTasks} задач.</p>
           </section>
           <section class="sd-section">
-            <h2 class="sd-title">2. Просрочка по отделам, всего дней</h2>
+            <h2 class="sd-title">2. Текущая открытая просрочка по отделам, дней</h2>
             <div class="sd-chart">${bars}</div>
             <div class="sd-axis"><span>0</span><span>${Math.round(maxOverdue / 2)}</span><span>${maxOverdue}</span></div>
           </section>
           <section class="sd-section">
             <h2 class="sd-title">3. Структура и итоговая оценка</h2>
-            <p class="sd-subtitle">Оценка 0–100: 60% дисциплина сроков + 40% объём. Нажмите на отдел — детализация по людям.</p>
+            <p class="sd-subtitle">Оценка 0–100: 70% качество исполнения + 30% текущая дисциплина. Открытая просрочка снижает балл независимо от общего числа задач; объём не даёт бонуса.</p>
             <div class="sd-departments">${cards}</div>
           </section>
         </div>`;

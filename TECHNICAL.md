@@ -81,7 +81,25 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
   tasks where that person is a Bitrix24 co-executor or observer but not the
   primary executor. Duplicate roles on the same task are merged.
 
-Department and employee scores use 60% deadline discipline and 40% relative
-task volume. Child departments are rolled up to the direct children of the AУП
-department (`157`). The view follows the global period and employee search
-filters.
+Department and employee scores combine:
+
+- `70%` average execution quality for tasks where the person is the primary
+  executor;
+- `30%` current deadline discipline: start at `100`, subtract `20` for each
+  currently overdue task and `2` for every current overdue day, floor at `0`.
+
+Execution quality per task is:
+
+- closed or currently open in time: `100`;
+- closed late: `100 - 2 × overdue days`, with a floor of `50`;
+- currently open late: `70 - 5 × overdue days`, with a floor of `0`;
+- without a deadline or unknown state: `75`.
+
+This extra current-discipline component prevents a long task history from
+diluting an active overdue problem. Task volume does not increase the score,
+and `Помогает` tasks do not affect it.
+The overdue day chart and employee overdue column include only currently open
+overdue tasks; historical lateness still affects the quality score through the
+softer closed-late rule. Child departments are rolled up to the direct children
+of the AУП department (`157`). The view follows the global period and employee
+search filters.
