@@ -1970,15 +1970,32 @@
             </details>`;
         };
 
-        const byDept = new Map();
+        const topDepartments = ['АУ', 'ФУ', 'УРК', 'УРБ'];
+        const departmentById = new Map(
+          (state.departments || []).map(dept => [String(dept.ID), dept])
+        );
+        const departmentByName = new Map(
+          (state.departments || []).map(dept => [String(dept.NAME), dept])
+        );
+        const topDepartmentFor = deptName => {
+          let dept = departmentByName.get(String(deptName || ''));
+          const visited = new Set();
+          while (dept && !visited.has(String(dept.ID))) {
+            if (topDepartments.includes(dept.NAME)) return dept.NAME;
+            visited.add(String(dept.ID));
+            dept = departmentById.get(String(dept.PARENT || ''));
+          }
+          return null;
+        };
+
+        const byDept = new Map(topDepartments.map(name => [name, []]));
         sorted.forEach(emp => {
-          const dept = emp.dept || 'Без отдела';
-          if (!byDept.has(dept)) byDept.set(dept, []);
-          byDept.get(dept).push(emp);
+          const topDept = topDepartmentFor(emp.dept);
+          if (topDept) byDept.get(topDept).push(emp);
         });
 
-        const departmentMarkup = Array.from(byDept.entries())
-          .sort(([a], [b]) => a.localeCompare(b, 'ru'))
+        const departmentMarkup = topDepartments
+          .map(dept => [dept, byDept.get(dept)])
           .map(([dept, employees]) => {
             employees.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
             const deptCounts = employees.reduce((acc, emp) => {
