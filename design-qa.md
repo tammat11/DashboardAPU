@@ -131,5 +131,8 @@ width. No additional focused crop was required.
 - Pass 13: replaced the single employee task-count column with separate
   `По плану` and `Вне плана` columns. Verified both counts and the seven-column
   alignment against live local data. No P0/P1/P2 findings.
+- Pass 14: suppressed zero values in employee task, helper, and overdue cells.
+  Verified that non-zero values remain visible and zero cells render empty. No
+  P0/P1/P2 findings.
 
 final result: passed

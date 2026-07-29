@@ -2899,10 +2899,10 @@
             return `<details class="sd-person-card">
               <summary class="sd-person">
                 <span class="sd-person-name"><span class="sd-person-chevron">›</span>${escapeHtml(emp.name)}</span>
-                <span class="sd-person-num">${planTaskCount} зад.</span>
-                <span class="sd-person-num">${outsideTaskCount} зад.</span>
-                <span class="sd-help-count">${helpingItems.length || '—'}</span>
-                <span class="sd-person-num">${emp.overdueDays} дн.</span>
+                <span class="sd-person-num">${planTaskCount ? `${planTaskCount} зад.` : ''}</span>
+                <span class="sd-person-num">${outsideTaskCount ? `${outsideTaskCount} зад.` : ''}</span>
+                <span class="sd-help-count">${helpingItems.length || ''}</span>
+                <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
                 <div class="sd-person-scores">
                   <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
                   <div class="sd-score-line"><span class="sd-score-label">По плану</span><div class="sd-person-bar"><div class="sd-person-fill plan" style="width:${emp.planScore ?? 0}%"></div></div></div>
