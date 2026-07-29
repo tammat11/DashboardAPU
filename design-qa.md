@@ -137,5 +137,8 @@ width. No additional focused crop was required.
 - Pass 15: shortened the four report section headings to one-word labels and
   centered them while keeping the TBU badge right-aligned. No P0/P1/P2
   findings.
+- Pass 16: removed heading numbers and polished the report with centered divider
+  headings, softer elevated cards, rounded chart elements, and clearer metric
+  chips. Verified the full report at the TV layout. No P0/P1/P2 findings.
 
 final result: passed

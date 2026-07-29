@@ -1059,28 +1059,30 @@
       }
 
       /* Structure analytics */
-      .sd-page { padding: 4px 0 18px; color: var(--text-dark); display: flex; flex-direction: column; gap: 8px; }
+      .sd-page { padding: 6px 0 20px; color: var(--text-dark); display: flex; flex-direction: column; gap: 12px; }
       .sd-section {
         margin: 0;
-        padding: 12px;
-        background: var(--surface);
-        border: 1px solid var(--border-color);
-        border-radius: 16px;
-        box-shadow: var(--shadow-soft);
+        padding: 15px 16px;
+        background: linear-gradient(180deg, #ffffff 0%, #fcfdfc 100%);
+        border: 1px solid #e2e7e1;
+        border-radius: 18px;
+        box-shadow: 0 5px 18px rgba(35, 48, 35, .045);
       }
-      .sd-title { width: 100%; margin: 0 0 10px; font-size: 16px; font-weight: 750; text-align: center; }
+      .sd-title { display: flex; width: 100%; margin: 0 0 12px; align-items: center; gap: 12px; color: #303a30; font-size: 15px; font-weight: 700; text-align: center; letter-spacing: .015em; }
+      .sd-title::before, .sd-title::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, #dce4da); }
+      .sd-title::after { background: linear-gradient(90deg, #dce4da, transparent); }
       .sd-note { margin: 9px 0 0; color: var(--text-muted); font-size: 11px; }
-      .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 9px; background: #eef0ed; }
+      .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 12px; background: #eef0ed; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
       .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
       .sd-stack-value { font-size: 18px; line-height: 1; font-weight: 900; }
       .sd-stack-label { margin-top: 4px; font-size: 10px; font-weight: 750; opacity: .92; }
       .sd-ratio-head { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; }
       .sd-ratio-head .sd-tbu { position: absolute; top: 0; right: 0; }
-      .sd-tbu { padding: 5px 10px; border-radius: 9px; color: #c63e43; background: #fde8e8; font-size: 11px; font-weight: 750; white-space: nowrap; }
+      .sd-tbu { padding: 5px 10px; border: 1px solid #f7d2d2; border-radius: 10px; color: #c63e43; background: #fff0f0; font-size: 11px; font-weight: 750; white-space: nowrap; }
       .sd-ratio-chart { width: 100%; min-height: 190px; }
       .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 190px; overflow: visible; }
       .sd-ratio-formulas { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 3px; }
-      .sd-ratio-formula { padding: 4px 8px; border: 1px solid var(--border-color); border-radius: 9px; color: #555c55; background: #fafbfa; font-size: 10.5px; font-weight: 600; }
+      .sd-ratio-formula { padding: 4px 9px; border: 1px solid #e2e7e1; border-radius: 999px; color: #555c55; background: #f8faf8; font-size: 10.5px; font-weight: 600; }
       .sd-ratio-formula strong { color: #317fd4; font-size: 12px; font-weight: 700; }
       .sd-ratio-legend { display: flex; justify-content: flex-end; gap: 14px; margin-top: 5px; color: var(--text-muted); font-size: 10px; }
       .sd-ratio-legend span { display: inline-flex; align-items: center; gap: 5px; }
@@ -1089,8 +1091,8 @@
       .sd-chart { display: flex; flex-direction: column; gap: 9px; padding: 4px 0 0; }
       .sd-bar-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
       .sd-bar-name { font-size: 12px; font-weight: 650; color: #656b64; text-align: right; }
-      .sd-bar-track { height: 18px; background: #f0f2ef; border-radius: 3px; overflow: hidden; }
-      .sd-bar-fill { height: 100%; min-width: 2px; background: #e54c50; border-radius: 3px; }
+      .sd-bar-track { height: 16px; background: #f0f2ef; border-radius: 999px; overflow: hidden; }
+      .sd-bar-fill { height: 100%; min-width: 2px; background: linear-gradient(90deg, #ee5b60, #df454a); border-radius: 999px; }
       .sd-bar-value { font-size: 11px; font-weight: 800; color: #697069; }
       .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 10px; }
       .sd-subtitle { margin: -5px 0 12px; font-size: 11px; color: var(--text-muted); }
@@ -2932,13 +2934,13 @@
 
         ids.structureWrap.innerHTML = `<div class="sd-page">
           <section class="sd-section">
-            <h2 class="sd-title">1. Распределение</h2>
+            <h2 class="sd-title">Распределение</h2>
             <div class="sd-stack">${stack}</div>
             <p class="sd-note">Ширина блока — доля отдела в общем объёме ${totalTasks} задач.</p>
           </section>
           <section class="sd-section">
             <div class="sd-ratio-head">
-              <h2 class="sd-title">2. Нагрузка</h2>
+              <h2 class="sd-title">Нагрузка</h2>
               <span class="sd-tbu">ТБУ: ${tbu.toFixed(1)}</span>
             </div>
             <div class="sd-ratio-chart">${ratioDiagram}</div>
@@ -2950,12 +2952,12 @@
             <p class="sd-note">Коэффициент = задачи выбранного периода / количество сотрудников отдела.</p>
           </section>
           <section class="sd-section">
-            <h2 class="sd-title">3. Просрочка</h2>
+            <h2 class="sd-title">Просрочка</h2>
             <div class="sd-chart">${bars}</div>
             <div class="sd-axis"><span>0</span><span>${Math.round(maxOverdue / 2)}</span><span>${maxOverdue}</span></div>
           </section>
           <section class="sd-section">
-            <h2 class="sd-title">4. Оценка</h2>
+            <h2 class="sd-title">Оценка</h2>
             <p class="sd-subtitle">Оценка 0–100: 70% качество исполнения + 30% текущая дисциплина. Открытая просрочка снижает балл независимо от общего числа задач; объём не даёт бонуса.</p>
             <div class="sd-departments">${cards}</div>
           </section>
