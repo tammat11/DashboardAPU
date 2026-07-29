@@ -906,13 +906,23 @@
       .pt-val .pt-of { font-weight: 600; color: var(--text-muted); }
 
       /* «План+задачи»: Отдел → сотрудник → задачи */
-      .pt-departments { display: flex; flex-direction: column; gap: 14px; padding: 16px; }
+      .pt-departments {
+        display: grid;
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(360px, 420px);
+        align-items: start;
+        gap: 14px;
+        padding: 16px;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+      }
       .pt-department {
         background: var(--surface);
         border: 1px solid var(--border-color);
         border-radius: 16px;
         box-shadow: var(--shadow-soft);
         overflow: hidden;
+        scroll-snap-align: start;
       }
       .pt-department > summary,
       .pt-employee > summary {
@@ -957,7 +967,7 @@
       .pt-task-list { border-top: 1px solid rgba(0,0,0,.06); background: #fafbfa; }
       .pt-task-item {
         display: grid;
-        grid-template-columns: 88px minmax(220px, 1fr) 105px 115px;
+        grid-template-columns: 78px minmax(0, 1fr);
         align-items: center;
         gap: 10px;
         padding: 9px 12px;
@@ -970,6 +980,9 @@
       .pt-task-title { min-width: 0; font-size: 10.5px; line-height: 1.35; }
       .pt-task-title .task-link { font-weight: 650; }
       .pt-task-status { display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 750; }
+      .pt-task-item > .pt-task-status,
+      .pt-task-item > div:last-child { grid-column: 2; }
+      .pt-task-item > div:last-child { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
       .pt-status-dot { width: 7px; height: 7px; border-radius: 50%; background: #94a3b8; flex: 0 0 7px; }
       .pt-task-status.overdue { color: #dc2626; }
       .pt-task-status.overdue .pt-status-dot { background: #ef4444; }
@@ -977,13 +990,11 @@
       .pt-task-status.done .pt-status-dot { background: #22a06b; }
       .pt-empty-tasks { padding: 14px; text-align: center; font-size: 10px; color: var(--text-muted); }
       @media (max-width: 760px) {
-        .pt-departments { padding: 8px; }
+        .pt-departments { padding: 8px; grid-auto-columns: minmax(310px, calc(100vw - 32px)); }
         .pt-dept-head { align-items: flex-start; }
         .pt-dept-stats { white-space: normal; text-align: right; }
         .pt-employee-head { grid-template-columns: 1fr; gap: 8px; }
         .pt-person-metrics { justify-content: flex-start; padding-left: 52px; }
-        .pt-task-item { grid-template-columns: 70px minmax(150px, 1fr); }
-        .pt-task-role, .pt-task-deadline { grid-column: 2; }
       }
 
       .g-card.g-top1 { border-color: rgba(255,193,7,0.75); background: linear-gradient(180deg, rgba(255,200,0,0.16), transparent 60%); }
