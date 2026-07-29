@@ -151,5 +151,10 @@ width. No additional focused crop was required.
   scrollable groups for employees above TBU and below 40% of their department
   average. Verified 16 high-load and 14 low-load employees against current-week
   local data. No P0/P1/P2 findings.
+- Pass 20: moved load deviations to the report bottom, renamed the groups to
+  maximum/minimum load, removed redundant workload-chart copy, fixed clipped
+  rows, and pinned four `UF_HEAD` managers with avatars and green highlighting.
+  Increased department-header spacing for the workload ratio. No P0/P1/P2
+  findings.
 
 final result: passed

@@ -86,6 +86,8 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
 - expandable department cards with employee task counts, overdue days, and a
   workload header showing visible employee count and
   `filtered primary tasks / visible employees`.
+- each department's `UF_HEAD` user is pinned as the first employee in the
+  `Оценка` table and rendered with an avatar, manager badge, and green highlight;
 - expandable employee rows with the selected period's task names, statuses,
   deadlines, and links back to Bitrix24.
 - employee rows include a separate `Помогает` count column; the nested
