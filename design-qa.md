@@ -6,9 +6,11 @@
 - Implementation screenshot:
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-implementation-v1.png`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-implementation-v2.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-help-column-v3.jpg`
 - Combined comparison:
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v1.png`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v2.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-help-column-comparison-v3.jpg`
 - Viewport: 1280 × 720 CSS px, device scale 1
 - Source pixels: 927 × 437 and 902 × 531
 - Implementation pixels: 1280 × 1107 full-page capture
@@ -49,6 +51,8 @@ width. No additional focused crop was required.
 - Two department cards can remain open simultaneously.
 - Clicking an employee opens that employee's task list; the live check exposed
   69 task rows with Bitrix links, statuses, and deadlines.
+- `Помогает` is aligned as a dedicated employee-table column; clicking Данара
+  still opens 23 helper-task rows.
 - Long employee task lists scroll inside a 320px-high nested card, keeping the
   department overview compact.
 - No browser console errors were reported.
@@ -65,5 +69,8 @@ width. No additional focused crop was required.
 - Pass 1: no P0/P1/P2 findings; no corrective iteration required.
 - Pass 2: aligned the sections with the dashboard card system and verified the
   new employee disclosure state; no P0/P1/P2 findings.
+- Pass 3: moved helper counts from inline name badges into a dedicated column
+  and verified row/header alignment plus the retained disclosure interaction;
+  no P0/P1/P2 findings.
 
 final result: passed
