@@ -1075,7 +1075,7 @@
       .sd-stack-value { font-size: 18px; line-height: 1; font-weight: 900; }
       .sd-stack-label { margin-top: 4px; font-size: 10px; font-weight: 750; opacity: .92; }
       .sd-ratio-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-      .sd-tbu { padding: 5px 10px; border-radius: 9px; color: #32628b; background: #dcebf8; font-size: 11px; font-weight: 850; white-space: nowrap; }
+      .sd-tbu { padding: 5px 10px; border-radius: 9px; color: #c63e43; background: #fde8e8; font-size: 11px; font-weight: 750; white-space: nowrap; }
       .sd-ratio-chart { width: 100%; min-height: 145px; }
       .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 145px; overflow: visible; }
       .sd-ratio-formulas { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 3px; }
@@ -2788,16 +2788,16 @@
         const ratioPoints = ratioSorted.map((d, index) => {
           const x = xFor(index);
           const y = yFor(d.workloadRatio);
-          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="#317fd4" stroke="#ffffff" stroke-width="3"/>
-            <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="17" font-weight="650">${d.workloadRatio.toFixed(1)}</text>
+          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="#317fd4" stroke="#ffffff" stroke-width="2"/>
+            <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="17" font-weight="500">${d.workloadRatio.toFixed(1)}</text>
             <text x="${x.toFixed(1)}" y="${chartBottom + 24}" text-anchor="middle" fill="#243024" font-size="16" font-weight="600">${escapeHtml(d.name)}</text>`;
         }).join('');
         const tbuY = yFor(tbu);
         const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 155" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
           ${ratioGrid}
           <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="#aeb5ae" stroke-width="1.5"/>
-          <line x1="${chartLeft}" y1="${tbuY.toFixed(1)}" x2="${chartRight}" y2="${tbuY.toFixed(1)}" stroke="#e54c50" stroke-width="3" stroke-dasharray="9 7"/>
-          <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+          <line x1="${chartLeft}" y1="${tbuY.toFixed(1)}" x2="${chartRight}" y2="${tbuY.toFixed(1)}" stroke="#e54c50" stroke-width="2" stroke-dasharray="8 7"/>
+          <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           ${ratioPoints}
         </svg>`;
         const ratioFormulas = ratioSorted.map(d =>

@@ -117,5 +117,8 @@ width. No additional focused crop was required.
   readable. No P0/P1/P2 findings.
 - Pass 9: removed the duplicate in-plot TBU label and widened plot insets;
   verified clean edge labels and five department points. No P0/P1/P2 findings.
+- Pass 10: reduced point-label weight and chart stroke widths, and changed the
+  TBU badge to red. Verified five points and the live TBU value. No P0/P1/P2
+  findings.
 
 final result: passed
