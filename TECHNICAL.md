@@ -99,6 +99,10 @@ Execution quality per task is:
 This extra current-discipline component prevents a long task history from
 diluting an active overdue problem. Task volume does not increase the score,
 and `Помогает` tasks do not affect it.
+Each employee row renders two score bars: `Все` uses all primary-executor tasks,
+while `По плану` applies the identical formula only to tasks whose `ID проекта`
+equals `51` (`OP_GROUP_ID`). If the employee has no project-51 tasks, the plan
+score is shown as `—`.
 The overdue day chart and employee overdue column include only currently open
 overdue tasks; historical lateness still affects the quality score through the
 softer closed-late rule. Child departments are rolled up to the direct children

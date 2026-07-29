@@ -1112,9 +1112,14 @@
       .sd-person-card[open] .sd-person-chevron { transform: rotate(90deg); }
       .sd-help-count { color: #32628b; font-weight: 800; }
       .sd-person-num { color: #555c55; }
+      .sd-person-scores { display: flex; flex-direction: column; gap: 4px; }
+      .sd-score-line { display: grid; grid-template-columns: 43px 1fr; align-items: center; gap: 5px; }
+      .sd-score-label { color: #7c837c; font-size: 7px; font-weight: 750; white-space: nowrap; }
       .sd-person-bar { height: 5px; border-radius: 5px; background: #f0f2ef; overflow: hidden; }
       .sd-person-fill { height: 100%; border-radius: 5px; background: var(--brand-green); }
-      .sd-person-score { font-weight: 850; text-align: right; }
+      .sd-person-fill.plan { background: #317fd4; }
+      .sd-person-score { display: flex; min-height: 25px; flex-direction: column; justify-content: space-between; font-weight: 850; text-align: right; }
+      .sd-person-score .plan { color: #317fd4; font-size: 8px; }
       .sd-task-list { max-height: 320px; margin: 0 0 8px 22px; border: 1px solid rgba(0,0,0,.055); border-radius: 9px; overflow-y: auto; background: #fafbfa; }
       .sd-task-section-title { margin: 8px 0 5px 22px; color: #687068; font-size: 8px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
       .sd-task-section-title.help { color: #32628b; }
@@ -2704,7 +2709,10 @@
         };
         depts.forEach(d => {
           d.score = scoreForRows(d.rows);
-          d.people.forEach(e => { e.score = scoreForRows(e.rows); });
+          d.people.forEach(e => {
+            e.score = scoreForRows(e.rows);
+            e.planScore = scoreForRows(e.rows.filter(row => String(row['ID проекта'] || '') === OP_GROUP_ID));
+          });
         });
 
         const palette = ['#317fd4', '#92938c', '#5141aa', '#1eae79', '#f26a3d', '#7666c8', '#2c9db1'];
@@ -2778,8 +2786,11 @@
                 <span class="sd-person-num">${emp.rows.length} зад.</span>
                 <span class="sd-help-count">${helpingItems.length || '—'}</span>
                 <span class="sd-person-num">${emp.overdueDays} дн.</span>
-                <div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div>
-                <span class="sd-person-score">${emp.score ?? '—'}</span>
+                <div class="sd-person-scores">
+                  <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
+                  <div class="sd-score-line"><span class="sd-score-label">По плану</span><div class="sd-person-bar"><div class="sd-person-fill plan" style="width:${emp.planScore ?? 0}%"></div></div></div>
+                </div>
+                <span class="sd-person-score"><span>${emp.score ?? '—'}</span><span class="plan">${emp.planScore ?? '—'}</span></span>
               </summary>
               ${ownSection}${helpingSection}
             </details>`;
@@ -2795,7 +2806,7 @@
               <span class="sd-score">${d.score ?? '—'}</span>
             </summary>
             <div class="sd-people">
-              <div class="sd-person-head"><span>Исполнитель</span><span>Задач</span><span>Помогает</span><span>Проср.</span><span>Оценка</span><span></span></div>
+              <div class="sd-person-head"><span>Исполнитель</span><span>Задач</span><span>Помогает</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
               ${peopleRows}
             </div>
           </details>`;
