@@ -125,3 +125,17 @@ overdue tasks; historical lateness still affects the quality score through the
 softer closed-late rule. Child departments are rolled up to the direct children
 of the AУП department (`157`). The view follows the global period and employee
 search filters.
+
+## Project 51 checklist members
+
+`scripts/sync-bitrix-checklist-members.mjs` synchronizes actual Bitrix checklist
+members from the `исполнитель: ФИО` suffix in checklist item titles. It is
+restricted by `BITRIX_PROJECT_ID` (default `51`), runs as a dry audit unless
+`--apply` is supplied, preserves existing members, and rereads every updated
+item to verify the write.
+
+The script needs `BITRIX_WEBHOOK_URL`. If that webhook cannot call `user.get`,
+provide a current `/api/task-report` response through `BITRIX_USERS_FILE`; the
+script builds the user directory from `allEmployees`, task executors,
+task creators, co-executors, and observers. Generic labels such as `Аудитор`
+remain unresolved by design because they do not identify a specific user.
