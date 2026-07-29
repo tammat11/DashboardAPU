@@ -75,7 +75,9 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
 - workload ratio by department: filtered-period primary tasks divided by the
   full visible employee roster of that top-level department; `ТБУ` is the
   arithmetic mean of these department ratios. The view renders a categorical
-  line diagram with department points and a separate horizontal TBU line;
+  line diagram with department points and a separate horizontal TBU line.
+  Staffed departments remain visible with ratio `0.0` when the selected period
+  contains no tasks;
 - total overdue days by department;
 - expandable department cards with employee task counts, overdue days, and a
   0–100 score.

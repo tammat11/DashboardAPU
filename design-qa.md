@@ -10,6 +10,7 @@
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-plan-score-v4.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-tbu-v5.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-diagram-v6.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-compact-urb-v7.jpg`
 - Combined comparison:
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v1.png`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-comparison-v2.jpg`
@@ -17,6 +18,7 @@
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-plan-score-comparison-v4.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-tbu-comparison-v5.jpg`
   - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-workload-diagram-comparison-v6.jpg`
+  - `/Users/tammat/Documents/DashboardAPU/output/design-qa/structure-compact-urb-comparison-v7.jpg`
 - Viewport: 1280 × 720 CSS px, device scale 1
 - Source pixels: 927 × 437 and 902 × 531
 - Implementation pixels: 1280 × 1107 full-page capture
@@ -69,6 +71,9 @@ width. No additional focused crop was required.
   headers, employee rows, score labels, and task details for TV readability.
 - Workload is now an actual categorical line diagram: blue department points
   and connecting line, red horizontal TBU mean, axis, labels, and formulas.
+- The diagram is vertically compact while retaining the larger type. Staffed
+  departments with no filtered-period tasks remain present, including УРБ at
+  `0 / 3 = 0.0`; TBU is recalculated across all five departments.
 - Long employee task lists scroll inside a 320px-high nested card, keeping the
   department overview compact.
 - No browser console errors were reported.
@@ -96,5 +101,8 @@ width. No additional focused crop was required.
 - Pass 6: replaced the workload bars with a line diagram and horizontal TBU
   reference. Verified four department points, four formulas, and the TBU 3.8
   annotation. No P0/P1/P2 findings.
+- Pass 7: reduced diagram height and section spacing, then restored zero-task
+  staffed departments. Verified five points including УРБ and compact current-
+  week rendering. No P0/P1/P2 findings.
 
 final result: passed
