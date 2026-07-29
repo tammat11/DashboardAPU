@@ -79,6 +79,10 @@ is rendered by `renderStructureDashboard()` in `public/index.html` and contains:
   Staffed departments remain visible with ratio `0.0` when the selected period
   contains no tasks;
 - total overdue days by department;
+- a compact `Отклонения нагрузки` section with avatars: one list contains
+  employees whose primary task count is above TBU, and the other contains those
+  below 40% of their department's selected-period average (minimum comparison
+  threshold: one task);
 - expandable department cards with employee task counts, overdue days, and a
   workload header showing visible employee count and
   `filtered primary tasks / visible employees`.

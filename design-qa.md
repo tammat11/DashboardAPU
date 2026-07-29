@@ -147,5 +147,9 @@ width. No additional focused crop was required.
   simplified score labels to `Все`/`План`, added department headcount and
   workload ratio, and increased overdue-chart spacing. Verified live local data
   and full-page alignment. No P0/P1/P2 findings.
+- Pass 19: added a compact load-deviation section with avatars and separate
+  scrollable groups for employees above TBU and below 40% of their department
+  average. Verified 16 high-load and 14 low-load employees against current-week
+  local data. No P0/P1/P2 findings.
 
 final result: passed
