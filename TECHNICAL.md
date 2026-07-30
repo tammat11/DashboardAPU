@@ -126,6 +126,10 @@ softer closed-late rule. Child departments are rolled up to the direct children
 of the AУП department (`157`). The view follows the global period and employee
 search filters.
 
+Tasks from project `53` are excluded in `lib/task-report.js` before all
+dashboard calculations. The same exclusion is applied to both direct Bitrix
+REST data and generic webhook payloads.
+
 ## Project 51 checklist members
 
 `scripts/sync-bitrix-checklist-members.mjs` synchronizes actual Bitrix checklist
