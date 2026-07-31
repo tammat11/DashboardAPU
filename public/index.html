@@ -1241,7 +1241,6 @@
           </span>
           <span class="divider"></span>
           <span class="view-switcher">
-            <button id="viewBtn2" class="view-btn">🏆 Рейтинг</button>
             <button id="viewBtn3" class="view-btn">🖼️ Галерея</button>
             <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
             <button id="viewBtn6" class="view-btn">📊 План</button>
@@ -1373,7 +1372,7 @@
         refreshIntervalMs: 5 * 60 * 1000,
         portalHost: null,
         searchQuery: '',
-        viewMode: 'table7', // 'table1' | 'table2' | 'table3' | 'table5' | 'table6' | 'table7'
+        viewMode: 'table7', // 'table1' | 'table3' | 'table5' | 'table6' | 'table7'
         expandedNodes: new Set()
       };
 
@@ -1409,7 +1408,6 @@
         searchInput: document.getElementById('searchInput'),
         searchClear: document.getElementById('searchClear'),
         viewBtn1: document.getElementById('viewBtn1'),
-        viewBtn2: document.getElementById('viewBtn2'),
         viewBtn3: document.getElementById('viewBtn3'),
         viewBtn4: document.getElementById('viewBtn4'),
         viewBtn5: document.getElementById('viewBtn5'),
@@ -4151,7 +4149,6 @@
       function setView(mode) {
         state.viewMode = mode;
         ids.viewBtn1.classList.toggle('active', mode === 'table1');
-        ids.viewBtn2.classList.toggle('active', mode === 'table2');
         ids.viewBtn3.classList.toggle('active', mode === 'table3');
         ids.viewBtn4.classList.toggle('active', mode === 'table4');
         if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
@@ -4160,7 +4157,6 @@
         renderTable();
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
-      if (ids.viewBtn2) ids.viewBtn2.addEventListener('click', () => setView('table2'));
       if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
       if (ids.viewBtn4) ids.viewBtn4.addEventListener('click', () => setView('table4'));
       if (ids.viewBtn5) ids.viewBtn5.addEventListener('click', () => setView('table5'));

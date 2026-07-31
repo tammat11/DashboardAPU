@@ -130,6 +130,9 @@ Tasks from project `53` are excluded in `lib/task-report.js` before all
 dashboard calculations. The same exclusion is applied to both direct Bitrix
 REST data and generic webhook payloads.
 
+The legacy `Рейтинг` view remains available internally for compatibility but
+is intentionally absent from the dashboard navigation.
+
 ## Project 51 checklist members
 
 `scripts/sync-bitrix-checklist-members.mjs` synchronizes actual Bitrix checklist
