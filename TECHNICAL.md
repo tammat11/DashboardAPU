@@ -133,6 +133,11 @@ REST data and generic webhook payloads.
 The legacy `Рейтинг` view remains available internally for compatibility but
 is intentionally absent from the dashboard navigation.
 
+Long department names in the workload chart use stable short labels and
+two-line SVG captions. This prevents label collisions when the structure has
+seven or more top-level departments, while full names remain available in the
+department cards and distribution tooltip.
+
 ## Project 51 checklist members
 
 `scripts/sync-bitrix-checklist-members.mjs` synchronizes actual Bitrix checklist

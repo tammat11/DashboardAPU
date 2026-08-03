@@ -161,4 +161,15 @@ width. No additional focused crop was required.
   the first current-week department. Added server/client exclusion for the
   `Закрывающий документ` tag. No P0/P1/P2 findings.
 
+## Department label overlap fix — 2026-08-03
+
+- Source: `/Users/tammat/Desktop/screenshots/Screenshot 2026-08-03 at 11.04.09.png`
+- Implementation: `/Users/tammat/Documents/DashboardAPU/output/design-qa/report-department-labels-fixed.png`
+- Viewport/state: 1920 × 1080 CSS px, «Отчёт», «Все время».
+- Long chart labels are abbreviated and split into two SVG lines.
+- Narrow distribution segments use short labels and retain full names in `title`.
+- Visual comparison confirmed separate, readable department labels.
+- `npm run build` and `git diff --check` passed; no console errors were observed.
+- No actionable P0, P1, or P2 mismatch remains.
+
 final result: passed

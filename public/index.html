@@ -1082,12 +1082,12 @@
       .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 12px; background: #eef0ed; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
       .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
       .sd-stack-value { font-size: 16px; line-height: 1; font-weight: 800; }
-      .sd-stack-label { margin-top: 4px; font-size: 12px; font-weight: 700; opacity: .92; }
+      .sd-stack-label { margin-top: 4px; max-width: 100%; overflow: hidden; font-size: 12px; font-weight: 700; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; opacity: .92; }
       .sd-ratio-head { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; }
       .sd-ratio-head .sd-tbu { position: absolute; top: 0; right: 0; }
       .sd-tbu { padding: 5px 10px; border: 1px solid #f7d2d2; border-radius: 10px; color: #c63e43; background: #fff0f0; font-size: 12px; font-weight: 750; white-space: nowrap; }
-      .sd-ratio-chart { width: 100%; min-height: 190px; }
-      .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 190px; overflow: visible; }
+      .sd-ratio-chart { width: 100%; min-height: 210px; }
+      .sd-ratio-svg { display: block; width: 100%; height: auto; min-height: 210px; overflow: visible; }
       .sd-ratio-formulas { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; margin-top: 3px; }
       .sd-ratio-formula { padding: 4px 9px; border: 1px solid #e2e7e1; border-radius: 999px; color: #555c55; background: #f8faf8; font-size: 12px; font-weight: 600; }
       .sd-ratio-formula strong { color: #317fd4; font-size: 12px; font-weight: 700; }
@@ -2855,15 +2855,35 @@
         const tbu = ratioDepts.length
           ? ratioDepts.reduce((sum, d) => sum + d.workloadRatio, 0) / ratioDepts.length
           : 0;
-        const deptOrder = ['АУ', 'ФУ', 'УРК', 'УРБ', 'Оптимизация'];
+        const shortDeptName = name => ({
+          'Административное управление': 'Адм. управление',
+          'Финансовое управление': 'Фин. управление',
+          'Без отдела': 'Без отд.',
+          'Офис учредителя': 'Офис'
+        }[name] || name);
+        const chartDeptLines = name => {
+          const shortName = shortDeptName(name);
+          if (shortName === 'Адм. управление') return ['Адм.', 'управление'];
+          if (shortName === 'Фин. управление') return ['Фин.', 'управление'];
+          return [shortName];
+        };
+        const deptOrder = [
+          'Административное управление',
+          'Финансовое управление',
+          'УК',
+          'Аутсорсинг',
+          'УРК',
+          'Без отдела',
+          'Офис учредителя'
+        ];
         const ratioSorted = ratioDepts.slice().sort((a, b) => {
           const ai = deptOrder.indexOf(a.name);
           const bi = deptOrder.indexOf(b.name);
           return (ai < 0 ? 99 : ai) - (bi < 0 ? 99 : bi);
         });
         const chartMax = Math.max(1, Math.ceil(Math.max(tbu, ...ratioSorted.map(d => d.workloadRatio)) * 1.2));
-        const chartLeft = 95;
-        const chartRight = 895;
+        const chartLeft = 70;
+        const chartRight = 930;
         const chartTop = 20;
         const chartBottom = 145;
         const chartWidth = chartRight - chartLeft;
@@ -2882,12 +2902,16 @@
         const ratioPoints = ratioSorted.map((d, index) => {
           const x = xFor(index);
           const y = yFor(d.workloadRatio);
+          const labelLines = chartDeptLines(d.name);
+          const label = labelLines.map((line, lineIndex) =>
+            `<tspan x="${x.toFixed(1)}" dy="${lineIndex ? 14 : 0}">${escapeHtml(line)}</tspan>`
+          ).join('');
           return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="#317fd4" stroke="#ffffff" stroke-width="2"/>
             <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="14" font-weight="600">${d.workloadRatio.toFixed(1)}</text>
-            <text x="${x.toFixed(1)}" y="${chartBottom + 24}" text-anchor="middle" fill="#243024" font-size="14" font-weight="600">${escapeHtml(d.name)}</text>`;
+            <text x="${x.toFixed(1)}" y="${chartBottom + 22}" text-anchor="middle" fill="#354035" font-size="11.5" font-weight="600">${label}</text>`;
         }).join('');
         const tbuY = yFor(tbu);
-        const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 195" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
+        const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 215" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
           ${ratioGrid}
           <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="#aeb5ae" stroke-width="1.5"/>
           <line x1="${chartLeft}" y1="${tbuY.toFixed(1)}" x2="${chartRight}" y2="${tbuY.toFixed(1)}" stroke="#e54c50" stroke-width="2" stroke-dasharray="8 7"/>
@@ -2932,7 +2956,7 @@
           const width = totalTasks ? d.rows.length / totalTasks * 100 : 0;
           return `<div class="sd-stack-item" style="width:${width.toFixed(2)}%;background:${palette[index % palette.length]}">
             <span class="sd-stack-value">${d.rows.length}</span>
-            <span class="sd-stack-label">${escapeHtml(d.name)}</span>
+            <span class="sd-stack-label" title="${escapeHtml(d.name)}">${escapeHtml(shortDeptName(d.name))}</span>
           </div>`;
         }).join('');
 
