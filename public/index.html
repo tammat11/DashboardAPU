@@ -1366,6 +1366,7 @@
       .sd-person-card[open] .sd-person-chevron { transform: rotate(90deg); }
       .sd-help-count { color: #245c89; font-size: 13px; font-weight: 700; }
       .sd-person-num { color: #3f463f; font-size: 13px; font-weight: 650; }
+      .sd-checklist-overdue { display: inline-grid; place-items: center; min-width: 16px; height: 16px; margin-left: 5px; padding: 0 4px; border-radius: 8px; background: #fdECEC; color: #dc2626; font-size: 10px; font-weight: 800; vertical-align: middle; }
       .sd-person-scores { display: flex; flex-direction: column; gap: 4px; }
       .sd-score-line { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 7px; }
       .sd-score-label { color: #697169; font-size: 11px; line-height: 1.1; font-weight: 700; white-space: nowrap; }
@@ -1616,6 +1617,21 @@
         if (!name) return false;
         const n = String(name).toLowerCase();
         return EXCLUDED_NAMES.some(ex => n.includes(ex.toLowerCase()));
+      }
+
+      // Deadline written inside a checklist item title as «до DD.MM.YYYY».
+      // Returns end-of-day Date or null. Used only to flag overdue checklist
+      // items — it does not affect scores or the «Просрочка» chart.
+      function checklistItemDeadline(title) {
+        const m = String(title || '').match(/до\s+(\d{1,2})\.(\d{1,2})\.(\d{4})/i);
+        if (!m) return null;
+        const dt = new Date(Number(m[3]), Number(m[2]) - 1, Number(m[1]), 23, 59, 59, 999);
+        return Number.isNaN(dt.getTime()) ? null : dt;
+      }
+      function isChecklistItemOverdue(item) {
+        if (!item || item.complete === true) return false;
+        const dl = checklistItemDeadline(item.title);
+        return !!dl && dl.getTime() < Date.now();
       }
 
       // Top-level departments hidden everywhere — the whole subtree and its
@@ -3049,6 +3065,7 @@
           if (!Array.isArray(items)) return;
           const taskId = String(row['ID задачи'] || '');
           items.forEach(item => {
+            const itemOverdue = isChecklistItemOverdue(item);
             (item.members || []).forEach(member => {
               const memberId = String(member.id || '');
               const employee = employeeById.get(memberId);
@@ -3074,7 +3091,8 @@
               const person = group.people.get(employee.name);
               if (!person.checklist) person.checklist = new Map();
               person.checklist.set(`${taskId}:${item.id}`, {
-                complete: item.complete === true
+                complete: item.complete === true,
+                overdue: itemOverdue
               });
             });
           });
@@ -3323,6 +3341,7 @@
             const helpingItems = Array.from((emp.helping || new Map()).values());
             const checklistItems = Array.from((emp.checklist || new Map()).values());
             const completedChecklistItems = checklistItems.filter(item => item.complete).length;
+            const overdueChecklistItems = checklistItems.filter(item => item.overdue).length;
             const isPlanRow = row => String(row['ID проекта'] || '') === OP_GROUP_ID;
             const planTaskCount = emp.rows.filter(isPlanRow).length;
             const outsideTaskCount = emp.rows.length - planTaskCount;
@@ -3373,7 +3392,7 @@
                 <span class="sd-help-count" title="Наблюдатель/соисполнитель в проекте 51">${planGroupCount || ''}</span>
                 <span class="sd-person-num">${outsideTaskCount ? `${outsideTaskCount} зад.` : ''}</span>
                 <span class="sd-help-count">${offHelpingCount || ''}</span>
-                <span class="sd-person-num" title="Выполнено / всего пунктов чек-листа">${checklistItems.length ? `${completedChecklistItems}/${checklistItems.length}` : ''}</span>
+                <span class="sd-person-num" title="Выполнено / всего пунктов чек-листа${overdueChecklistItems ? ` · просрочено: ${overdueChecklistItems}` : ''}">${checklistItems.length ? `${completedChecklistItems}/${checklistItems.length}${overdueChecklistItems ? `<span class="sd-checklist-overdue" title="Просрочено пунктов чек-листа (не выполнено в срок «до ДАТА»)">${overdueChecklistItems}</span>` : ''}` : ''}</span>
                 <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
                 <div class="sd-person-scores">
                   <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
