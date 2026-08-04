@@ -1295,6 +1295,35 @@
       .sd-person-card > summary::-webkit-details-marker { display: none; }
       .sd-person { padding: 8px 2px; font-size: 13px; transition: background .15s ease; }
       .sd-person:hover { background: rgba(138,196,63,.045); }
+      .sd-person-row { cursor: pointer; }
+      .sd-person-row:focus-visible { outline: 2px solid #79bd32; outline-offset: -2px; border-radius: 8px; }
+
+      /* Task detail popup */
+      .sd-modal { position: fixed; inset: 0; z-index: 4000; }
+      .sd-modal[hidden] { display: none; }
+      .sd-modal-backdrop { position: absolute; inset: 0; background: rgba(18,26,18,.48); backdrop-filter: blur(2px); }
+      .sd-modal-card {
+        position: relative;
+        margin: 5vh auto;
+        width: min(760px, calc(100% - 28px));
+        max-height: 90vh;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 26px 64px rgba(0,0,0,.30);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        animation: sdModalIn .16s ease;
+      }
+      @keyframes sdModalIn { from { transform: translateY(10px); opacity: 0; } to { transform: none; opacity: 1; } }
+      .sd-modal-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 15px 18px; border-bottom: 1px solid #e9ece7; }
+      .sd-modal-title { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; color: var(--text-dark); }
+      .sd-modal-meta { margin-top: 3px; font-size: 12px; font-weight: 650; color: var(--text-muted); }
+      .sd-modal-meta[hidden] { display: none; }
+      .sd-modal-close { flex-shrink: 0; width: 30px; height: 30px; border: none; border-radius: 9px; background: rgba(0,0,0,.05); color: #555; font-size: 14px; cursor: pointer; transition: background .15s ease; }
+      .sd-modal-close:hover { background: rgba(0,0,0,.11); }
+      .sd-modal-body { padding: 14px 18px 18px; overflow-y: auto; }
+      .sd-modal-empty { text-align: center; color: var(--text-muted); padding: 28px 8px; }
       .sd-person-card.manager { margin: 5px 0; border: 1px solid #acd873; border-left: 4px solid #79bd32; border-radius: 10px; background: #f8fcef; overflow: hidden; }
       .sd-person-card.manager > .sd-person { padding-left: 7px; padding-right: 7px; }
       .sd-person-name { display: flex; align-items: center; gap: 6px; font-weight: 650; }
@@ -1538,6 +1567,7 @@
         searchQuery: '',
         period: 'all', // 'all' | 'week' | 'lastWeek' | 'month:YYYY-MM' | 'range:YYYY-MM-DD:YYYY-MM-DD'
         planFilter: 'all', // 'all' | 'plan' | 'off'
+        personDetails: {}, // pkey -> {title, meta, html} for the task popup
         viewMode: 'table7', // 'table1' | 'table3' | 'table5' | 'table6' | 'table7'
         expandedNodes: new Set()
       };
@@ -3184,6 +3214,10 @@
           return ['Риск', 'risk'];
         };
 
+        // Per-person task detail is shown in a popup; collect each person's task
+        // HTML here and open it on row click (see the delegated handler below).
+        state.personDetails = {};
+        let personSeq = 0;
         const cards = depts.map((d, index) => {
           const [health, healthClass] = healthFor(d);
           const departmentHeadId = String(depByName.get(d.name)?.UF_HEAD || '');
@@ -3251,8 +3285,18 @@
                 helpingItems.filter(item => !isPlanRow(item.row)),
                 true
               );
-            return `<details class="sd-person-card${isManager ? ' manager' : ''}">
-              <summary class="sd-person">
+            const pkey = 'p' + (personSeq++);
+            const modalTitle = `${isManager ? loadAvatar(emp) : ''}<span>${escapeHtml(emp.name)}</span>${isManager ? '<span class="sd-manager-badge">Руководитель</span>' : ''}`;
+            const modalMeta = [
+              planTaskCount ? `По плану: ${planTaskCount}` : '',
+              planGroupCount ? `Раб. группа: ${planGroupCount}` : '',
+              outsideTaskCount ? `Вне плана: ${outsideTaskCount}` : '',
+              offHelpingCount ? `Помогает: ${offHelpingCount}` : '',
+              emp.overdueDays ? `Просрочка: ${emp.overdueDays} дн.` : ''
+            ].filter(Boolean).join(' · ');
+            state.personDetails[pkey] = { title: modalTitle, meta: modalMeta, html: taskSections };
+            return `<div class="sd-person-card${isManager ? ' manager' : ''}">
+              <div class="sd-person sd-person-row" data-pkey="${pkey}" role="button" tabindex="0" title="Показать задачи">
                 <span class="sd-person-name"><span class="sd-person-chevron">›</span>${isManager ? loadAvatar(emp) : ''}<span>${escapeHtml(emp.name)}</span>${isManager ? '<span class="sd-manager-badge">Руководитель</span>' : ''}</span>
                 <span class="sd-person-num">${planTaskCount ? `${planTaskCount} зад.` : ''}</span>
                 <span class="sd-help-count" title="Наблюдатель/соисполнитель в проекте 51">${planGroupCount || ''}</span>
@@ -3265,9 +3309,8 @@
                   <div class="sd-score-line"><span class="sd-score-label">План</span><div class="sd-person-bar"><div class="sd-person-fill plan" style="width:${emp.planScore ?? 0}%"></div></div></div>
                 </div>
                 <span class="sd-person-score"><span>${emp.score ?? '—'}</span><span class="plan">${emp.planScore ?? '—'}</span></span>
-              </summary>
-              ${taskSections}
-            </details>`;
+              </div>
+            </div>`;
           }).join('');
           return `<details class="sd-dept"${index === 0 ? ' open' : ''}>
             <summary class="sd-dept-head">
@@ -3325,7 +3368,64 @@
           </section>
         </div>`;
 
+        bindPersonTaskPopup();
         renderStats(state.filteredRows);
+      }
+
+      // Popup with a person's task breakdown, opened from an «Оценка» row.
+      function ensureTaskModal() {
+        let modal = document.getElementById('sdTaskModal');
+        if (modal) return modal;
+        modal = document.createElement('div');
+        modal.id = 'sdTaskModal';
+        modal.className = 'sd-modal';
+        modal.hidden = true;
+        modal.innerHTML = `
+          <div class="sd-modal-backdrop"></div>
+          <div class="sd-modal-card" role="dialog" aria-modal="true">
+            <div class="sd-modal-head">
+              <div class="sd-modal-titlewrap">
+                <div class="sd-modal-title"></div>
+                <div class="sd-modal-meta"></div>
+              </div>
+              <button class="sd-modal-close" type="button" aria-label="Закрыть">✕</button>
+            </div>
+            <div class="sd-modal-body"></div>
+          </div>`;
+        document.body.appendChild(modal);
+        const close = () => { modal.hidden = true; document.body.style.overflow = ''; };
+        modal.querySelector('.sd-modal-backdrop').addEventListener('click', close);
+        modal.querySelector('.sd-modal-close').addEventListener('click', close);
+        document.addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) close(); });
+        return modal;
+      }
+
+      function openTaskModal(detail) {
+        const modal = ensureTaskModal();
+        modal.querySelector('.sd-modal-title').innerHTML = detail.title || '';
+        const metaEl = modal.querySelector('.sd-modal-meta');
+        metaEl.textContent = detail.meta || '';
+        metaEl.hidden = !detail.meta;
+        modal.querySelector('.sd-modal-body').innerHTML = detail.html
+          || '<div class="sd-modal-empty">Нет задач за выбранный период</div>';
+        modal.querySelector('.sd-modal-body').scrollTop = 0;
+        modal.hidden = false;
+        document.body.style.overflow = 'hidden';
+      }
+
+      function bindPersonTaskPopup() {
+        if (!ids.structureWrap || ids.structureWrap.dataset.popupBound) return;
+        ids.structureWrap.dataset.popupBound = '1';
+        const handler = e => {
+          const row = e.target.closest('.sd-person-row');
+          if (!row || !ids.structureWrap.contains(row)) return;
+          if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+          if (e.type === 'keydown') e.preventDefault();
+          const detail = state.personDetails[row.dataset.pkey];
+          if (detail) openTaskModal(detail);
+        };
+        ids.structureWrap.addEventListener('click', handler);
+        ids.structureWrap.addEventListener('keydown', handler);
       }
 
       // ── Table dispatcher ──────────────────────────────────────────────
