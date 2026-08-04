@@ -1618,6 +1618,42 @@
         return EXCLUDED_NAMES.some(ex => n.includes(ex.toLowerCase()));
       }
 
+      // Top-level departments hidden everywhere — the whole subtree and its
+      // employees are dropped right after the payload loads, so task filtering,
+      // the roster, gallery and «Отчёт» all exclude them automatically.
+      const EXCLUDED_DEPARTMENTS = ['Аутсорсинг'];
+      function isExcludedDept(name) {
+        return !!(state.excludedDeptNames && state.excludedDeptNames.has(String(name)));
+      }
+      function removeExcludedDepartments() {
+        state.excludedDeptNames = new Set();
+        if (!Array.isArray(state.departments) || !state.departments.length) return;
+        const excludedIds = new Set();
+        state.departments.forEach(d => {
+          if (EXCLUDED_DEPARTMENTS.includes(String(d.NAME))) excludedIds.add(String(d.ID));
+        });
+        if (!excludedIds.size) return;
+        let added = true;
+        while (added) {
+          added = false;
+          state.departments.forEach(d => {
+            const parentId = String(d.PARENT || '');
+            const id = String(d.ID);
+            if (parentId && excludedIds.has(parentId) && !excludedIds.has(id)) {
+              excludedIds.add(id);
+              added = true;
+            }
+          });
+        }
+        const excludedNames = new Set();
+        state.departments.forEach(d => {
+          if (excludedIds.has(String(d.ID))) excludedNames.add(String(d.NAME));
+        });
+        state.excludedDeptNames = excludedNames;
+        state.departments = state.departments.filter(d => !excludedIds.has(String(d.ID)));
+        state.allEmployees = (state.allEmployees || []).filter(e => !excludedNames.has(String(e && e.dept)));
+      }
+
       const ids = {
         host: document.getElementById('host'),
         fetchedAt: document.getElementById('fetchedAt'),
@@ -1915,7 +1951,7 @@
             const accomplices = typeof accomplicesJson === 'string' ? JSON.parse(accomplicesJson) : accomplicesJson;
             if (Array.isArray(accomplices)) {
               accomplices.forEach(acc => {
-                if (acc.name && acc.name !== 'Без исполнителя') {
+                if (acc.name && acc.name !== 'Без исполнителя' && !isExcludedDept(acc.dept)) {
                   if (!empMap[acc.name]) {
                     empMap[acc.name] = {
                       name: acc.name,
@@ -1951,7 +1987,7 @@
           const executorDept = row['Отдел'] || 'Без отдела';
           // Нельзя «поручить» задачу самому себе — бонус постановщика не начисляем
           const selfAssigned = creatorId && String(row['ID исполнителя'] || '') === creatorId;
-          if (creatorName && creatorName !== 'Без постановщика' && !selfAssigned) {
+          if (creatorName && creatorName !== 'Без постановщика' && !selfAssigned && !isExcludedDept(creatorDept)) {
             if (!empMap[creatorName]) {
               empMap[creatorName] = {
                 name: creatorName,
@@ -4466,6 +4502,7 @@
           await mergeAiScores();
           state.departments = payload.departments || [];
           state.allEmployees = payload.allEmployees || [];
+          removeExcludedDepartments();
           state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
           state.portalHost = payload.portalHost || null;
 
