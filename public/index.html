@@ -1367,6 +1367,22 @@
       .sd-help-count { color: #245c89; font-size: 13px; font-weight: 700; }
       .sd-person-num { color: #3f463f; font-size: 13px; font-weight: 650; }
       .sd-checklist-overdue { display: inline-grid; place-items: center; min-width: 16px; height: 16px; margin-left: 5px; padding: 0 4px; border-radius: 8px; background: #fdECEC; color: #dc2626; font-size: 10px; font-weight: 800; vertical-align: middle; }
+      .sd-checklist-cell { cursor: pointer; border-radius: 6px; padding: 2px 4px; margin: -2px -4px; transition: background .15s ease; }
+      .sd-checklist-cell:hover { background: rgba(0,0,0,.06); }
+      .sd-modal-sub { color: var(--text-muted); font-weight: 700; }
+      .sd-cl-group { margin: 10px 0 14px; }
+      .sd-cl-group:first-child { margin-top: 4px; }
+      .sd-cl-task { position: sticky; top: 0; z-index: 2; padding: 8px 10px; background: #eef4fb; border-radius: 8px; font-size: 12.5px; font-weight: 750; }
+      .sd-cl-task .task-link { color: #1e6aaa; font-weight: 750; }
+      .sd-cl-item { display: grid; grid-template-columns: 20px 1fr auto; align-items: start; gap: 10px; padding: 8px 10px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 12.5px; }
+      .sd-cl-item:last-child { border-bottom: 0; }
+      .sd-cl-check { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; font-size: 11px; font-weight: 800; background: #ecefea; color: #8a928a; }
+      .sd-cl-item.done .sd-cl-check { background: #d8f0dc; color: #1c8a3f; }
+      .sd-cl-item.overdue .sd-cl-check { background: #fdECEC; color: #dc2626; }
+      .sd-cl-text { line-height: 1.3; }
+      .sd-cl-item.done .sd-cl-text { color: #8a928a; text-decoration: line-through; }
+      .sd-cl-dl { white-space: nowrap; color: var(--text-muted); font-weight: 650; font-size: 11.5px; }
+      .sd-cl-item.overdue .sd-cl-dl { color: #dc2626; font-weight: 750; }
       .sd-person-scores { display: flex; flex-direction: column; gap: 4px; }
       .sd-score-line { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 7px; }
       .sd-score-label { color: #697169; font-size: 11px; line-height: 1.1; font-weight: 700; white-space: nowrap; }
@@ -2287,7 +2303,7 @@
             </div>`;
         })() : '';
 
-        const cards = heroCard + sorted.map((emp) => {
+        const cards = heroCard + sorted.filter(emp => String(emp.id) !== CEO_ID).map((emp) => {
           const c = counts[String(emp.id)] || blank();
           return `
             <div class="g-card pt-card" style="${overdueStyle(c)}"${overdueTitle(c)}>
@@ -3064,8 +3080,10 @@
           } catch {}
           if (!Array.isArray(items)) return;
           const taskId = String(row['ID задачи'] || '');
+          const taskTitle = String(row['Название задачи'] || 'Без названия');
           items.forEach(item => {
             const itemOverdue = isChecklistItemOverdue(item);
+            const itemDeadline = checklistItemDeadline(item.title);
             (item.members || []).forEach(member => {
               const memberId = String(member.id || '');
               const employee = employeeById.get(memberId);
@@ -3092,7 +3110,11 @@
               if (!person.checklist) person.checklist = new Map();
               person.checklist.set(`${taskId}:${item.id}`, {
                 complete: item.complete === true,
-                overdue: itemOverdue
+                overdue: itemOverdue,
+                title: String(item.title || ''),
+                deadline: itemDeadline,
+                taskId,
+                taskTitle
               });
             });
           });
@@ -3267,9 +3289,13 @@
           </div>`;
         }).join('');
 
-        const bars = depts
+        // Only departments that actually have overdue days appear in the
+        // «Просрочка» block; the whole block is hidden when there are none.
+        const overdueBarDepts = depts
           .slice()
-          .sort((a, b) => b.overdueDays - a.overdueDays)
+          .filter(d => d.overdueDays > 0)
+          .sort((a, b) => b.overdueDays - a.overdueDays);
+        const bars = overdueBarDepts
           .map(d => {
             const unfinished = d.rows
               .filter(row => !String(row['Состояние задачи'] || '').startsWith('Закрыта'))
@@ -3305,6 +3331,7 @@
         // Per-person task detail is shown in a popup; collect each person's task
         // HTML here and open it on row click (see the delegated handler below).
         state.personDetails = {};
+        state.personChecklists = {};
         let personSeq = 0;
         const cards = depts.map((d, index) => {
           const [health, healthClass] = healthFor(d);
@@ -3385,6 +3412,50 @@
               emp.overdueDays ? `Просрочка: ${emp.overdueDays} дн.` : ''
             ].filter(Boolean).join(' · ');
             state.personDetails[pkey] = { title: modalTitle, meta: modalMeta, html: taskSections };
+            // Checklist popup: what to do and which task each item belongs to.
+            const checklistDetailHtml = (() => {
+              if (!checklistItems.length) return '';
+              const fmtDl = dl => {
+                if (!dl) return '';
+                const d = new Date(dl);
+                if (Number.isNaN(d.getTime())) return '';
+                return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`;
+              };
+              const cleanTitle = t => String(t || '')
+                .replace(/\s*·\s*исполнитель\s*:.*$/i, '')
+                .replace(/\s*·\s*до\s+\d{1,2}\.\d{1,2}\.\d{4}\s*/i, ' ')
+                .trim();
+              const byTask = new Map();
+              checklistItems.forEach(it => {
+                const key = it.taskId || '';
+                if (!byTask.has(key)) byTask.set(key, { taskTitle: it.taskTitle || 'Без названия', taskId: key, items: [] });
+                byTask.get(key).items.push(it);
+              });
+              return Array.from(byTask.values()).map(g => {
+                const link = state.portalHost && /^\d+$/.test(g.taskId)
+                  ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${g.taskId}/">${escapeHtml(g.taskTitle)}</a>`
+                  : escapeHtml(g.taskTitle);
+                const itemsHtml = g.items
+                  .slice()
+                  .sort((a, b) => (a.complete === b.complete ? 0 : a.complete ? 1 : -1) || (b.overdue - a.overdue))
+                  .map(it => {
+                    const cls = it.complete ? 'done' : (it.overdue ? 'overdue' : '');
+                    const mark = it.complete ? '✓' : (it.overdue ? '!' : '○');
+                    const dl = fmtDl(it.deadline);
+                    return `<div class="sd-cl-item ${cls}">
+                      <span class="sd-cl-check">${mark}</span>
+                      <span class="sd-cl-text">${escapeHtml(cleanTitle(it.title) || 'Пункт чек-листа')}</span>
+                      ${dl ? `<span class="sd-cl-dl">до ${escapeHtml(dl)}</span>` : ''}
+                    </div>`;
+                  }).join('');
+                return `<div class="sd-cl-group"><div class="sd-cl-task">${link}</div>${itemsHtml}</div>`;
+              }).join('');
+            })();
+            state.personChecklists[pkey] = {
+              title: `${modalTitle}<span class="sd-modal-sub"> · Чек-лист</span>`,
+              meta: `Выполнено ${completedChecklistItems} из ${checklistItems.length}${overdueChecklistItems ? ` · просрочено ${overdueChecklistItems}` : ''}`,
+              html: checklistDetailHtml
+            };
             return `<div class="sd-person-card${isManager ? ' manager' : ''}">
               <div class="sd-person sd-person-row" data-pkey="${pkey}" role="button" tabindex="0" title="Показать задачи">
                 <span class="sd-person-name"><span class="sd-person-chevron">›</span>${isManager ? loadAvatar(emp) : ''}<span>${escapeHtml(emp.name)}</span>${isManager ? '<span class="sd-manager-badge">Руководитель</span>' : ''}</span>
@@ -3392,7 +3463,7 @@
                 <span class="sd-help-count" title="Наблюдатель/соисполнитель в проекте 51">${planGroupCount || ''}</span>
                 <span class="sd-person-num">${outsideTaskCount ? `${outsideTaskCount} зад.` : ''}</span>
                 <span class="sd-help-count">${offHelpingCount || ''}</span>
-                <span class="sd-person-num" title="Выполнено / всего пунктов чек-листа${overdueChecklistItems ? ` · просрочено: ${overdueChecklistItems}` : ''}">${checklistItems.length ? `${completedChecklistItems}/${checklistItems.length}${overdueChecklistItems ? `<span class="sd-checklist-overdue" title="Просрочено пунктов чек-листа (не выполнено в срок «до ДАТА»)">${overdueChecklistItems}</span>` : ''}` : ''}</span>
+                <span class="sd-person-num${checklistItems.length ? ' sd-checklist-cell' : ''}"${checklistItems.length ? ` data-ckey="${pkey}" role="button" tabindex="0"` : ''} title="${checklistItems.length ? 'Показать чек-лист' : 'Выполнено / всего пунктов чек-листа'}${overdueChecklistItems ? ` · просрочено: ${overdueChecklistItems}` : ''}">${checklistItems.length ? `${completedChecklistItems}/${checklistItems.length}${overdueChecklistItems ? `<span class="sd-checklist-overdue">${overdueChecklistItems}</span>` : ''}` : ''}</span>
                 <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
                 <div class="sd-person-scores">
                   <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
@@ -3435,11 +3506,11 @@
             </div>
             <div class="sd-ratio-chart">${ratioDiagram}</div>
           </section>
-          <section class="sd-section">
+          ${overdueBarDepts.length ? `<section class="sd-section">
             <h2 class="sd-title">Просрочка</h2>
             <div class="sd-chart">${bars}</div>
             <div class="sd-axis"><span>0</span><span>${Math.round(maxOverdue / 2)}</span><span>${maxOverdue}</span></div>
-          </section>
+          </section>` : ''}
           <section class="sd-section">
             <h2 class="sd-title">Оценка</h2>
             <p class="sd-subtitle">Оценка 0–100: 70% качество исполнения + 30% текущая дисциплина. Открытая просрочка снижает балл независимо от общего числа задач; объём не даёт бонуса.</p>
@@ -3509,6 +3580,15 @@
             const visible = [...g.querySelectorAll('.sd-task')].some(t => t.style.display !== 'none');
             g.style.display = visible ? '' : 'none';
           });
+          // Checklist popup items
+          body.querySelectorAll('.sd-cl-item').forEach(it => {
+            const text = (it.querySelector('.sd-cl-text')?.textContent || '').toLowerCase();
+            it.style.display = (!q || text.includes(q)) ? '' : 'none';
+          });
+          body.querySelectorAll('.sd-cl-group').forEach(g => {
+            const visible = [...g.querySelectorAll('.sd-cl-item')].some(it => it.style.display !== 'none');
+            g.style.display = visible ? '' : 'none';
+          });
         });
         return modal;
       }
@@ -3534,9 +3614,17 @@
         if (!ids.structureWrap || ids.structureWrap.dataset.popupBound) return;
         ids.structureWrap.dataset.popupBound = '1';
         const handler = e => {
+          if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+          // Checklist cell has priority over the row's task popup.
+          const clCell = e.target.closest('.sd-checklist-cell');
+          if (clCell && ids.structureWrap.contains(clCell)) {
+            if (e.type === 'keydown') e.preventDefault();
+            const cl = state.personChecklists[clCell.dataset.ckey];
+            if (cl) openTaskModal(cl);
+            return;
+          }
           const row = e.target.closest('.sd-person-row');
           if (!row || !ids.structureWrap.contains(row)) return;
-          if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
           if (e.type === 'keydown') e.preventDefault();
           const detail = state.personDetails[row.dataset.pkey];
           if (detail) openTaskModal(detail);
