@@ -663,33 +663,43 @@
       }
       .period-month:hover { background: rgba(0,0,0,0.08); }
       .period-month.active { background: #1e6aaa; color: #fff; }
-      .period-range { display: flex; align-items: center; gap: 6px; padding: 0 6px; }
-      .period-range-sep { color: var(--text-muted); font-weight: 700; }
-      .period-date {
-        flex: 1;
-        min-width: 0;
-        font-family: 'Montserrat', sans-serif;
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-dark);
-        padding: 6px 7px;
-        border: 1px solid rgba(0,0,0,0.14);
-        border-radius: 8px;
-        background: #fff;
-      }
-      .period-range-apply {
-        background: #1e6aaa;
-        color: #fff;
+      /* Custom range calendar */
+      .period-cal { padding: 0 4px; }
+      .period-cal-head { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding: 2px 4px 8px; }
+      .period-cal-month { font-family: 'Montserrat', sans-serif; font-size: 12.5px; font-weight: 800; color: var(--text-dark); }
+      .period-cal-nav { width: 26px; height: 26px; border: none; border-radius: 8px; background: rgba(0,0,0,.04); color: #444; font-size: 16px; line-height: 1; cursor: pointer; transition: background .15s ease; }
+      .period-cal-nav:hover { background: rgba(0,0,0,.09); }
+      .period-cal-weekdays, .period-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+      .period-cal-weekdays { margin-bottom: 3px; }
+      .period-cal-weekdays span { text-align: center; font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: #b1b7b1; padding: 2px 0; }
+      .period-cal-day {
+        aspect-ratio: 1 / 1;
+        display: grid; place-items: center;
         border: none;
+        background: transparent;
         font-family: 'Montserrat', sans-serif;
-        font-size: 11px;
-        font-weight: 800;
-        padding: 6px 12px;
+        font-size: 11.5px;
+        font-weight: 650;
+        color: var(--text-dark);
         border-radius: 8px;
         cursor: pointer;
-        flex-shrink: 0;
+        transition: background .12s ease, color .12s ease;
       }
-      .period-range-apply:hover { background: #185a90; }
+      .period-cal-day.empty { cursor: default; }
+      .period-cal-day:not(.empty):hover { background: rgba(30,106,170,.12); }
+      .period-cal-day.today { box-shadow: inset 0 0 0 1.5px #c3d4e8; }
+      .period-cal-day.inrange { background: #e7f0fb; border-radius: 0; color: #1e6aaa; }
+      .period-cal-day.start, .period-cal-day.end { background: #1e6aaa; color: #fff; }
+      .period-cal-day.start { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+      .period-cal-day.end { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+      .period-cal-day.start.end { border-radius: 8px; }
+      .period-cal-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 9px; padding-top: 8px; border-top: 1px solid rgba(0,0,0,.06); }
+      .period-cal-range { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+      .period-cal-actions { display: flex; gap: 6px; }
+      .period-cal-clear { background: transparent; border: none; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 750; color: var(--text-muted); padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+      .period-cal-clear:hover { background: rgba(0,0,0,.05); color: var(--text-dark); }
+      .period-cal-apply { background: #1e6aaa; color: #fff; border: none; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
+      .period-cal-apply:hover { background: #185a90; }
 
       /* Floating chat widget */
       .chat-fab {
@@ -1461,11 +1471,21 @@
                 </div>
                 <div class="period-sub">
                   <div class="period-sub-title">Диапазон</div>
-                  <div class="period-range">
-                    <input type="date" id="periodFrom" class="period-date" aria-label="Дата с">
-                    <span class="period-range-sep">–</span>
-                    <input type="date" id="periodTo" class="period-date" aria-label="Дата по">
-                    <button id="periodRangeApply" class="period-range-apply" type="button">OK</button>
+                  <div class="period-cal">
+                    <div class="period-cal-head">
+                      <button class="period-cal-nav" id="periodCalPrev" type="button" aria-label="Предыдущий месяц">‹</button>
+                      <span class="period-cal-month" id="periodCalMonth"></span>
+                      <button class="period-cal-nav" id="periodCalNext" type="button" aria-label="Следующий месяц">›</button>
+                    </div>
+                    <div class="period-cal-weekdays"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+                    <div class="period-cal-grid" id="periodCalGrid"></div>
+                    <div class="period-cal-foot">
+                      <span class="period-cal-range" id="periodCalRange">Выберите даты</span>
+                      <div class="period-cal-actions">
+                        <button class="period-cal-clear" id="periodCalClear" type="button">Сброс</button>
+                        <button class="period-cal-apply" id="periodCalApply" type="button">Применить</button>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1707,9 +1727,6 @@
         periodMenu: document.getElementById('periodMenu'),
         periodMonths: document.getElementById('periodMonths'),
         periodMonthsYear: document.getElementById('periodMonthsYear'),
-        periodFrom: document.getElementById('periodFrom'),
-        periodTo: document.getElementById('periodTo'),
-        periodRangeApply: document.getElementById('periodRangeApply'),
         searchInput: document.getElementById('searchInput'),
         searchClear: document.getElementById('searchClear'),
         planFilterBtns: Array.from(document.querySelectorAll('.plan-filter-btn')),
@@ -3431,7 +3448,11 @@
                 if (!byTask.has(key)) byTask.set(key, { taskTitle: it.taskTitle || 'Без названия', taskId: key, items: [] });
                 byTask.get(key).items.push(it);
               });
-              return Array.from(byTask.values()).map(g => {
+              // Tasks that have overdue checklist items come first (most overdue on top).
+              const groups = Array.from(byTask.values());
+              groups.forEach(g => { g.overdueCount = g.items.filter(i => i.overdue).length; });
+              groups.sort((a, b) => (b.overdueCount > 0) - (a.overdueCount > 0) || b.overdueCount - a.overdueCount);
+              return groups.map(g => {
                 const link = state.portalHost && /^\d+$/.test(g.taskId)
                   ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${g.taskId}/">${escapeHtml(g.taskTitle)}</a>`
                   : escapeHtml(g.taskTitle);
@@ -4724,6 +4745,7 @@
         const openMenu = () => {
           ids.periodMenu.hidden = false;
           ids.periodBtn.setAttribute('aria-expanded', 'true');
+          syncCalFromPeriod();
         };
         const closeMenu = () => {
           ids.periodMenu.hidden = true;
@@ -4753,19 +4775,83 @@
         ids.periodMonths.querySelectorAll('.period-month').forEach(btn => {
           btn.addEventListener('click', () => { setPeriod('month:' + btn.dataset.month); closeMenu(); });
         });
-        if (ids.periodRangeApply) {
-          const applyRange = () => {
-            const from = ids.periodFrom.value;
-            const to = ids.periodTo.value;
-            if (!from && !to) return;
-            if (from && to && from > to) { setPeriod('range:' + to + ':' + from); }
-            else { setPeriod('range:' + from + ':' + to); }
+        // ── Custom range calendar ──
+        const calGridEl = document.getElementById('periodCalGrid');
+        const calMonthEl = document.getElementById('periodCalMonth');
+        const calRangeEl = document.getElementById('periodCalRange');
+        const WEEKDAY_MON = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+        const calState = { y: periodYear, m: new Date().getMonth(), start: null, end: null };
+        const sameDay = (a, b) => a && b && a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+        const fmtDay = d => d ? `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)}.${d.getFullYear()}` : '';
+
+        function renderCal() {
+          if (!calGridEl) return;
+          calMonthEl.textContent = `${MONTH_NAMES[calState.m]} ${calState.y}`;
+          const firstDow = (new Date(calState.y, calState.m, 1).getDay() + 6) % 7; // Mon=0
+          const daysInMonth = new Date(calState.y, calState.m + 1, 0).getDate();
+          const today = new Date();
+          const cells = [];
+          for (let i = 0; i < firstDow; i++) cells.push('<span class="period-cal-day empty"></span>');
+          for (let d = 1; d <= daysInMonth; d++) {
+            const date = new Date(calState.y, calState.m, d);
+            const cls = ['period-cal-day'];
+            const isStart = sameDay(date, calState.start);
+            const isEnd = sameDay(date, calState.end);
+            if (isStart) cls.push('start');
+            if (isEnd) cls.push('end');
+            if (calState.start && calState.end && date > calState.start && date < calState.end) cls.push('inrange');
+            if (sameDay(date, today)) cls.push('today');
+            cells.push(`<button type="button" class="${cls.join(' ')}" data-d="${d}">${d}</button>`);
+          }
+          calGridEl.innerHTML = cells.join('');
+          calRangeEl.textContent = calState.start
+            ? (calState.end ? `${fmtDay(calState.start)} – ${fmtDay(calState.end)}` : `${fmtDay(calState.start)} – …`)
+            : 'Выберите даты';
+        }
+
+        function syncCalFromPeriod() {
+          if (state.period && state.period.startsWith('range:')) {
+            const [f, t] = state.period.slice(6).split(':');
+            const pf = f ? new Date(f + 'T00:00:00') : null;
+            const pt = t ? new Date(t + 'T00:00:00') : null;
+            calState.start = pf && !Number.isNaN(pf.getTime()) ? pf : null;
+            calState.end = pt && !Number.isNaN(pt.getTime()) ? pt : null;
+            if (calState.start) { calState.y = calState.start.getFullYear(); calState.m = calState.start.getMonth(); }
+          }
+          renderCal();
+        }
+
+        if (calGridEl) {
+          calGridEl.addEventListener('click', e => {
+            const btn = e.target.closest('.period-cal-day[data-d]');
+            if (!btn) return;
+            const date = new Date(calState.y, calState.m, Number(btn.dataset.d));
+            if (!calState.start || calState.end || date < calState.start) {
+              calState.start = date;
+              calState.end = null;
+            } else {
+              calState.end = date;
+            }
+            renderCal();
+          });
+          document.getElementById('periodCalPrev').addEventListener('click', () => {
+            if (--calState.m < 0) { calState.m = 11; calState.y--; }
+            renderCal();
+          });
+          document.getElementById('periodCalNext').addEventListener('click', () => {
+            if (++calState.m > 11) { calState.m = 0; calState.y++; }
+            renderCal();
+          });
+          document.getElementById('periodCalClear').addEventListener('click', () => {
+            calState.start = null; calState.end = null; renderCal();
+          });
+          document.getElementById('periodCalApply').addEventListener('click', () => {
+            if (!calState.start) return;
+            const iso = d => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+            setPeriod(`range:${iso(calState.start)}:${iso(calState.end || calState.start)}`);
             closeMenu();
-          };
-          ids.periodRangeApply.addEventListener('click', applyRange);
-          [ids.periodFrom, ids.periodTo].forEach(inp => inp && inp.addEventListener('keydown', e => {
-            if (e.key === 'Enter') applyRange();
-          }));
+          });
+          renderCal();
         }
 
         document.addEventListener('click', () => { if (!ids.periodMenu.hidden) closeMenu(); });
