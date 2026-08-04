@@ -549,6 +549,148 @@
       }
       .view-btn:not(.active):hover { color: var(--text-dark); }
 
+      /* Plan filter segmented control */
+      .plan-filter {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(0,0,0,0.04);
+        border-radius: 20px;
+        padding: 3px;
+        gap: 2px;
+      }
+      .plan-filter-btn {
+        background: transparent;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        padding: 4px 12px;
+        border-radius: 16px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+      }
+      .plan-filter-btn.active {
+        background: var(--surface);
+        color: var(--text-dark);
+        box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+      }
+      .plan-filter-btn:not(.active):hover { color: var(--text-dark); }
+
+      /* Period dropdown */
+      .period-dd { position: relative; display: inline-block; }
+      .period-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: transparent;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        color: var(--text-dark);
+        padding: 2px 4px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .period-btn:hover { color: #111; }
+      .period-caret { color: var(--text-muted); transition: transform 0.2s ease; flex-shrink: 0; }
+      .period-btn[aria-expanded="true"] .period-caret { transform: rotate(180deg); }
+      .period-menu {
+        position: absolute;
+        top: calc(100% + 10px);
+        left: -8px;
+        z-index: 1200;
+        min-width: 260px;
+        background: var(--surface, #fff);
+        border: 1px solid rgba(0,0,0,0.08);
+        border-radius: 14px;
+        box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+      .period-opt {
+        display: block;
+        width: 100%;
+        text-align: left;
+        background: transparent;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--text-dark);
+        padding: 9px 12px;
+        border-radius: 9px;
+        cursor: pointer;
+        transition: background 0.15s ease;
+      }
+      .period-opt:hover { background: rgba(0,0,0,0.05); }
+      .period-opt.active { background: #eaf2fb; color: #1e6aaa; }
+      .period-sub { border-top: 1px solid rgba(0,0,0,0.06); margin-top: 4px; padding-top: 8px; }
+      .period-sub-title {
+        font-family: 'Montserrat', sans-serif;
+        font-size: 10px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        color: var(--text-muted);
+        padding: 0 6px 6px;
+      }
+      .period-sub-year { color: #b7bdb7; font-weight: 700; }
+      .period-months {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 4px;
+      }
+      .period-month {
+        background: rgba(0,0,0,0.03);
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11px;
+        font-weight: 700;
+        color: var(--text-dark);
+        padding: 7px 4px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+      }
+      .period-month:hover { background: rgba(0,0,0,0.08); }
+      .period-month.active { background: #1e6aaa; color: #fff; }
+      .period-range { display: flex; align-items: center; gap: 6px; padding: 0 6px; }
+      .period-range-sep { color: var(--text-muted); font-weight: 700; }
+      .period-date {
+        flex: 1;
+        min-width: 0;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-dark);
+        padding: 6px 7px;
+        border: 1px solid rgba(0,0,0,0.14);
+        border-radius: 8px;
+        background: #fff;
+      }
+      .period-range-apply {
+        background: #1e6aaa;
+        color: #fff;
+        border: none;
+        font-family: 'Montserrat', sans-serif;
+        font-size: 11px;
+        font-weight: 800;
+        padding: 6px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .period-range-apply:hover { background: #185a90; }
+
       /* Floating chat widget */
       .chat-fab {
         position: fixed;
@@ -1224,20 +1366,42 @@
           <span class="period-selector">
             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);"><rect width="18" height="18" x="3" y="4" rx="2" ry="2"/><line x1="16" x2="16" y1="2" y2="6"/><line x1="8" x2="8" y1="2" y2="6"/><line x1="3" x2="21" y1="10" y2="10"/></svg>
             Период:
-            <select id="periodSelect" class="compact-select">
-              <option value="all">Все время</option>
-              <option value="today">Сегодня</option>
-              <option value="week">Текущая неделя</option>
-              <option value="lastWeek">Прошлая неделя</option>
-              <option value="month" selected>Текущий месяц</option>
-              <option value="lastMonth">Прошлый месяц</option>
-            </select>
+            <div class="period-dd">
+              <button id="periodBtn" class="period-btn" type="button" aria-haspopup="true" aria-expanded="false">
+                <span id="periodBtnLabel">Все время</span>
+                <svg class="period-caret" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              <div id="periodMenu" class="period-menu" hidden>
+                <button class="period-opt" type="button" data-period="all">Все время</button>
+                <button class="period-opt" type="button" data-period="week">Текущая неделя</button>
+                <button class="period-opt" type="button" data-period="lastWeek">Прошлая неделя</button>
+                <div class="period-sub">
+                  <div class="period-sub-title">Месяц <span id="periodMonthsYear" class="period-sub-year"></span></div>
+                  <div class="period-months" id="periodMonths"></div>
+                </div>
+                <div class="period-sub">
+                  <div class="period-sub-title">Диапазон</div>
+                  <div class="period-range">
+                    <input type="date" id="periodFrom" class="period-date" aria-label="Дата с">
+                    <span class="period-range-sep">–</span>
+                    <input type="date" id="periodTo" class="period-date" aria-label="Дата по">
+                    <button id="periodRangeApply" class="period-range-apply" type="button">OK</button>
+                  </div>
+                </div>
+              </div>
+            </div>
           </span>
           <span class="divider"></span>
           <span class="search-wrap" title="Поиск по имени исполнителя">
             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
             <input id="searchInput" class="search-input" type="text" placeholder="Имя исполнителя…" autocomplete="off" spellcheck="false">
             <button id="searchClear" class="search-clear" tabindex="-1" title="Очистить">✕</button>
+          </span>
+          <span class="divider"></span>
+          <span class="plan-filter" role="group" aria-label="Фильтр по плану">
+            <button id="planFilterPlan" class="plan-filter-btn" data-plan="plan">По плану</button>
+            <button id="planFilterOff" class="plan-filter-btn" data-plan="off">Вне плана</button>
+            <button id="planFilterAll" class="plan-filter-btn active" data-plan="all">Все</button>
           </span>
           <span class="divider"></span>
           <span class="view-switcher">
@@ -1372,6 +1536,8 @@
         refreshIntervalMs: 5 * 60 * 1000,
         portalHost: null,
         searchQuery: '',
+        period: 'all', // 'all' | 'week' | 'lastWeek' | 'month:YYYY-MM' | 'range:YYYY-MM-DD:YYYY-MM-DD'
+        planFilter: 'all', // 'all' | 'plan' | 'off'
         viewMode: 'table7', // 'table1' | 'table3' | 'table5' | 'table6' | 'table7'
         expandedNodes: new Set()
       };
@@ -1380,8 +1546,8 @@
       let headUserIds = new Set();
 
       // Сотрудники, которых не показываем в рейтинге/галерее/структуре (системные/исключённые)
-      // Larion — руководство; Технический Аккаунт — служебный; Арипханов — уволен
-      const EXCLUDED_NAMES = ['Larion Lyan', 'Larion', 'Технический Аккаунт', 'Ырыскелди Арипханов'];
+      // Larion — руководство; Технический Аккаунт — служебный; Арипханов, Аубакир — уволены
+      const EXCLUDED_NAMES = ['Larion Lyan', 'Larion', 'Технический Аккаунт', 'Ырыскелди Арипханов', 'Максат Аубакир'];
       function isExcludedPerson(name) {
         if (!name) return false;
         const n = String(name).toLowerCase();
@@ -1404,9 +1570,17 @@
         statTotal: document.getElementById('statTotal'),
         statClosedInTime: document.getElementById('statClosedInTime'),
         refreshBtn: document.getElementById('refreshBtn'),
-        periodSelect: document.getElementById('periodSelect'),
+        periodBtn: document.getElementById('periodBtn'),
+        periodBtnLabel: document.getElementById('periodBtnLabel'),
+        periodMenu: document.getElementById('periodMenu'),
+        periodMonths: document.getElementById('periodMonths'),
+        periodMonthsYear: document.getElementById('periodMonthsYear'),
+        periodFrom: document.getElementById('periodFrom'),
+        periodTo: document.getElementById('periodTo'),
+        periodRangeApply: document.getElementById('periodRangeApply'),
         searchInput: document.getElementById('searchInput'),
         searchClear: document.getElementById('searchClear'),
+        planFilterBtns: Array.from(document.querySelectorAll('.plan-filter-btn')),
         viewBtn1: document.getElementById('viewBtn1'),
         viewBtn3: document.getElementById('viewBtn3'),
         viewBtn4: document.getElementById('viewBtn4'),
@@ -2045,7 +2219,7 @@
         }
 
         // Compute period bounds (mirrors applyFilters logic)
-        const period = ids.periodSelect ? ids.periodSelect.value : 'week';
+        const period = state.period || 'all';
         const now = new Date();
         let periodStart = null, periodEnd = null;
         if (period !== 'all') {
@@ -2496,7 +2670,7 @@
         const pct = (d, t) => t ? Math.round(d / t * 100) : 0;
         const sum = (arr, key) => arr.reduce((a, x) => a + x[key], 0);
 
-        const period = ids.periodSelect ? ids.periodSelect.value : 'all';
+        const period = state.period || 'all';
         const range = getPeriodRange(period);
         const now = Date.now();
 
@@ -2806,7 +2980,9 @@
           });
         });
 
-        const depts = Array.from(groups.values()).sort((a, b) => b.rows.length - a.rows.length);
+        const depts = Array.from(groups.values())
+          .filter(d => d.name !== 'Без отдела')
+          .sort((a, b) => b.rows.length - a.rows.length);
         if (!depts.length) {
           ids.structureWrap.innerHTML = '<div class="loading-panel">Нет данных для структуры</div>';
           renderStats(state.filteredRows);
@@ -2865,7 +3041,20 @@
           const shortName = shortDeptName(name);
           if (shortName === 'Адм. управление') return ['Адм.', 'управление'];
           if (shortName === 'Фин. управление') return ['Фин.', 'управление'];
-          return [shortName];
+          // Wrap any remaining multi-word name onto two balanced lines so long
+          // captions (e.g. «Коммерческое управление», «Управление PR») do not
+          // collide with their neighbours on the axis.
+          const words = shortName.split(/\s+/).filter(Boolean);
+          if (words.length <= 1) return [shortName];
+          let splitAt = 1;
+          let bestDiff = Infinity;
+          for (let i = 1; i < words.length; i++) {
+            const left = words.slice(0, i).join(' ').length;
+            const right = words.slice(i).join(' ').length;
+            const diff = Math.abs(left - right);
+            if (diff < bestDiff) { bestDiff = diff; splitAt = i; }
+          }
+          return [words.slice(0, splitAt).join(' '), words.slice(splitAt).join(' ')];
         };
         const deptOrder = [
           'Административное управление',
@@ -3873,6 +4062,24 @@
         const diffToMonday = d - day + (day === 0 ? -6 : 1);
         const startWeek = new Date(y, m, diffToMonday, 0, 0, 0, 0);
 
+        // Specific calendar month: "month:2026-08"
+        if (period.startsWith('month:')) {
+          const [yy, mm] = period.slice(6).split('-').map(Number);
+          if (yy && mm >= 1 && mm <= 12) {
+            return { start: new Date(yy, mm - 1, 1, 0, 0, 0, 0), end: new Date(yy, mm, 0, 23, 59, 59, 999) };
+          }
+          return null;
+        }
+
+        // Custom date range: "range:2026-03-01:2026-03-31" (either bound may be empty)
+        if (period.startsWith('range:')) {
+          const [from, to] = period.slice(6).split(':');
+          const start = from ? new Date(from + 'T00:00:00') : new Date(-8640000000000000);
+          const end = to ? new Date(to + 'T23:59:59.999') : new Date(8640000000000000);
+          if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) return null;
+          return { start, end };
+        }
+
         switch (period) {
           case 'today':
             return { start: new Date(y, m, d, 0, 0, 0, 0), end: new Date(y, m, d, 23, 59, 59, 999) };
@@ -3890,7 +4097,7 @@
       }
 
       function applyFilters() {
-        const period = ids.periodSelect ? ids.periodSelect.value : 'all';
+        const period = state.period || 'all';
 
         const hasClosingDocumentTag = row => String(row['Теги'] || '')
           .split(/[,;|]/)
@@ -3949,6 +4156,13 @@
           });
         }
         
+        // Apply plan filter (project 51 = "По плану", everything else = "Вне плана")
+        if (state.planFilter === 'plan') {
+          filtered = filtered.filter(row => String(row['ID проекта'] || '') === OP_GROUP_ID);
+        } else if (state.planFilter === 'off') {
+          filtered = filtered.filter(row => String(row['ID проекта'] || '') !== OP_GROUP_ID);
+        }
+
         // Apply name search filter
         const q = state.searchQuery.toLowerCase().trim();
         if (q) {
@@ -4116,36 +4330,134 @@
         ids.refreshBtn.addEventListener('click', () => loadReport('POST'));
       }
 
-      if (ids.periodSelect) {
-        // Dynamically set actual names for current and previous months
-        const now = new Date();
-        const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
-        const currentMonthName = monthNames[now.getMonth()];
-        const prevMonthName = monthNames[(now.getMonth() + 11) % 12];
-        
-        const monthOpt = ids.periodSelect.querySelector('option[value="month"]');
-        if (monthOpt) monthOpt.textContent = currentMonthName;
-        
-        const lastMonthOpt = ids.periodSelect.querySelector('option[value="lastMonth"]');
-        if (lastMonthOpt) lastMonthOpt.textContent = prevMonthName;
+      // Plan filter: «По плану» / «Вне плана» / «Все»
+      if (ids.planFilterBtns && ids.planFilterBtns.length) {
+        const savedPlanFilter = localStorage.getItem('dashboard_plan_filter');
+        if (savedPlanFilter && ['all', 'plan', 'off'].includes(savedPlanFilter)) {
+          state.planFilter = savedPlanFilter;
+        }
+        const syncPlanFilterUI = () => ids.planFilterBtns.forEach(btn =>
+          btn.classList.toggle('active', btn.dataset.plan === state.planFilter)
+        );
+        syncPlanFilterUI();
+        ids.planFilterBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            if (state.planFilter === btn.dataset.plan) return;
+            state.planFilter = btn.dataset.plan;
+            localStorage.setItem('dashboard_plan_filter', state.planFilter);
+            syncPlanFilterUI();
+            applyFilters();
+          });
+        });
+      }
 
-        // Restore saved period preference. Default is «Все время»: the OP plan runs
-        // to 2027, so a month-wide window hides most of it.
+      if (ids.periodBtn) {
+        const MONTH_NAMES = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
+        const MONTH_SHORT = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+        const pad2 = n => String(n).padStart(2, '0');
+        const fmtDate = str => {
+          const [yy, mm, dd] = String(str).split('-');
+          return dd && mm ? `${dd}.${mm}` : str;
+        };
+        const periodYear = new Date(state.serverNow || Date.now()).getFullYear() || 2026;
+
+        // Human-readable label for the current period value
+        const periodLabel = value => {
+          if (!value || value === 'all') return 'Все время';
+          if (value === 'week') return 'Текущая неделя';
+          if (value === 'lastWeek') return 'Прошлая неделя';
+          if (value.startsWith('month:')) {
+            const [yy, mm] = value.slice(6).split('-').map(Number);
+            return mm ? `${MONTH_NAMES[mm - 1]} ${yy}` : 'Месяц';
+          }
+          if (value.startsWith('range:')) {
+            const [from, to] = value.slice(6).split(':');
+            if (from && to) return `${fmtDate(from)} – ${fmtDate(to)}`;
+            if (from) return `с ${fmtDate(from)}`;
+            if (to) return `по ${fmtDate(to)}`;
+            return 'Диапазон';
+          }
+          // legacy values
+          if (value === 'today') return 'Сегодня';
+          if (value === 'month') return `${MONTH_NAMES[new Date().getMonth()]}`;
+          if (value === 'lastMonth') return `${MONTH_NAMES[(new Date().getMonth() + 11) % 12]}`;
+          return 'Период';
+        };
+
+        // Build the month grid for the working year
+        if (ids.periodMonthsYear) ids.periodMonthsYear.textContent = periodYear;
+        if (ids.periodMonths) {
+          ids.periodMonths.innerHTML = MONTH_SHORT.map((name, i) =>
+            `<button class="period-month" type="button" data-month="${periodYear}-${pad2(i + 1)}">${name}</button>`
+          ).join('');
+        }
+
+        const syncPeriodUI = () => {
+          ids.periodBtnLabel.textContent = periodLabel(state.period);
+          ids.periodMenu.querySelectorAll('.period-opt').forEach(btn =>
+            btn.classList.toggle('active', btn.dataset.period === state.period)
+          );
+          const activeMonth = state.period.startsWith('month:') ? state.period.slice(6) : null;
+          ids.periodMenu.querySelectorAll('.period-month').forEach(btn =>
+            btn.classList.toggle('active', btn.dataset.month === activeMonth)
+          );
+        };
+
+        const setPeriod = value => {
+          state.period = value;
+          localStorage.setItem('dashboard_period', value);
+          syncPeriodUI();
+          applyFilters();
+        };
+
+        const openMenu = () => {
+          ids.periodMenu.hidden = false;
+          ids.periodBtn.setAttribute('aria-expanded', 'true');
+        };
+        const closeMenu = () => {
+          ids.periodMenu.hidden = true;
+          ids.periodBtn.setAttribute('aria-expanded', 'false');
+        };
+
+        // Restore saved period. Default «Все время»: the OP plan runs to 2027,
+        // so a month-wide window would hide most of it.
         let savedPeriod = localStorage.getItem('dashboard_period');
-        // One-time reset for anyone still carrying the previous 'month' default
         if (!localStorage.getItem('dashboard_period_default_all')) {
           savedPeriod = 'all';
           localStorage.setItem('dashboard_period', 'all');
           localStorage.setItem('dashboard_period_default_all', '1');
         }
-        if (!savedPeriod) savedPeriod = 'all';
-        
-        ids.periodSelect.value = savedPeriod;
-        
-        ids.periodSelect.addEventListener('change', () => {
-          applyFilters();
-          localStorage.setItem('dashboard_period', ids.periodSelect.value);
+        state.period = savedPeriod || 'all';
+        syncPeriodUI();
+
+        ids.periodBtn.addEventListener('click', e => {
+          e.stopPropagation();
+          if (ids.periodMenu.hidden) openMenu(); else closeMenu();
         });
+        ids.periodMenu.addEventListener('click', e => e.stopPropagation());
+
+        ids.periodMenu.querySelectorAll('.period-opt').forEach(btn => {
+          btn.addEventListener('click', () => { setPeriod(btn.dataset.period); closeMenu(); });
+        });
+        ids.periodMonths.querySelectorAll('.period-month').forEach(btn => {
+          btn.addEventListener('click', () => { setPeriod('month:' + btn.dataset.month); closeMenu(); });
+        });
+        if (ids.periodRangeApply) {
+          const applyRange = () => {
+            const from = ids.periodFrom.value;
+            const to = ids.periodTo.value;
+            if (!from && !to) return;
+            if (from && to && from > to) { setPeriod('range:' + to + ':' + from); }
+            else { setPeriod('range:' + from + ':' + to); }
+            closeMenu();
+          };
+          ids.periodRangeApply.addEventListener('click', applyRange);
+          [ids.periodFrom, ids.periodTo].forEach(inp => inp && inp.addEventListener('keydown', e => {
+            if (e.key === 'Enter') applyRange();
+          }));
+        }
+
+        document.addEventListener('click', () => { if (!ids.periodMenu.hidden) closeMenu(); });
       }
 
       // Search input with 200ms debounce
