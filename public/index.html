@@ -1287,7 +1287,7 @@
       .sd-score strong { font-size: 18px; line-height: 1; font-weight: 800; }
       .sd-score small { margin-top: 3px; color: #788078; font-size: 10px; line-height: 1; font-weight: 650; }
       .sd-people { padding: 0 12px 11px; }
-      .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(170px,1fr) 66px 72px 68px 74px 75px minmax(150px,1fr) 34px; align-items: center; gap: 8px; }
+      .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(160px,1fr) 62px 78px 72px 66px 68px 66px minmax(140px,1fr) 32px; align-items: center; gap: 8px; }
       .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 6px; color: #687068; font-size: 12px; font-weight: 650; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
@@ -1339,7 +1339,7 @@
         .sd-axis { margin-left: 88px; }
         .sd-dept-head { grid-template-columns: minmax(150px,1fr) auto 72px; gap: 8px; }
         .sd-dept-meta { display: none; }
-        .sd-person-head, .sd-person { grid-template-columns: minmax(108px,1fr) 44px 48px 46px 52px 50px 72px 28px; gap: 4px; }
+        .sd-person-head, .sd-person { grid-template-columns: minmax(96px,1fr) 40px 50px 46px 44px 50px 46px 68px 26px; gap: 4px; }
         .sd-task { grid-template-columns: minmax(150px,1fr) 90px; }
         .sd-task-deadline { grid-column: 2; }
       }
@@ -3222,6 +3222,10 @@
             const isPlanRow = row => String(row['ID проекта'] || '') === OP_GROUP_ID;
             const planTaskCount = emp.rows.filter(isPlanRow).length;
             const outsideTaskCount = emp.rows.length - planTaskCount;
+            // «В рабочей группе» — наблюдатель/соисполнитель в проекте 51.
+            // «Помогает» остаётся только для задач вне плана, чтобы не задваивать.
+            const planGroupCount = helpingItems.filter(item => isPlanRow(item.row)).length;
+            const offHelpingCount = helpingItems.length - planGroupCount;
             const renderTaskGroup = (title, ownRows, helpItems, outside = false) => {
               const ownTaskRows = sortedRows(ownRows).map(row => renderTaskRow(row)).join('');
               const helpingRows = sortedRows(helpItems.map(item => item.row)).map(row => {
@@ -3251,8 +3255,9 @@
               <summary class="sd-person">
                 <span class="sd-person-name"><span class="sd-person-chevron">›</span>${isManager ? loadAvatar(emp) : ''}<span>${escapeHtml(emp.name)}</span>${isManager ? '<span class="sd-manager-badge">Руководитель</span>' : ''}</span>
                 <span class="sd-person-num">${planTaskCount ? `${planTaskCount} зад.` : ''}</span>
+                <span class="sd-help-count" title="Наблюдатель/соисполнитель в проекте 51">${planGroupCount || ''}</span>
                 <span class="sd-person-num">${outsideTaskCount ? `${outsideTaskCount} зад.` : ''}</span>
-                <span class="sd-help-count">${helpingItems.length || ''}</span>
+                <span class="sd-help-count">${offHelpingCount || ''}</span>
                 <span class="sd-person-num" title="Выполнено / всего пунктов чек-листа">${checklistItems.length ? `${completedChecklistItems}/${checklistItems.length}` : ''}</span>
                 <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
                 <div class="sd-person-scores">
@@ -3278,7 +3283,7 @@
               </span>
             </summary>
             <div class="sd-people">
-              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span>Вне плана</span><span>Помогает</span><span>Чек-лист</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
+              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span title="Наблюдатель/соисполнитель в проекте 51">Раб. группа</span><span>Вне плана</span><span>Помогает</span><span>Чек-лист</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
               ${peopleRows}
             </div>
           </details>`;
