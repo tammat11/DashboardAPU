@@ -3448,17 +3448,21 @@
                 if (!byTask.has(key)) byTask.set(key, { taskTitle: it.taskTitle || 'Без названия', taskId: key, items: [] });
                 byTask.get(key).items.push(it);
               });
-              // Tasks that have overdue checklist items come first (most overdue on top).
+              // Sort by nearest deadline first — overdue (past) items naturally
+              // rise to the top. Items with no deadline go last, completed after.
+              const dlValue = it => (!it.complete && it.deadline) ? new Date(it.deadline).getTime() : Infinity;
               const groups = Array.from(byTask.values());
-              groups.forEach(g => { g.overdueCount = g.items.filter(i => i.overdue).length; });
-              groups.sort((a, b) => (b.overdueCount > 0) - (a.overdueCount > 0) || b.overdueCount - a.overdueCount);
+              groups.forEach(g => {
+                g.sortKey = Math.min(...g.items.map(dlValue), Infinity);
+              });
+              groups.sort((a, b) => a.sortKey - b.sortKey);
               return groups.map(g => {
                 const link = state.portalHost && /^\d+$/.test(g.taskId)
                   ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${g.taskId}/">${escapeHtml(g.taskTitle)}</a>`
                   : escapeHtml(g.taskTitle);
                 const itemsHtml = g.items
                   .slice()
-                  .sort((a, b) => (a.complete === b.complete ? 0 : a.complete ? 1 : -1) || (b.overdue - a.overdue))
+                  .sort((a, b) => (a.complete === b.complete ? 0 : a.complete ? 1 : -1) || (dlValue(a) - dlValue(b)))
                   .map(it => {
                     const cls = it.complete ? 'done' : (it.overdue ? 'overdue' : '');
                     const mark = it.complete ? '✓' : (it.overdue ? '!' : '○');
