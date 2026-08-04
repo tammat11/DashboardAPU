@@ -1256,7 +1256,7 @@
       .sd-overdue-dept summary::-webkit-details-marker { display: none; }
       .sd-overdue-dept[open] .sd-bar-name { color: #b6363b; }
       .sd-bar-row { display: grid; grid-template-columns: 110px 1fr 44px; align-items: center; gap: 10px; }
-      .sd-bar-name { font-size: 14px; font-weight: 650; color: #656b64; text-align: right; }
+      .sd-bar-name { font-size: 14px; font-weight: 650; color: #656b64; text-align: right; min-width: 0; overflow-wrap: anywhere; line-height: 1.2; }
       .sd-bar-track { height: 18px; background: #f0f2ef; border-radius: 999px; overflow: hidden; }
       .sd-bar-fill { height: 100%; min-width: 2px; background: linear-gradient(90deg, #ee5b60, #df454a); border-radius: 999px; }
       .sd-bar-value { font-size: 14px; font-weight: 700; color: #697069; }
@@ -3232,7 +3232,7 @@
               : '<div class="sd-overdue-empty">Незавершённых задач нет</div>';
             return `<details class="sd-overdue-dept">
               <summary class="sd-bar-row" title="Показать ${unfinished.length} незавершённых задач">
-                <span class="sd-bar-name">${escapeHtml(d.name)}</span>
+                <span class="sd-bar-name" title="${escapeHtml(d.name)}">${escapeHtml(shortDeptName(d.name))}</span>
                 <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(d.overdueDays / maxOverdue * 100).toFixed(1)}%"></div></div>
                 <span class="sd-bar-value">${d.overdueDays}</span>
               </summary>
