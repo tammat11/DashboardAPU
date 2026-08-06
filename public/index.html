@@ -701,6 +701,12 @@
       .period-cal-apply { background: #1e6aaa; color: #fff; border: none; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
       .period-cal-apply:hover { background: #185a90; }
 
+      /* Plan tactical task expander */
+      .plan-tact > summary { list-style: none; }
+      .plan-tact > summary::-webkit-details-marker { display: none; }
+      .plan-tact-caret { display: inline-block; transition: transform .15s ease; }
+      .plan-tact[open] > summary .plan-tact-caret { transform: rotate(90deg); }
+
       /* Floating chat widget */
       .chat-fab {
         position: fixed;
@@ -2801,6 +2807,33 @@
         return isNaN(d) ? '' : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
       }
 
+      // Round avatar with initials fallback; the image (if any) covers the initials.
+      function planAvatar(person, size, ring) {
+        if (!person || !person.name) return '';
+        size = size || 22; ring = ring || '#7cc437';
+        const initials = planEscape(person.name.split(/\s+/).map(w => w[0] || '').slice(0, 2).join('').toUpperCase());
+        const img = person.avatar
+          ? `<img src="${planEscape(person.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
+          : '';
+        return `<span title="${planEscape(person.name)}" style="position:relative;display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;background:#e8efe0;color:#4a7a1e;font-size:${Math.round(size * 0.4)}px;font-weight:800;box-shadow:0 0 0 1.5px ${ring};flex-shrink:0">${initials}${img}</span>`;
+      }
+
+      function planStepRow(s, now) {
+        const overdue = !s.done && s.deadline && new Date(s.deadline).getTime() < now;
+        const mark = s.done ? '✓' : (overdue ? '!' : '○');
+        const markColor = s.done ? '#22a06b' : (overdue ? '#ef4444' : '#b0b6ae');
+        const people = [
+          ...(s.executors || []).map(p => planAvatar(p, 18, '#7cc437')),
+          ...(s.observers || []).map(p => planAvatar(p, 18, '#3b82f6'))
+        ].join('');
+        return `<div style="display:flex;align-items:flex-start;gap:6px;padding:5px 4px 5px 2px;font-size:10.5px;border-top:1px dashed rgba(0,0,0,.07)">
+          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:12px;text-align:center">${mark}</span>
+          <span style="flex:1;min-width:0;line-height:1.35;overflow-wrap:anywhere;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
+          ${people ? `<span style="display:flex;gap:2px;flex-shrink:0">${people}</span>` : ''}
+          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:600;min-width:32px;text-align:right">${planDate(s.deadline)}</span>
+        </div>`;
+      }
+
       // A tactical task belongs to the period when its own "Крайний срок" (the Bitrix
       // DEADLINE field) falls inside the window — not when its steps happen to.
       function planTactInPeriod(tact, range) {
@@ -2912,16 +2945,27 @@
                         : p === 100        ? PLAN_COLORS.done
                         : t.soonSteps > 0  ? PLAN_COLORS.soon
                         : 'var(--text-muted)';
-            // Titles wrap over as many lines as they need; the code, counter and date
-            // stay pinned to the first line so the columns still read straight down.
-            return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:11px;
-                                border-top:1px solid rgba(233,235,232,.7)">
-              <span style="font-weight:800;color:${color};min-width:34px;flex-shrink:0">${t.code}</span>
-              <span style="flex:1;min-width:0;line-height:1.4;overflow-wrap:anywhere;
-                           color:var(--text-main)">${planEscape(t.title)}</span>
-              <span style="color:var(--text-muted);flex-shrink:0;font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.deadline)}</span>
-            </div>`;
+            // Expandable: the summary keeps the compact one-line layout; opening it
+            // reveals the checklist steps with their people and deadlines.
+            const stepsHtml = (t.steps || [])
+              .slice()
+              .sort((a, b) => (a.done === b.done ? 0 : a.done ? 1 : -1)
+                || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')))
+              .map(s => planStepRow(s, now))
+              .join('') || `<div style="padding:6px 4px;color:var(--text-muted);font-size:10.5px">Шаги не заданы</div>`;
+            return `<details class="plan-tact">
+              <summary style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;font-size:11px;
+                                border-top:1px solid rgba(233,235,232,.7);cursor:pointer;list-style:none">
+                <span class="plan-tact-caret" style="color:${color};flex-shrink:0;font-size:9px;line-height:1.6">▶</span>
+                <span style="font-weight:800;color:${color};min-width:30px;flex-shrink:0">${t.code}</span>
+                <span style="flex:1;min-width:0;line-height:1.4;overflow-wrap:anywhere;
+                             color:var(--text-main)">${planEscape(t.title)}</span>
+                ${t.responsible ? planAvatar(t.responsible, 20) : ''}
+                <span style="color:var(--text-muted);flex-shrink:0;font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
+                <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.deadline)}</span>
+              </summary>
+              <div style="padding:2px 0 6px 8px;margin:2px 0 4px 6px;border-left:2px solid rgba(233,235,232,.9)">${stepsHtml}</div>
+            </details>`;
           }).join('');
 
           return `<div style="background:var(--surface);border-radius:16px;padding:18px;

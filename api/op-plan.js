@@ -10,12 +10,6 @@ function isExcludedPerson(value) {
   return name.includes('арайлым') && name.includes('ташенова');
 }
 
-function redactExcludedPerson(value) {
-  return String(value || '')
-    .replace(/Арайлым\s+Ташенова/giu, '')
-    .replace(/Ташенова\s+Арайлым/giu, '');
-}
-
 function isExcludedTask(task) {
   const responsibleId = task.responsibleId || task.RESPONSIBLE_ID || '';
   return EXCLUDED_USER_IDS.has(String(responsibleId));
@@ -93,7 +87,7 @@ function parseStep(item) {
   let head = parts[0] || '';
   const codeMatch = head.match(/^(\d+(?:\.\d+)+)\s+/);
   const code = codeMatch ? codeMatch[1] : null;
-  const text = redactExcludedPerson(codeMatch ? head.slice(codeMatch[0].length).trim() : head);
+  const text = codeMatch ? head.slice(codeMatch[0].length).trim() : head;
 
   let deadline = null;
   let responsible = '';
@@ -104,13 +98,36 @@ function parseStep(item) {
     if (r) responsible = r[1].trim();
   }
 
+  const rawMembers = Array.isArray(item.MEMBERS) ? item.MEMBERS : Object.values(item.MEMBERS || {});
+  const members = rawMembers
+    .filter(m => m && m.ID)
+    .map(m => ({ id: String(m.ID), type: String(m.TYPE || '') }));
+
   return {
     code,
     text,
     deadline,
     responsible,
+    members,
     done: (item.IS_COMPLETE || item.isComplete) === 'Y'
   };
+}
+
+// Resolve Bitrix user ids to name + avatar (batched user.get).
+async function fetchUsers(ids) {
+  const map = {};
+  const unique = Array.from(new Set(ids.map(String).filter(Boolean)));
+  for (let i = 0; i < unique.length; i += 50) {
+    const chunk = unique.slice(i, i + 50);
+    try {
+      const r = await bx('user.get', { ID: chunk, ADMIN_MODE: true });
+      (r.result || []).forEach(u => {
+        const name = [u.NAME, u.LAST_NAME].filter(Boolean).join(' ').trim() || u.EMAIL || `ID ${u.ID}`;
+        map[String(u.ID)] = { id: String(u.ID), name, avatar: u.PERSONAL_PHOTO || '' };
+      });
+    } catch { /* skip */ }
+  }
+  return map;
 }
 
 export default async function handler(req, res) {
@@ -151,11 +168,37 @@ export default async function handler(req, res) {
       tactByCode[tt._code] = {
         id,
         code: tt._code,
-        title: redactExcludedPerson(String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, '')),
+        title: String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, ''),
         deadline: tt.deadline || tt.DEADLINE || null,
+        responsibleId: String(tt.responsibleId || tt.RESPONSIBLE_ID || ''),
         steps: items.map(parseStep).filter(step => !isExcludedPerson(step.responsible))
       };
     }
+
+    // Resolve people to name + avatar: the tactical task's responsible person and
+    // any checklist members (type A = executor, U = observer) still set in Bitrix.
+    const memberIds = [];
+    Object.values(tactByCode).forEach(t => {
+      if (t.responsibleId) memberIds.push(t.responsibleId);
+      t.steps.forEach(s => (s.members || []).forEach(m => memberIds.push(m.id)));
+    });
+    const usersMap = memberIds.length ? await fetchUsers(memberIds) : {};
+    Object.values(tactByCode).forEach(t => {
+      t.responsible = usersMap[t.responsibleId] || null;
+      delete t.responsibleId;
+    });
+    Object.values(tactByCode).forEach(t => t.steps.forEach(s => {
+      const executors = [];
+      const observers = [];
+      (s.members || []).forEach(m => {
+        const u = usersMap[m.id];
+        if (!u || isExcludedPerson(u.name)) return;
+        (m.type === 'U' ? observers : executors).push(u);
+      });
+      s.executors = executors;
+      s.observers = observers;
+      delete s.members;
+    }));
 
     const tree = goals.map(g => {
       const gNum = ROMAN[g._code] || 0;
@@ -165,7 +208,7 @@ export default async function handler(req, res) {
         .sort((a, b) => a._code.localeCompare(b._code, undefined, { numeric: true }))
         .map(s => ({
           code: s._code,
-          title: redactExcludedPerson(String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, '')),
+          title: String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, ''),
           tacts: Object.values(tactByCode)
             .filter(t => t.code.startsWith(s._code + '.'))
             .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
@@ -174,7 +217,7 @@ export default async function handler(req, res) {
       return {
         code: g._code,
         num: gNum,
-        title: redactExcludedPerson(String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim()),
+        title: String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim(),
         children
       };
     }).sort((a, b) => a.num - b.num);
