@@ -3061,31 +3061,27 @@
         scaler.style.transform = '';
         scaler.style.width = '';
         // Defer so layout is settled (images/fonts) before measuring.
-        requestAnimationFrame(() => {
+        setTimeout(() => {
           const s2 = document.getElementById('planScaler');
           if (!s2) return;
-          const top = s2.getBoundingClientRect().top;
-          const avail = window.innerHeight - top - 44;
-          const contentH = s2.scrollHeight;
-          const scale = contentH > 0 ? Math.min(1, avail / contentH) : 1;
           const parent = s2.parentElement;
-          if (scale < 1) {
-            s2.style.transformOrigin = 'top left';
-            s2.style.transform = `scale(${scale})`;
-            // Widen first so the scaled content still fills the full width
-            // (columns are %-based, so this doesn't change how many fit per row).
-            s2.style.width = (100 / scale) + '%';
-            // A transform doesn't shrink layout height, so pin the wrapper to the
-            // scaled height — otherwise the page still scrolls to full size.
-            parent.style.height = Math.ceil(contentH * scale) + 'px';
-            parent.style.overflow = 'hidden';
-          } else {
-            s2.style.transform = '';
-            s2.style.width = '';
-            parent.style.height = '';
-            parent.style.overflow = '';
-          }
-        });
+          const top = s2.getBoundingClientRect().top;
+          const avail = window.innerHeight - top - 48;
+          if (s2.scrollHeight <= 0) return;
+          // Pass 1: rough scale from natural (100%-width) height. Scale can go
+          // above 1 to fill the screen (bigger text) — capped so it stays sane.
+          let scale = Math.max(0.3, Math.min(1.8, avail / s2.scrollHeight));
+          // Pass 2: re-measure at the width this scale implies (columns are
+          // %-based, so a wider box wraps differently) and correct the scale.
+          s2.style.width = (100 / scale) + '%';
+          scale = Math.max(0.3, Math.min(1.8, avail / s2.scrollHeight));
+          const contentH = s2.scrollHeight;
+          s2.style.transformOrigin = 'top left';
+          s2.style.transform = `scale(${scale})`;
+          s2.style.width = (100 / scale) + '%';
+          parent.style.height = Math.ceil(contentH * scale) + 'px';
+          parent.style.overflow = 'hidden';
+        }, 50);
         if (!planFitBound) {
           planFitBound = true;
           let rt;
@@ -4930,14 +4926,14 @@
           ids.periodBtn.setAttribute('aria-expanded', 'false');
         };
 
-        // Restore saved period. Default is the current week (one-time switch).
+        // Restore saved period. Default is «эта и следующая неделя» (one-time switch).
         let savedPeriod = localStorage.getItem('dashboard_period');
-        if (!localStorage.getItem('dashboard_period_default_week')) {
-          savedPeriod = 'week';
-          localStorage.setItem('dashboard_period', 'week');
-          localStorage.setItem('dashboard_period_default_week', '1');
+        if (!localStorage.getItem('dashboard_period_default_week2')) {
+          savedPeriod = 'week2';
+          localStorage.setItem('dashboard_period', 'week2');
+          localStorage.setItem('dashboard_period_default_week2', '1');
         }
-        state.period = savedPeriod || 'week';
+        state.period = savedPeriod || 'week2';
         syncPeriodUI();
 
         ids.periodBtn.addEventListener('click', e => {
