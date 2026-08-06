@@ -2839,11 +2839,11 @@
           ...(s.executors || []).map(p => planAvatar(p, 22, '#7cc437')),
           ...(s.observers || []).map(p => planAvatar(p, 22, '#3b82f6'))
         ].join('');
-        return `<div style="display:flex;align-items:flex-start;gap:7px;padding:6px 4px 6px 2px;font-size:11.5px;border-top:1px dashed rgba(0,0,0,.07)">
-          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:13px;text-align:center">${mark}</span>
-          <span style="flex:1;min-width:0;line-height:1.45;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
+        return `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 4px 8px 2px;font-size:13.5px;border-top:1px dashed rgba(0,0,0,.07)">
+          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:15px;text-align:center;font-size:15px">${mark}</span>
+          <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
           ${people ? `<span style="display:flex;gap:2px;flex-shrink:0">${people}</span>` : ''}
-          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:600;min-width:32px;text-align:right">${planDate(s.deadline)}</span>
+          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:700;min-width:40px;text-align:right">${planDate(s.deadline)}</span>
         </div>`;
       }
 
@@ -2923,9 +2923,9 @@
         // ── Metric strip ────────────────────────────────────────────────
         const metric = (label, value, color) => `
           <div style="background:var(--surface);border:1px solid rgba(233,235,232,.8);border-radius:16px;
-                      padding:14px 18px;box-shadow:0 4px 15px rgba(0,0,0,.01);flex:1;min-width:120px">
-            <div style="font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted)">${label}</div>
-            <strong style="font-size:24px;font-weight:900;color:${color || 'var(--text-main)'};line-height:1.2">${value}</strong>
+                      padding:16px 22px;box-shadow:0 4px 15px rgba(0,0,0,.01);flex:1;min-width:150px">
+            <div style="font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted)">${label}</div>
+            <strong style="font-size:34px;font-weight:900;color:${color || 'var(--text-main)'};line-height:1.2">${value}</strong>
           </div>`;
 
         const metrics = [
@@ -2967,41 +2967,41 @@
               .map(s => planStepRow(s, now))
               .join('') || `<div style="padding:6px 4px;color:var(--text-muted);font-size:10.5px">Шаги не заданы</div>`;
             return `<details class="plan-tact" open>
-              <summary style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;font-size:12.5px;
+              <summary style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;font-size:15px;
                                 border-top:1px solid rgba(233,235,232,.7);cursor:pointer;list-style:none">
-                <span class="plan-tact-caret" style="color:${color};flex-shrink:0;font-size:9px;line-height:1.7">▶</span>
-                <span style="font-weight:800;color:${color};min-width:34px;flex-shrink:0">${t.code}</span>
+                <span class="plan-tact-caret" style="color:${color};flex-shrink:0;font-size:11px;line-height:1.7">▶</span>
+                <span style="font-weight:800;color:${color};min-width:40px;flex-shrink:0">${t.code}</span>
                 <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;
                              color:var(--text-main)">${planEscape(t.title)}</span>
                 ${planPeopleCluster([
                   ...(t.responsible ? [{ person: t.responsible, ring: '#7cc437' }] : []),
                   ...(t.observers || []).map(o => ({ person: o, ring: '#3b82f6' }))
                 ], 32)}
-                <span style="flex-shrink:0;font-variant-numeric:tabular-nums;font-weight:800;font-size:12px;color:${color};background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.05)' : color + '1f'};border-radius:8px;padding:2px 8px;min-width:34px;text-align:center">${t.doneSteps}/${t.totalSteps}</span>
-                <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.deadline)}</span>
+                <span style="flex-shrink:0;font-variant-numeric:tabular-nums;font-weight:800;font-size:14px;color:${color};background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.05)' : color + '1f'};border-radius:9px;padding:3px 10px;min-width:40px;text-align:center">${t.doneSteps}/${t.totalSteps}</span>
+                <span style="color:${color};flex-shrink:0;font-weight:800;font-size:14px;min-width:42px;text-align:right">${planDate(t.deadline)}</span>
               </summary>
-              <div style="padding:2px 0 6px 8px;margin:2px 0 4px 6px;border-left:2px solid rgba(233,235,232,.9)">${stepsHtml}</div>
+              <div style="padding:3px 0 8px 10px;margin:3px 0 6px 8px;border-left:2px solid rgba(233,235,232,.9)">${stepsHtml}</div>
             </details>`;
           }).join('');
 
-          return `<div style="background:var(--surface);border-radius:16px;padding:18px;
-                      border:1.5px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};
-                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:11px">
-            <div style="display:flex;align-items:flex-start;gap:8px">
-              <span style="background:rgba(138,196,63,.1);color:#5a9a1a;font-weight:900;font-size:11px;
-                           padding:3px 9px;border-radius:20px;flex-shrink:0">${g.code}</span>
-              <span style="font-weight:800;font-size:14px;line-height:1.4;color:var(--text-main)">${planEscape(g.title)}</span>
+          return `<div style="background:var(--surface);border-radius:16px;padding:22px;
+                      border:2px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};
+                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:13px">
+            <div style="display:flex;align-items:flex-start;gap:9px">
+              <span style="background:rgba(138,196,63,.1);color:#5a9a1a;font-weight:900;font-size:13px;
+                           padding:4px 11px;border-radius:20px;flex-shrink:0">${g.code}</span>
+              <span style="font-weight:800;font-size:18px;line-height:1.4;color:var(--text-main)">${planEscape(g.title)}</span>
             </div>
 
-            <div style="display:flex;height:7px;border-radius:4px;overflow:hidden;background:rgba(0,0,0,.05)">
+            <div style="display:flex;height:10px;border-radius:5px;overflow:hidden;background:rgba(0,0,0,.05)">
               <div style="width:${donePct}%;background:${PLAN_COLORS.done}"></div>
               <div style="width:${overPct}%;background:${PLAN_COLORS.overdue}"></div>
               <div style="width:${soonPct}%;background:${PLAN_COLORS.soon}"></div>
             </div>
 
-            <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--text-muted)">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--text-muted)">
               <span>${g.doneSteps} / ${g.totalSteps} шагов${g.overdueSteps ? ` · <b style="color:${PLAN_COLORS.overdue}">${g.overdueSteps} просроч.</b>` : ''}</span>
-              <strong style="font-size:15px;font-weight:900;color:${hasOverdue ? PLAN_COLORS.overdue : '#5a9a1a'}">${donePct}%</strong>
+              <strong style="font-size:20px;font-weight:900;color:${hasOverdue ? PLAN_COLORS.overdue : '#5a9a1a'}">${donePct}%</strong>
             </div>
 
             <div>${rows}</div>
@@ -3010,15 +3010,44 @@
 
         const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
 
+        // ── «Обратите внимание»: people responsible for tasks with overdue or
+        // soon-due (≤14 дн) steps, most-overdue first, with big avatars for TV.
+        const attentionMap = new Map();
+        goals.forEach(g => g.tacts.forEach(t => {
+          if (!t.responsible || (t.overdueSteps === 0 && t.soonSteps === 0)) return;
+          const key = t.responsible.id || t.responsible.name;
+          if (!attentionMap.has(key)) attentionMap.set(key, { person: t.responsible, overdue: 0, soon: 0 });
+          const a = attentionMap.get(key);
+          a.overdue += t.overdueSteps;
+          a.soon += t.soonSteps;
+        }));
+        const attention = [...attentionMap.values()].sort((a, b) => b.overdue - a.overdue || b.soon - a.soon);
+        const attentionHtml = attention.length ? `
+          <section style="margin:8px 0 32px;padding:22px 24px;background:#fff6f5;border:2px solid #f6c9c4;border-radius:18px">
+            <div style="font-size:17px;font-weight:900;letter-spacing:.5px;color:#c0392b;margin-bottom:16px">⚠️ ОБРАТИТЕ ВНИМАНИЕ</div>
+            <div style="display:flex;flex-wrap:wrap;gap:14px">
+              ${attention.map(a => `
+                <div style="display:flex;align-items:center;gap:14px;background:#fff;border:1px solid #f0d2ce;border-radius:16px;padding:12px 20px 12px 12px;min-width:240px">
+                  ${planAvatar(a.person, 46, a.overdue ? '#ef4444' : '#f97316')}
+                  <div style="min-width:0">
+                    <div style="font-weight:800;font-size:16px;color:var(--text-main);line-height:1.3">${planEscape(a.person.name)}</div>
+                    <div style="font-size:14px;font-weight:800;margin-top:3px">
+                      ${a.overdue ? `<span style="color:#ef4444">${a.overdue} просрочено</span>` : ''}${a.overdue && a.soon ? ' · ' : ''}${a.soon ? `<span style="color:#f97316">${a.soon} горит</span>` : ''}
+                    </div>
+                  </div>
+                </div>`).join('')}
+            </div>
+          </section>` : '';
+
         ids.planWrap.innerHTML = `
           <div style="padding:14px 0 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-            <span style="font-weight:900;font-size:16px;color:var(--text-main)">
+            <span style="font-weight:900;font-size:20px;color:var(--text-main)">
               Оперативный план IC Group 2026
-              <span style="font-weight:600;font-size:11px;color:var(--text-muted);margin-left:8px">
+              <span style="font-weight:600;font-size:13px;color:var(--text-muted);margin-left:8px">
                 ${scale.goals} целей · ${scale.strat} стратзадач · ${scale.tact} тактических · ${scale.steps} шагов
               </span>
             </span>
-            <span style="font-size:11px;color:var(--text-muted)">обновлено ${updAt}
+            <span style="font-size:13px;color:var(--text-muted)">обновлено ${updAt}
               <button id="planRefresh" style="margin-left:8px;background:none;border:1px solid rgba(233,235,232,.9);
                       border-radius:8px;padding:3px 9px;cursor:pointer;font-size:11px;color:var(--text-muted)">↻</button>
             </span>
@@ -3027,8 +3056,9 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
           ${shownGoals.length
-            ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(460px,1fr));gap:16px;padding-bottom:32px">${cards}</div>`
-            : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px">Нет задач с крайним сроком в выбранном периоде</div>`}`;
+            ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:16px;padding-bottom:24px">${cards}</div>`
+            : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`}
+          ${attentionHtml}`;
 
         const btn = document.getElementById('planRefresh');
         if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
