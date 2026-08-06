@@ -2808,6 +2808,15 @@
         return isNaN(d) ? '' : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
       }
 
+      const RU_DOW = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+      // Date with a short weekday, e.g. "06.08 Ср".
+      function planDateDow(iso) {
+        if (!iso) return '';
+        const d = new Date(iso);
+        if (isNaN(d)) return '';
+        return `${planDate(iso)} ${RU_DOW[d.getDay()]}`;
+      }
+
       // Round avatar with initials fallback; the image (if any) covers the initials.
       function planAvatar(person, size, ring) {
         if (!person || !person.name) return '';
@@ -2840,11 +2849,11 @@
           ...(s.executors || []).map(p => planAvatar(p, 22, '#7cc437')),
           ...(s.observers || []).map(p => planAvatar(p, 22, '#3b82f6'))
         ].join('');
-        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 4px 10px 2px;font-size:18px;border-top:1px dashed rgba(0,0,0,.07)">
+        return `<div style="display:flex;align-items:center;gap:10px;padding:10px 4px 10px 2px;font-size:18px;border-top:1px dashed rgba(0,0,0,.07)">
           <span style="color:${markColor};font-weight:800;flex-shrink:0;width:19px;text-align:center;font-size:19px">${mark}</span>
           <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
           ${people ? `<span style="display:flex;gap:3px;flex-shrink:0">${people}</span>` : ''}
-          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:700;min-width:46px;text-align:right;font-size:15px">${planDate(s.deadline)}</span>
+          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:700;min-width:64px;text-align:right;font-size:15px">${planDateDow(s.deadline)}</span>
         </div>`;
       }
 
@@ -2982,14 +2991,13 @@
                       border:2px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};border-left:7px solid ${gColor};
                       box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:14px;
                       flex:1 1 ${cardBasis};min-width:280px">
-            <div style="font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</div>
-            <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
-              <span style="background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.06)' : color + '1f'};color:${color};font-weight:900;font-size:20px;padding:6px 16px;border-radius:22px;flex-shrink:0">${t.code}</span>
-              <span style="font-weight:800;font-size:21px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="margin-left:auto;color:${color};font-weight:800;font-size:21px;flex-shrink:0">${planDate(t.deadline)}</span>
+            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
+              <span style="flex:1;min-width:0;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</span>
+              <span style="font-weight:900;font-size:20px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
+              <span style="color:${color};font-weight:900;font-size:20px;flex-shrink:0">${planDateDow(t.deadline)}</span>
             </div>
             <div style="font-weight:800;font-size:24px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
-            ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 56, x.ring)).join('')}</div>` : ''}
+            ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 64, x.ring)).join('')}</div>` : ''}
             <div style="border-top:1px solid rgba(233,235,232,.8);padding-top:8px">${stepsHtml}</div>
           </div>`;
         }).join('');
@@ -3009,6 +3017,25 @@
           a.soon += t.soonSteps;
         }));
         const attention = [...attentionMap.values()].sort((a, b) => b.overdue - a.overdue || b.soon - a.soon);
+
+        // ── «Люди 2 недель»: everyone involved in the shown period (responsible
+        // or observer of any shown task), unique, as avatars.
+        const peopleMap = new Map();
+        goals.forEach(g => g.tacts.forEach(t => {
+          [t.responsible, ...(t.observers || [])].forEach(p => {
+            if (p && p.id && !peopleMap.has(p.id)) peopleMap.set(p.id, p);
+          });
+        }));
+        const periodPeople = [...peopleMap.values()].sort((a, b) => a.name.localeCompare(b.name, 'ru'));
+        const periodName = (document.getElementById('periodBtnLabel')?.textContent || '').trim();
+        const peopleHtml = periodPeople.length ? `
+          <section style="margin:8px 0 12px;padding:16px 22px;background:#eff5ff;border:2px solid #cbdcf5;border-radius:18px">
+            <div style="font-size:15px;font-weight:900;letter-spacing:.5px;color:#2563eb;margin-bottom:12px;text-align:center">👥 ЛЮДИ${periodName ? ' · ' + planEscape(periodName.toUpperCase()) : ''} · ${periodPeople.length}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center">
+              ${periodPeople.map(p => `<span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text-main)">${planAvatar(p, 40, '#2563eb')}${planEscape(p.name)}</span>`).join('')}
+            </div>
+          </section>` : '';
+
         const attentionHtml = attention.length ? `
           <section style="margin:8px 0 32px;padding:22px 24px;background:#fff6f5;border:2px solid #f6c9c4;border-radius:18px">
             <div style="font-size:17px;font-weight:900;letter-spacing:.5px;color:#c0392b;margin-bottom:16px;text-align:center">⚠️ ОБРАТИТЕ ВНИМАНИЕ</div>
@@ -3028,14 +3055,12 @@
 
         ids.planWrap.innerHTML = `
           <div id="planScaler" style="transform-origin:top left">
-          <div style="padding:14px 0 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-            <span style="font-weight:900;font-size:20px;color:var(--text-main)">
-              Оперативный план IC Group 2026
-              <span style="font-weight:600;font-size:13px;color:var(--text-muted);margin-left:8px">
-                ${scale.goals} целей · ${scale.strat} стратзадач · ${scale.tact} тактических · ${scale.steps} шагов
-              </span>
-            </span>
-            <span style="font-size:13px;color:var(--text-muted)">обновлено ${updAt}
+          <div style="padding:6px 0 12px;position:relative;text-align:center">
+            <div style="font-weight:900;font-size:30px;color:var(--text-main);line-height:1.2">Оперативный план IC Group 2026</div>
+            <div style="font-weight:600;font-size:16px;color:var(--text-muted);margin-top:4px">
+              ${scale.goals} целей · ${scale.strat} стратзадач · ${scale.tact} тактических · ${scale.steps} шагов
+            </div>
+            <span style="position:absolute;top:6px;right:0;font-size:13px;color:var(--text-muted)">обновлено ${updAt}
               <button id="planRefresh" style="margin-left:8px;background:none;border:1px solid rgba(233,235,232,.9);
                       border-radius:8px;padding:3px 9px;cursor:pointer;font-size:11px;color:var(--text-muted)">↻</button>
             </span>
@@ -3046,6 +3071,7 @@
           ${shownAny
             ? `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${cards}</div>`
             : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`}
+          ${peopleHtml}
           ${attentionHtml}
           </div>`;
 
@@ -3803,8 +3829,14 @@
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7' || state.viewMode === 'table6');
         // On «План» the plan has its own metric strip, so hide the top task stats.
+        const isPlan = state.viewMode === 'table6';
         const statsGrid = document.querySelector('.stats-grid');
-        if (statsGrid) statsGrid.style.display = state.viewMode === 'table6' ? 'none' : '';
+        if (statsGrid) statsGrid.style.display = isPlan ? 'none' : '';
+        // TV kiosk: no scrolling and no floating chat button on the plan.
+        document.documentElement.style.overflow = isPlan ? 'hidden' : '';
+        document.body.style.overflow = isPlan ? 'hidden' : '';
+        const chatFab = document.querySelector('.chat-fab');
+        if (chatFab) chatFab.style.display = isPlan ? 'none' : '';
         if (ids.structureWrap) ids.structureWrap.hidden = true;
         if (state.viewMode === 'table1') { renderStructureDashboard(); return; }
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
