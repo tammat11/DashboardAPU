@@ -4609,9 +4609,34 @@
         });
       }
 
+      async function applyReportPayload(payload) {
+        state.columns = payload.columns;
+        state.rows = payload.rows || [];
+        await mergeAiScores();
+        state.departments = payload.departments || [];
+        state.allEmployees = payload.allEmployees || [];
+        removeExcludedDepartments();
+        state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
+        state.portalHost = payload.portalHost || null;
+        applyFilters();
+      }
+
+      // Instant first paint from the last saved snapshot, so the dashboard never
+      // sits on «Синхронизация…» while the live API (slow from this region) runs.
+      async function loadFromCache() {
+        try {
+          const resp = await fetch('/report-cache.json', { cache: 'no-store' });
+          if (!resp.ok) return false;
+          const payload = await resp.json();
+          if (!payload || !Array.isArray(payload.rows) || !payload.rows.length) return false;
+          await applyReportPayload(payload);
+          ids.fetchedAt.textContent = formatDate(payload.cachedAt || payload.fetchedAt) + ' · кэш';
+          ids.loadingBox.hidden = true;
+          return true;
+        } catch { return false; }
+      }
+
       async function loadReport(method = 'GET') {
-        ids.errorBox.hidden = true;
-        
         const isFirstLoad = state.rows.length === 0;
         if (isFirstLoad) {
           ids.loadingBox.hidden = false;
@@ -4620,7 +4645,7 @@
         } else {
           if (ids.syncIndicator) ids.syncIndicator.hidden = false;
         }
-        
+
         if (ids.refreshBtn) ids.refreshBtn.disabled = true;
 
         try {
@@ -4629,22 +4654,19 @@
             throw new Error(payload.error || 'Не удалось загрузить отчет');
           }
 
-          state.columns = payload.columns;
-          state.rows = payload.rows;
-          await mergeAiScores();
-          state.departments = payload.departments || [];
-          state.allEmployees = payload.allEmployees || [];
-          removeExcludedDepartments();
-          state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
-          state.portalHost = payload.portalHost || null;
-
+          await applyReportPayload(payload);
           ids.fetchedAt.textContent = formatDate(payload.fetchedAt);
-
-          applyFilters();
+          ids.errorBox.hidden = true;
           scheduleRefresh();
         } catch (error) {
-          ids.errorBox.hidden = false;
-          ids.errorBox.textContent = error.message || 'Ошибка загрузки отчета';
+          // If we already show cached (or previous) data, don't wipe it with a
+          // blocking error — just keep the snapshot and retry later.
+          if (state.rows.length > 0) {
+            scheduleRefresh();
+          } else {
+            ids.errorBox.hidden = false;
+            ids.errorBox.textContent = error.message || 'Ошибка загрузки отчета';
+          }
         } finally {
           ids.loadingBox.hidden = true;
           if (ids.syncIndicator) ids.syncIndicator.hidden = true;
@@ -4900,7 +4922,11 @@
       if (ids.viewBtn6) ids.viewBtn6.addEventListener('click', () => setView('table6'));
       if (ids.viewBtn7) ids.viewBtn7.addEventListener('click', () => setView('table7'));
 
-      loadReport('GET');
+      // Paint from cache immediately, then refresh with live data in background.
+      (async () => {
+        await loadFromCache();
+        loadReport('GET');
+      })();
 
 
     </script>
