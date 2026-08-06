@@ -3070,14 +3070,18 @@
           const scale = contentH > 0 ? Math.min(1, avail / contentH) : 1;
           const parent = s2.parentElement;
           if (scale < 1) {
+            s2.style.transformOrigin = 'top left';
             s2.style.transform = `scale(${scale})`;
-            s2.style.transformOrigin = 'top center';
+            // Widen first so the scaled content still fills the full width
+            // (columns are %-based, so this doesn't change how many fit per row).
+            s2.style.width = (100 / scale) + '%';
             // A transform doesn't shrink layout height, so pin the wrapper to the
             // scaled height — otherwise the page still scrolls to full size.
             parent.style.height = Math.ceil(contentH * scale) + 'px';
             parent.style.overflow = 'hidden';
           } else {
-            parent.style.transform = '';
+            s2.style.transform = '';
+            s2.style.width = '';
             parent.style.height = '';
             parent.style.overflow = '';
           }
@@ -3795,6 +3799,9 @@
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7' || state.viewMode === 'table6');
+        // On «План» the plan has its own metric strip, so hide the top task stats.
+        const statsGrid = document.querySelector('.stats-grid');
+        if (statsGrid) statsGrid.style.display = state.viewMode === 'table6' ? 'none' : '';
         if (ids.structureWrap) ids.structureWrap.hidden = true;
         if (state.viewMode === 'table1') { renderStructureDashboard(); return; }
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
