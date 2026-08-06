@@ -3032,7 +3032,7 @@
           <section style="margin:8px 0 12px;padding:16px 22px;background:#eff5ff;border:2px solid #cbdcf5;border-radius:18px">
             <div style="font-size:15px;font-weight:900;letter-spacing:.5px;color:#2563eb;margin-bottom:12px;text-align:center">👥 ЛЮДИ${periodName ? ' · ' + planEscape(periodName.toUpperCase()) : ''} · ${periodPeople.length}</div>
             <div style="display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center">
-              ${periodPeople.map(p => `<span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text-main)">${planAvatar(p, 40, '#2563eb')}${planEscape(p.name)}</span>`).join('')}
+              ${periodPeople.map(p => `<span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text-main)">${planAvatar(p, 40, '#2563eb')}${firstNameOnly(p.name)}</span>`).join('')}
             </div>
           </section>` : '';
 
@@ -3044,7 +3044,7 @@
                 <div style="display:flex;align-items:center;gap:18px;background:#fff;border:1px solid #f0d2ce;border-radius:18px;padding:16px 26px 16px 16px;min-width:280px">
                   ${planAvatar(a.person, 64, a.overdue ? '#ef4444' : '#f97316')}
                   <div style="min-width:0">
-                    <div style="font-weight:800;font-size:19px;color:var(--text-main);line-height:1.3">${planEscape(a.person.name)}</div>
+                    <div style="font-weight:800;font-size:19px;color:var(--text-main);line-height:1.3">${firstNameOnly(a.person.name)}</div>
                     <div style="font-size:15px;font-weight:800;margin-top:4px">
                       ${a.overdue ? `<span style="color:#ef4444">просрочено</span>` : ''}${a.overdue && a.soon ? ' · ' : ''}${a.soon ? `<span style="color:#f97316">горит</span>` : ''}
                     </div>
