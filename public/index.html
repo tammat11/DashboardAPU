@@ -2952,6 +2952,11 @@
           .sort((a, b) => (b.overdueSteps > 0) - (a.overdueSteps > 0)
             || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
 
+        // Balance cards over two rows: columns-per-row = ceil(N/2).
+        // 5→3+2, 6→3+3, 7→4+3, 8→4+4 … (capped so huge sets still wrap sanely).
+        const planCols = Math.max(1, Math.min(5, Math.ceil(flatTacts.length / 2)));
+        const cardBasis = `calc(${(100 / planCols).toFixed(4)}% - 14px)`;
+
         const cards = flatTacts.map(t => {
           const p = pct(t.doneSteps, t.totalSteps);
           const color = t.overdueSteps > 0 ? PLAN_COLORS.overdue
@@ -2973,7 +2978,7 @@
           return `<div style="background:var(--surface);border-radius:18px;padding:24px 26px;
                       border:2px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};border-left:7px solid ${gColor};
                       box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:14px;
-                      flex:1 1 0;min-width:0">
+                      flex:1 1 ${cardBasis};min-width:280px">
             <div style="font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</div>
             <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
               <span style="background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.06)' : color + '1f'};color:${color};font-weight:900;font-size:18px;padding:6px 15px;border-radius:22px;flex-shrink:0">${t.code}</span>
@@ -3036,7 +3041,7 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
           ${shownAny
-            ? `<div style="display:flex;flex-wrap:nowrap;gap:14px;align-items:stretch;padding-bottom:16px">${cards}</div>`
+            ? `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${cards}</div>`
             : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`}
           ${attentionHtml}
           </div>`;
