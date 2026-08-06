@@ -1470,6 +1470,7 @@
               <div id="periodMenu" class="period-menu" hidden>
                 <button class="period-opt" type="button" data-period="all">Все время</button>
                 <button class="period-opt" type="button" data-period="week">Текущая неделя</button>
+                <button class="period-opt" type="button" data-period="week2">Эта и следующая неделя</button>
                 <button class="period-opt" type="button" data-period="lastWeek">Прошлая неделя</button>
                 <div class="period-sub">
                   <div class="period-sub-title">Месяц <span id="periodMonthsYear" class="period-sub-year"></span></div>
@@ -2839,11 +2840,11 @@
           ...(s.executors || []).map(p => planAvatar(p, 22, '#7cc437')),
           ...(s.observers || []).map(p => planAvatar(p, 22, '#3b82f6'))
         ].join('');
-        return `<div style="display:flex;align-items:flex-start;gap:8px;padding:8px 4px 8px 2px;font-size:13.5px;border-top:1px dashed rgba(0,0,0,.07)">
-          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:15px;text-align:center;font-size:15px">${mark}</span>
+        return `<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 4px 9px 2px;font-size:16px;border-top:1px dashed rgba(0,0,0,.07)">
+          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:17px;text-align:center;font-size:17px">${mark}</span>
           <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
-          ${people ? `<span style="display:flex;gap:2px;flex-shrink:0">${people}</span>` : ''}
-          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:700;min-width:40px;text-align:right">${planDate(s.deadline)}</span>
+          ${people ? `<span style="display:flex;gap:3px;flex-shrink:0">${people}</span>` : ''}
+          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:700;min-width:46px;text-align:right;font-size:15px">${planDate(s.deadline)}</span>
         </div>`;
       }
 
@@ -2942,8 +2943,12 @@
 
         // Flat list of tactical tasks (no Roman-numeral goal grouping): each
         // tactical task is its own card, overdue first, then nearest deadline.
+        // Distinct accent colour per goal (by its number).
+        const GOAL_COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#0ea5e9', '#14b8a6', '#ef4444', '#6366f1', '#84cc16', '#d946ef'];
+        const goalColor = num => GOAL_COLORS[((Number(num) || 1) - 1) % GOAL_COLORS.length];
+
         const flatTacts = goals
-          .flatMap(g => g.tacts.map(t => Object.assign(t, { _goalTitle: g.title, _goalCode: g.code })))
+          .flatMap(g => g.tacts.map(t => Object.assign(t, { _goalTitle: g.title, _goalCode: g.code, _goalNum: g.num })))
           .sort((a, b) => (b.overdueSteps > 0) - (a.overdueSteps > 0)
             || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
 
@@ -2964,19 +2969,20 @@
             ...(t.responsible ? [{ person: t.responsible, ring: '#7cc437' }] : []),
             ...(t.observers || []).map(o => ({ person: o, ring: '#3b82f6' }))
           ];
-          return `<div style="background:var(--surface);border-radius:18px;padding:20px 22px;
-                      border:2px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};
-                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:12px;
-                      flex:1 1 460px;min-width:420px;max-width:760px">
-            <div style="font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#9aa39a">${planEscape(t._goalTitle || '')}</div>
-            <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
-              <span style="background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.06)' : color + '1f'};color:${color};font-weight:900;font-size:15px;padding:5px 13px;border-radius:20px;flex-shrink:0">${t.code}</span>
-              <span style="font-weight:800;font-size:16px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="margin-left:auto;color:${color};font-weight:800;font-size:16px;flex-shrink:0">${planDate(t.deadline)}</span>
+          const gColor = goalColor(t._goalNum);
+          return `<div style="background:var(--surface);border-radius:18px;padding:24px 26px;
+                      border:2px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};border-left:7px solid ${gColor};
+                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:14px;
+                      flex:1 1 0;min-width:0">
+            <div style="font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</div>
+            <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
+              <span style="background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.06)' : color + '1f'};color:${color};font-weight:900;font-size:18px;padding:6px 15px;border-radius:22px;flex-shrink:0">${t.code}</span>
+              <span style="font-weight:800;font-size:19px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
+              <span style="margin-left:auto;color:${color};font-weight:800;font-size:19px;flex-shrink:0">${planDate(t.deadline)}</span>
             </div>
-            <div style="font-weight:800;font-size:18px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
-            ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 40, x.ring)).join('')}</div>` : ''}
-            <div style="border-top:1px solid rgba(233,235,232,.8);padding-top:6px">${stepsHtml}</div>
+            <div style="font-weight:800;font-size:22px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
+            ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 50, x.ring)).join('')}</div>` : ''}
+            <div style="border-top:1px solid rgba(233,235,232,.8);padding-top:8px">${stepsHtml}</div>
           </div>`;
         }).join('');
         const shownAny = flatTacts.length > 0;
@@ -2997,8 +3003,8 @@
         const attention = [...attentionMap.values()].sort((a, b) => b.overdue - a.overdue || b.soon - a.soon);
         const attentionHtml = attention.length ? `
           <section style="margin:8px 0 32px;padding:22px 24px;background:#fff6f5;border:2px solid #f6c9c4;border-radius:18px">
-            <div style="font-size:17px;font-weight:900;letter-spacing:.5px;color:#c0392b;margin-bottom:16px">⚠️ ОБРАТИТЕ ВНИМАНИЕ</div>
-            <div style="display:flex;flex-wrap:wrap;gap:14px">
+            <div style="font-size:17px;font-weight:900;letter-spacing:.5px;color:#c0392b;margin-bottom:16px;text-align:center">⚠️ ОБРАТИТЕ ВНИМАНИЕ</div>
+            <div style="display:flex;flex-wrap:wrap;gap:14px;justify-content:center">
               ${attention.map(a => `
                 <div style="display:flex;align-items:center;gap:18px;background:#fff;border:1px solid #f0d2ce;border-radius:18px;padding:16px 26px 16px 16px;min-width:280px">
                   ${planAvatar(a.person, 64, a.overdue ? '#ef4444' : '#f97316')}
@@ -3030,7 +3036,7 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
           ${shownAny
-            ? `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;padding-bottom:16px">${cards}</div>`
+            ? `<div style="display:flex;flex-wrap:nowrap;gap:14px;align-items:stretch;padding-bottom:16px">${cards}</div>`
             : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`}
           ${attentionHtml}
           </div>`;
@@ -4543,6 +4549,8 @@
             return { start: new Date(y, m, d, 0, 0, 0, 0), end: new Date(y, m, d, 23, 59, 59, 999) };
           case 'week':
             return { start: startWeek, end: new Date(startWeek.getTime() + 7 * 864e5 - 1) };
+          case 'week2':
+            return { start: startWeek, end: new Date(startWeek.getTime() + 14 * 864e5 - 1) };
           case 'lastWeek':
             return { start: new Date(startWeek.getTime() - 7 * 864e5), end: new Date(startWeek.getTime() - 1) };
           case 'month':
@@ -4854,6 +4862,7 @@
         const periodLabel = value => {
           if (!value || value === 'all') return 'Все время';
           if (value === 'week') return 'Текущая неделя';
+          if (value === 'week2') return 'Эта и след. неделя';
           if (value === 'lastWeek') return 'Прошлая неделя';
           if (value.startsWith('month:')) {
             const [yy, mm] = value.slice(6).split('-').map(Number);
