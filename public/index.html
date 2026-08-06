@@ -4531,7 +4531,7 @@
           try {
             const xhr = new XMLHttpRequest();
             xhr.open(method, `/api/task-report?t=${Date.now()}`, true);
-            xhr.timeout = 55000;
+            xhr.timeout = 15000;
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.setRequestHeader('Cache-Control', 'no-store');
             xhr.setRequestHeader('Pragma', 'no-cache');
@@ -4568,11 +4568,19 @@
         }
 
         const url = `/api/task-report?t=${Date.now()}`;
+        // Background refresh over an already-painted cache: give the live API a
+        // bounded window, otherwise a slow/timing-out function would keep the
+        // «Синхронизация…» state on screen for the full 60s.
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 15000);
         try {
-          const response = await fetch(url, { method });
+          const response = await fetch(url, { method, signal: controller.signal });
           return await response.json();
         } catch (e) {
+          if (controller.signal.aborted) throw new Error('Превышено время ожидания');
           return requestReportXHR(method);
+        } finally {
+          clearTimeout(timer);
         }
       }
 
