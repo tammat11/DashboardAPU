@@ -2823,8 +2823,8 @@
         const mark = s.done ? '✓' : (overdue ? '!' : '○');
         const markColor = s.done ? '#22a06b' : (overdue ? '#ef4444' : '#b0b6ae');
         const people = [
-          ...(s.executors || []).map(p => planAvatar(p, 18, '#7cc437')),
-          ...(s.observers || []).map(p => planAvatar(p, 18, '#3b82f6'))
+          ...(s.executors || []).map(p => planAvatar(p, 22, '#7cc437')),
+          ...(s.observers || []).map(p => planAvatar(p, 22, '#3b82f6'))
         ].join('');
         return `<div style="display:flex;align-items:flex-start;gap:7px;padding:6px 4px 6px 2px;font-size:11.5px;border-top:1px dashed rgba(0,0,0,.07)">
           <span style="color:${markColor};font-weight:800;flex-shrink:0;width:13px;text-align:center">${mark}</span>
@@ -2953,17 +2953,16 @@
                 || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')))
               .map(s => planStepRow(s, now))
               .join('') || `<div style="padding:6px 4px;color:var(--text-muted);font-size:10.5px">Шаги не заданы</div>`;
-            return `<details class="plan-tact">
+            return `<details class="plan-tact" open>
               <summary style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;font-size:12.5px;
                                 border-top:1px solid rgba(233,235,232,.7);cursor:pointer;list-style:none">
                 <span class="plan-tact-caret" style="color:${color};flex-shrink:0;font-size:9px;line-height:1.7">▶</span>
                 <span style="font-weight:800;color:${color};min-width:34px;flex-shrink:0">${t.code}</span>
                 <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;
                              color:var(--text-main)">${planEscape(t.title)}</span>
-                <span style="display:flex;gap:2px;flex-shrink:0;align-items:center" title="${t.observers && t.observers.length ? 'Наблюдатели: ' + planEscape(t.observers.map(o => o.name).join(', ')) : ''}">
-                  ${t.responsible ? planAvatar(t.responsible, 20, '#7cc437') : ''}
-                  ${(t.observers || []).slice(0, 3).map(o => planAvatar(o, 20, '#3b82f6')).join('')}
-                  ${(t.observers || []).length > 3 ? `<span style="font-size:9px;color:#3b82f6;font-weight:800;background:#eaf1fd;border-radius:9px;padding:2px 5px">+${t.observers.length - 3}</span>` : ''}
+                <span style="display:flex;gap:3px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:180px">
+                  ${t.responsible ? planAvatar(t.responsible, 26, '#7cc437') : ''}
+                  ${(t.observers || []).map(o => planAvatar(o, 26, '#3b82f6')).join('')}
                 </span>
                 <span style="flex-shrink:0;font-variant-numeric:tabular-nums;font-weight:800;font-size:12px;color:${color};background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.05)' : color + '1f'};border-radius:8px;padding:2px 8px;min-width:34px;text-align:center">${t.doneSteps}/${t.totalSteps}</span>
                 <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.deadline)}</span>
