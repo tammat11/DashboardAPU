@@ -2840,8 +2840,8 @@
           ...(s.executors || []).map(p => planAvatar(p, 22, '#7cc437')),
           ...(s.observers || []).map(p => planAvatar(p, 22, '#3b82f6'))
         ].join('');
-        return `<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 4px 9px 2px;font-size:16px;border-top:1px dashed rgba(0,0,0,.07)">
-          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:17px;text-align:center;font-size:17px">${mark}</span>
+        return `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 4px 10px 2px;font-size:18px;border-top:1px dashed rgba(0,0,0,.07)">
+          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:19px;text-align:center;font-size:19px">${mark}</span>
           <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
           ${people ? `<span style="display:flex;gap:3px;flex-shrink:0">${people}</span>` : ''}
           <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:700;min-width:46px;text-align:right;font-size:15px">${planDate(s.deadline)}</span>
@@ -2979,14 +2979,14 @@
                       border:2px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};border-left:7px solid ${gColor};
                       box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:14px;
                       flex:1 1 ${cardBasis};min-width:280px">
-            <div style="font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</div>
+            <div style="font-size:15px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</div>
             <div style="display:flex;align-items:center;gap:14px;flex-shrink:0">
-              <span style="background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.06)' : color + '1f'};color:${color};font-weight:900;font-size:18px;padding:6px 15px;border-radius:22px;flex-shrink:0">${t.code}</span>
-              <span style="font-weight:800;font-size:19px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="margin-left:auto;color:${color};font-weight:800;font-size:19px;flex-shrink:0">${planDate(t.deadline)}</span>
+              <span style="background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.06)' : color + '1f'};color:${color};font-weight:900;font-size:20px;padding:6px 16px;border-radius:22px;flex-shrink:0">${t.code}</span>
+              <span style="font-weight:800;font-size:21px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
+              <span style="margin-left:auto;color:${color};font-weight:800;font-size:21px;flex-shrink:0">${planDate(t.deadline)}</span>
             </div>
-            <div style="font-weight:800;font-size:22px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
-            ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 50, x.ring)).join('')}</div>` : ''}
+            <div style="font-weight:800;font-size:24px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
+            ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 56, x.ring)).join('')}</div>` : ''}
             <div style="border-top:1px solid rgba(233,235,232,.8);padding-top:8px">${stepsHtml}</div>
           </div>`;
         }).join('');
@@ -3794,7 +3794,7 @@
 
       // ── Table dispatcher ──────────────────────────────────────────────
       function renderTable() {
-        document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7');
+        document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7' || state.viewMode === 'table6');
         if (ids.structureWrap) ids.structureWrap.hidden = true;
         if (state.viewMode === 'table1') { renderStructureDashboard(); return; }
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
