@@ -2940,73 +2940,44 @@
         // Goals with nothing due in the period are dropped, not shown empty
         const shownGoals = goals.filter(g => g.tacts.length > 0);
 
-        const cards = shownGoals.map(g => {
-          const donePct = pct(g.doneSteps, g.totalSteps);
-          const overPct = pct(g.overdueSteps, g.totalSteps);
-          const soonPct = pct(g.soonSteps, g.totalSteps);
-          const hasOverdue = g.overdueSteps > 0;
+        // Flat list of tactical tasks (no Roman-numeral goal grouping): each
+        // tactical task is its own card, overdue first, then nearest deadline.
+        const flatTacts = goals
+          .flatMap(g => g.tacts)
+          .sort((a, b) => (b.overdueSteps > 0) - (a.overdueSteps > 0)
+            || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
 
-          // Up to 8 tactical tasks, nearest "Крайний срок" first
-          const tacts = g.tacts
+        const cards = flatTacts.map(t => {
+          const p = pct(t.doneSteps, t.totalSteps);
+          const color = t.overdueSteps > 0 ? PLAN_COLORS.overdue
+                      : p === 100        ? PLAN_COLORS.done
+                      : t.soonSteps > 0  ? PLAN_COLORS.soon
+                      : 'var(--text-muted)';
+          const hasOverdue = t.overdueSteps > 0;
+          const stepsHtml = (t.steps || [])
             .slice()
-            .sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')))
-            .slice(0, 8);
-
-          const rows = tacts.map(t => {
-            const p = pct(t.doneSteps, t.totalSteps);
-            const color = t.overdueSteps > 0 ? PLAN_COLORS.overdue
-                        : p === 100        ? PLAN_COLORS.done
-                        : t.soonSteps > 0  ? PLAN_COLORS.soon
-                        : 'var(--text-muted)';
-            // Expandable: the summary keeps the compact one-line layout; opening it
-            // reveals the checklist steps with their people and deadlines.
-            const stepsHtml = (t.steps || [])
-              .slice()
-              .sort((a, b) => (a.done === b.done ? 0 : a.done ? 1 : -1)
-                || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')))
-              .map(s => planStepRow(s, now))
-              .join('') || `<div style="padding:6px 4px;color:var(--text-muted);font-size:10.5px">Шаги не заданы</div>`;
-            return `<details class="plan-tact" open>
-              <summary style="display:flex;align-items:flex-start;gap:10px;padding:11px 0;font-size:15px;
-                                border-top:1px solid rgba(233,235,232,.7);cursor:pointer;list-style:none">
-                <span class="plan-tact-caret" style="color:${color};flex-shrink:0;font-size:11px;line-height:1.7">▶</span>
-                <span style="font-weight:800;color:${color};min-width:40px;flex-shrink:0">${t.code}</span>
-                <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;
-                             color:var(--text-main)">${planEscape(t.title)}</span>
-                ${planPeopleCluster([
-                  ...(t.responsible ? [{ person: t.responsible, ring: '#7cc437' }] : []),
-                  ...(t.observers || []).map(o => ({ person: o, ring: '#3b82f6' }))
-                ], 32)}
-                <span style="flex-shrink:0;font-variant-numeric:tabular-nums;font-weight:800;font-size:14px;color:${color};background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.05)' : color + '1f'};border-radius:9px;padding:3px 10px;min-width:40px;text-align:center">${t.doneSteps}/${t.totalSteps}</span>
-                <span style="color:${color};flex-shrink:0;font-weight:800;font-size:14px;min-width:42px;text-align:right">${planDate(t.deadline)}</span>
-              </summary>
-              <div style="padding:3px 0 8px 10px;margin:3px 0 6px 8px;border-left:2px solid rgba(233,235,232,.9)">${stepsHtml}</div>
-            </details>`;
-          }).join('');
-
-          return `<div style="background:var(--surface);border-radius:16px;padding:22px;
+            .sort((a, b) => (a.done === b.done ? 0 : a.done ? 1 : -1)
+              || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')))
+            .map(s => planStepRow(s, now))
+            .join('') || `<div style="padding:6px 4px;color:var(--text-muted);font-size:12px">Шаги не заданы</div>`;
+          return `<div style="background:var(--surface);border-radius:16px;padding:16px 18px;
                       border:2px solid ${hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)'};
-                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:13px">
-            <div style="display:flex;align-items:flex-start;gap:9px">
-              <span style="background:rgba(138,196,63,.1);color:#5a9a1a;font-weight:900;font-size:13px;
-                           padding:4px 11px;border-radius:20px;flex-shrink:0">${g.code}</span>
-              <span style="font-weight:800;font-size:18px;line-height:1.4;color:var(--text-main)">${planEscape(g.title)}</span>
+                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:10px;
+                      flex:1 1 320px;min-width:300px">
+            <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+              <span style="background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.06)' : color + '1f'};color:${color};font-weight:900;font-size:14px;padding:4px 11px;border-radius:20px;flex-shrink:0">${t.code}</span>
+              <span style="font-weight:800;font-size:15px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
+              <span style="margin-left:auto;color:${color};font-weight:800;font-size:15px;flex-shrink:0">${planDate(t.deadline)}</span>
             </div>
-
-            <div style="display:flex;height:10px;border-radius:5px;overflow:hidden;background:rgba(0,0,0,.05)">
-              <div style="width:${donePct}%;background:${PLAN_COLORS.done}"></div>
-              <div style="width:${overPct}%;background:${PLAN_COLORS.overdue}"></div>
-              <div style="width:${soonPct}%;background:${PLAN_COLORS.soon}"></div>
-            </div>
-
-            <div style="display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--text-muted)">
-              <span>${g.doneSteps} / ${g.totalSteps} шагов${g.overdueSteps ? ` · <b style="color:${PLAN_COLORS.overdue}">${g.overdueSteps} просроч.</b>` : ''}</span>
-              <strong style="font-size:20px;font-weight:900;color:${hasOverdue ? PLAN_COLORS.overdue : '#5a9a1a'}">${donePct}%</strong>
-            </div>
-
-            <div>${rows}</div>
+            <div style="font-weight:800;font-size:16px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
+            ${planPeopleCluster([
+              ...(t.responsible ? [{ person: t.responsible, ring: '#7cc437' }] : []),
+              ...(t.observers || []).map(o => ({ person: o, ring: '#3b82f6' }))
+            ], 32)}
+            <div style="border-top:1px solid rgba(233,235,232,.8);padding-top:4px">${stepsHtml}</div>
           </div>`;
         }).join('');
+        const shownAny = flatTacts.length > 0;
 
         const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
 
@@ -3040,6 +3011,7 @@
           </section>` : '';
 
         ids.planWrap.innerHTML = `
+          <div id="planScaler" style="transform-origin:top left">
           <div style="padding:14px 0 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
             <span style="font-weight:900;font-size:20px;color:var(--text-main)">
               Оперативный план IC Group 2026
@@ -3055,13 +3027,57 @@
 
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
-          ${shownGoals.length
-            ? `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:16px;padding-bottom:24px">${cards}</div>`
+          ${shownAny
+            ? `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start;padding-bottom:16px">${cards}</div>`
             : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`}
-          ${attentionHtml}`;
+          ${attentionHtml}
+          </div>`;
 
         const btn = document.getElementById('planRefresh');
         if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
+
+        // Kiosk fit: scale the whole plan down so it always fits one screen —
+        // no scrolling or clicking needed (unusable with a TV remote).
+        fitPlanToScreen();
+      }
+
+      let planFitBound = false;
+      function fitPlanToScreen() {
+        const scaler = document.getElementById('planScaler');
+        if (!scaler) return;
+        scaler.style.transform = '';
+        scaler.style.width = '';
+        // Defer so layout is settled (images/fonts) before measuring.
+        requestAnimationFrame(() => {
+          const s2 = document.getElementById('planScaler');
+          if (!s2) return;
+          const top = s2.getBoundingClientRect().top;
+          const avail = window.innerHeight - top - 44;
+          const contentH = s2.scrollHeight;
+          const scale = contentH > 0 ? Math.min(1, avail / contentH) : 1;
+          const parent = s2.parentElement;
+          if (scale < 1) {
+            s2.style.transform = `scale(${scale})`;
+            // Expand width so the scaled content still fills the screen width
+            // (uniform scale would otherwise leave a big empty margin on the right).
+            s2.style.width = (100 / scale) + '%';
+            // A transform doesn't shrink layout height, so pin the wrapper to the
+            // scaled height — otherwise the page still scrolls to full size.
+            parent.style.height = Math.ceil(contentH * scale) + 'px';
+            parent.style.overflow = 'hidden';
+          } else {
+            parent.style.height = '';
+            parent.style.overflow = '';
+          }
+        });
+        if (!planFitBound) {
+          planFitBound = true;
+          let rt;
+          window.addEventListener('resize', () => {
+            clearTimeout(rt);
+            rt = setTimeout(() => { if (state.viewMode === 'table6') fitPlanToScreen(); }, 150);
+          });
+        }
       }
 
       function renderStructureDashboard() {
