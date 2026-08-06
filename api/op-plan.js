@@ -15,6 +15,13 @@ function isExcludedTask(task) {
   return EXCLUDED_USER_IDS.has(String(responsibleId));
 }
 
+// AUDITORS/ACCOMPLICES come back as an array or an id-keyed object.
+function idList(raw) {
+  if (!raw) return [];
+  const arr = Array.isArray(raw) ? raw : Object.values(raw);
+  return arr.map(String).filter(v => /^\d+$/.test(v));
+}
+
 function baseUrl() {
   const url = process.env.TASK_REPORT_WEBHOOK_URL || '';
   return url.endsWith('/') ? url : url + '/';
@@ -39,7 +46,7 @@ async function fetchOpTasks() {
     const payload = await bx('tasks.task.list', {
       order: { ID: 'asc' },
       filter: { GROUP_ID: OP_GROUP_ID },
-      select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID'],
+      select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID', 'ACCOMPLICES', 'AUDITORS'],
       start
     });
     const page = payload.result?.tasks || payload.result || [];
@@ -171,6 +178,7 @@ export default async function handler(req, res) {
         title: String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, ''),
         deadline: tt.deadline || tt.DEADLINE || null,
         responsibleId: String(tt.responsibleId || tt.RESPONSIBLE_ID || ''),
+        auditorIds: idList(tt.auditors ?? tt.AUDITORS),
         steps: items.map(parseStep).filter(step => !isExcludedPerson(step.responsible))
       };
     }
@@ -180,12 +188,17 @@ export default async function handler(req, res) {
     const memberIds = [];
     Object.values(tactByCode).forEach(t => {
       if (t.responsibleId) memberIds.push(t.responsibleId);
+      (t.auditorIds || []).forEach(id => memberIds.push(id));
       t.steps.forEach(s => (s.members || []).forEach(m => memberIds.push(m.id)));
     });
     const usersMap = memberIds.length ? await fetchUsers(memberIds) : {};
     Object.values(tactByCode).forEach(t => {
       t.responsible = usersMap[t.responsibleId] || null;
+      t.observers = (t.auditorIds || [])
+        .map(id => usersMap[id])
+        .filter(u => u && u.id !== t.responsibleId && !isExcludedPerson(u.name));
       delete t.responsibleId;
+      delete t.auditorIds;
     });
     Object.values(tactByCode).forEach(t => t.steps.forEach(s => {
       const executors = [];
