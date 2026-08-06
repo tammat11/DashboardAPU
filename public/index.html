@@ -701,17 +701,13 @@
       .period-cal-apply { background: #1e6aaa; color: #fff; border: none; font-family: 'Montserrat', sans-serif; font-size: 11px; font-weight: 800; padding: 6px 14px; border-radius: 8px; cursor: pointer; }
       .period-cal-apply:hover { background: #185a90; }
 
-      /* Burning (urgent) plan card — animated ember glow, intensity via --heat */
-      @keyframes planBurn {
-        0%, 100% { box-shadow: 0 0 calc(6px + var(--heat) * 3px) rgba(249,115,22,.45), 0 0 calc(2px + var(--heat) * 2px) rgba(239,68,68,.40); }
-        50%      { box-shadow: 0 0 calc(14px + var(--heat) * 6px) rgba(239,68,68,.65), 0 0 calc(5px + var(--heat) * 4px) rgba(249,115,22,.55); }
-      }
-      .plan-burning { animation: planBurn calc(2s - var(--heat) * 0.22s) ease-in-out infinite; }
+      /* Decorative flames scattered across an urgent card (behind the text). */
       @keyframes planFlameFlicker {
-        0%, 100% { transform: scale(1) rotate(-3deg); opacity: .95; }
-        50%      { transform: scale(1.15) rotate(3deg); opacity: 1; }
+        0%, 100% { transform: scale(1) rotate(-4deg); opacity: .5; }
+        50%      { transform: scale(1.22) rotate(4deg); opacity: .85; }
       }
-      .plan-flame { display: inline-block; animation: planFlameFlicker calc(1.6s - var(--heat) * 0.18s) ease-in-out infinite; transform-origin: bottom center; }
+      .plan-embers { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+      .plan-ember { position: absolute; transform-origin: center bottom; animation: planFlameFlicker 1.5s ease-in-out infinite; will-change: transform, opacity; }
 
       /* Plan tactical task expander */
       .plan-tact > summary { list-style: none; }
@@ -3015,12 +3011,18 @@
           const gColor = goalColor(t._goalNum);
           const heat = planFireLevel(t.deadline);
           const burnBorder = heat >= 4 ? '#ef4444' : heat > 0 ? '#f97316' : (hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)');
-          return `<div class="${heat ? 'plan-burning' : ''}" style="--heat:${heat};background:var(--surface);border-radius:18px;padding:24px 26px;
+          // Scatter `heat` flames around the card edges, behind the text.
+          const EMBER_POS = ['top:5%;right:6%', 'bottom:7%;left:6%', 'top:46%;right:3%', 'bottom:26%;right:11%', 'top:15%;left:4%'];
+          const EMBER_SIZE = [42, 30, 36, 26, 34];
+          const embersHtml = heat ? `<div class="plan-embers" aria-hidden="true">${
+            Array.from({ length: heat }, (_, i) => `<span class="plan-ember" style="${EMBER_POS[i % EMBER_POS.length]};font-size:${EMBER_SIZE[i % EMBER_SIZE.length]}px;animation-delay:${(i * 0.25).toFixed(2)}s">🔥</span>`).join('')
+          }</div>` : '';
+          return `<div style="position:relative;overflow:hidden;background:var(--surface);border-radius:18px;padding:24px 26px;
                       border:2px solid ${burnBorder};border-left:7px solid ${gColor};
-                      box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:14px;
-                      flex:1 1 ${cardBasis};min-width:280px">
+                      box-shadow:0 4px 15px rgba(0,0,0,.01);flex:1 1 ${cardBasis};min-width:280px">
+            ${embersHtml}
+            <div style="position:relative;z-index:1;display:flex;flex-direction:column;gap:14px">
             <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
-              ${heat ? `<span class="plan-flame" style="--heat:${heat};flex-shrink:0;font-size:${16 + heat * 4}px">🔥</span>` : ''}
               <span style="flex:1;min-width:0;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</span>
               <span style="font-weight:900;font-size:20px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
               <span style="color:${color};font-weight:900;font-size:20px;flex-shrink:0">${planDateDow(t.deadline)}</span>
@@ -3028,6 +3030,7 @@
             <div style="font-weight:800;font-size:24px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
             ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 64, x.ring)).join('')}</div>` : ''}
             <div style="border-top:1px solid rgba(233,235,232,.8);padding-top:8px">${stepsHtml}</div>
+            </div>
           </div>`;
         }).join('');
         const shownAny = flatTacts.length > 0;
