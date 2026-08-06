@@ -1513,8 +1513,8 @@
           <span class="view-switcher">
             <button id="viewBtn3" class="view-btn">🖼️ Галерея</button>
             <button id="viewBtn5" class="view-btn">📋 ЗРС</button>
-            <button id="viewBtn6" class="view-btn">📊 План</button>
-            <button id="viewBtn7" class="view-btn active">📈 План+задачи</button>
+            <button id="viewBtn6" class="view-btn active">📊 План</button>
+            <button id="viewBtn7" class="view-btn">📈 План+задачи</button>
             <button id="viewBtn1" class="view-btn">📊 Отчёт</button>
             <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
           </span>
@@ -1645,7 +1645,7 @@
         period: 'all', // 'all' | 'week' | 'lastWeek' | 'month:YYYY-MM' | 'range:YYYY-MM-DD:YYYY-MM-DD'
         planFilter: 'all', // 'all' | 'plan' | 'off'
         personDetails: {}, // pkey -> {title, meta, html} for the task popup
-        viewMode: 'table7', // 'table1' | 'table3' | 'table5' | 'table6' | 'table7'
+        viewMode: 'table6', // 'table1' | 'table3' | 'table5' | 'table6' | 'table7'
         expandedNodes: new Set()
       };
 
@@ -2815,7 +2815,20 @@
         const img = person.avatar
           ? `<img src="${planEscape(person.avatar)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.style.display='none'" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">`
           : '';
-        return `<span title="${planEscape(person.name)}" style="position:relative;display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;background:#e8efe0;color:#4a7a1e;font-size:${Math.round(size * 0.4)}px;font-weight:800;box-shadow:0 0 0 1.5px ${ring};flex-shrink:0">${initials}${img}</span>`;
+        return `<span title="${planEscape(person.name)}" style="position:relative;display:inline-grid;place-items:center;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;background:#e8efe0;color:#4a7a1e;font-size:${Math.round(size * 0.4)}px;font-weight:800;box-shadow:0 0 0 2px #fff, 0 0 0 3.5px ${ring};flex-shrink:0">${initials}${img}</span>`;
+      }
+
+      // Overlapping, vertically-staggered avatar cluster (some higher, some lower).
+      function planPeopleCluster(people, size) {
+        size = size || 32;
+        if (!people.length) return '';
+        const overlap = Math.round(size * 0.34);
+        const chips = people.map((x, i) => {
+          const dy = (i % 2 === 0) ? -4 : 5; // stagger up / down
+          return `<span style="margin-left:${i ? -overlap : 0}px;transform:translateY(${dy}px);position:relative;z-index:${1000 - i}">${planAvatar(x.person, size, x.ring)}</span>`;
+        }).join('');
+        const names = planEscape(people.map(x => x.person.name).join(', '));
+        return `<span title="${names}" style="display:inline-flex;align-items:center;flex-shrink:0;padding:8px 4px 8px 2px">${chips}</span>`;
       }
 
       function planStepRow(s, now) {
@@ -2960,10 +2973,10 @@
                 <span style="font-weight:800;color:${color};min-width:34px;flex-shrink:0">${t.code}</span>
                 <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;
                              color:var(--text-main)">${planEscape(t.title)}</span>
-                <span style="display:flex;gap:3px;flex-shrink:0;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:180px">
-                  ${t.responsible ? planAvatar(t.responsible, 26, '#7cc437') : ''}
-                  ${(t.observers || []).map(o => planAvatar(o, 26, '#3b82f6')).join('')}
-                </span>
+                ${planPeopleCluster([
+                  ...(t.responsible ? [{ person: t.responsible, ring: '#7cc437' }] : []),
+                  ...(t.observers || []).map(o => ({ person: o, ring: '#3b82f6' }))
+                ], 32)}
                 <span style="flex-shrink:0;font-variant-numeric:tabular-nums;font-weight:800;font-size:12px;color:${color};background:${color === 'var(--text-muted)' ? 'rgba(0,0,0,.05)' : color + '1f'};border-radius:8px;padding:2px 8px;min-width:34px;text-align:center">${t.doneSteps}/${t.totalSteps}</span>
                 <span style="color:${color};flex-shrink:0;font-weight:700;min-width:34px;text-align:right">${planDate(t.deadline)}</span>
               </summary>
@@ -4849,15 +4862,14 @@
           ids.periodBtn.setAttribute('aria-expanded', 'false');
         };
 
-        // Restore saved period. Default «Все время»: the OP plan runs to 2027,
-        // so a month-wide window would hide most of it.
+        // Restore saved period. Default is the current week (one-time switch).
         let savedPeriod = localStorage.getItem('dashboard_period');
-        if (!localStorage.getItem('dashboard_period_default_all')) {
-          savedPeriod = 'all';
-          localStorage.setItem('dashboard_period', 'all');
-          localStorage.setItem('dashboard_period_default_all', '1');
+        if (!localStorage.getItem('dashboard_period_default_week')) {
+          savedPeriod = 'week';
+          localStorage.setItem('dashboard_period', 'week');
+          localStorage.setItem('dashboard_period_default_week', '1');
         }
-        state.period = savedPeriod || 'all';
+        state.period = savedPeriod || 'week';
         syncPeriodUI();
 
         ids.periodBtn.addEventListener('click', e => {
