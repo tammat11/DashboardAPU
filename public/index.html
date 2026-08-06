@@ -2760,14 +2760,30 @@
 
         ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">Загружаем план ОП 2026…</div>`;
         planState.loading = true;
+        let painted = false;
+        // Cache-first: the live /api/op-plan is slow from this region, so paint
+        // the saved snapshot instantly, then try to refresh in the background.
         try {
-          const r = await fetch('/api/op-plan');
-          const j = await r.json();
+          const cr = await fetch('/op-plan-cache.json', { cache: 'no-store' });
+          if (cr.ok) {
+            const cj = await cr.json();
+            if (cj && Array.isArray(cj.goals)) { planState.data = cj; drawPlan(cj); painted = true; }
+          }
+        } catch {}
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 15000);
+          let j;
+          try {
+            const r = await fetch('/api/op-plan', { signal: controller.signal });
+            j = await r.json();
+          } finally { clearTimeout(timer); }
           if (!j.ok) throw new Error(j.error || 'Ошибка загрузки');
           planState.data = j;
           drawPlan(j);
+          painted = true;
         } catch (e) {
-          ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:#ef4444">Ошибка: ${e.message}</div>`;
+          if (!painted) ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:#ef4444">Ошибка: ${e.message}</div>`;
         } finally {
           planState.loading = false;
         }
