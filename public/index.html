@@ -2808,6 +2808,21 @@
         return isNaN(d) ? '' : d.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
       }
 
+      // Urgency flames: the closer (or more overdue) the deadline, the more 🔥.
+      function planFire(deadline) {
+        if (!deadline) return '';
+        const dt = new Date(deadline).getTime();
+        if (isNaN(dt)) return '';
+        const days = (dt - Date.now()) / 864e5;
+        let n = 0;
+        if (days < 0) n = 5;              // overdue — hottest
+        else if (days <= 1) n = 4;        // today / tomorrow
+        else if (days <= 3) n = 3;
+        else if (days <= 6) n = 2;
+        else if (days <= 9) n = 1;
+        return '🔥'.repeat(n);
+      }
+
       const RU_DOW = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
       // Date with a short weekday, e.g. "06.08 Ср".
       function planDateDow(iso) {
@@ -2993,6 +3008,7 @@
                       flex:1 1 ${cardBasis};min-width:280px">
             <div style="display:flex;align-items:center;gap:12px;flex-shrink:0">
               <span style="flex:1;min-width:0;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</span>
+              ${planFire(t.deadline) ? `<span style="flex-shrink:0;font-size:18px;letter-spacing:-2px">${planFire(t.deadline)}</span>` : ''}
               <span style="font-weight:900;font-size:20px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
               <span style="color:${color};font-weight:900;font-size:20px;flex-shrink:0">${planDateDow(t.deadline)}</span>
             </div>
@@ -3029,10 +3045,10 @@
         const periodPeople = [...peopleMap.values()].sort((a, b) => a.name.localeCompare(b.name, 'ru'));
         const periodName = (document.getElementById('periodBtnLabel')?.textContent || '').trim();
         const peopleHtml = periodPeople.length ? `
-          <section style="margin:8px 0 12px;padding:16px 22px;background:#eff5ff;border:2px solid #cbdcf5;border-radius:18px">
-            <div style="font-size:15px;font-weight:900;letter-spacing:.5px;color:#2563eb;margin-bottom:12px;text-align:center">👥 ЛЮДИ${periodName ? ' · ' + planEscape(periodName.toUpperCase()) : ''} · ${periodPeople.length}</div>
-            <div style="display:flex;flex-wrap:wrap;gap:10px 16px;justify-content:center">
-              ${periodPeople.map(p => `<span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text-main)">${planAvatar(p, 40, '#2563eb')}${firstNameOnly(p.name)}</span>`).join('')}
+          <section style="margin:8px 0 12px;padding:14px 22px 18px;background:linear-gradient(180deg,#f2f7ff,#eaf1fd);border:1px solid #d5e2f7;border-radius:18px">
+            <div style="font-size:14px;font-weight:900;letter-spacing:.6px;color:#2563eb;margin-bottom:14px;text-align:center;text-transform:uppercase">👥 Люди${periodName ? ' · ' + planEscape(periodName) : ''} · ${periodPeople.length}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:16px 22px;justify-content:center">
+              ${periodPeople.map(p => `<span style="display:flex;flex-direction:column;align-items:center;gap:7px;width:82px">${planAvatar(p, 60, '#2563eb')}<span style="font-size:13.5px;font-weight:700;color:var(--text-main);text-align:center;line-height:1.2">${firstNameOnly(p.name)}</span></span>`).join('')}
             </div>
           </section>` : '';
 
