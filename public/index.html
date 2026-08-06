@@ -703,8 +703,8 @@
 
       /* Decorative flames scattered across an urgent card (behind the text). */
       @keyframes planFlameFlicker {
-        0%, 100% { transform: scale(1) rotate(-4deg); opacity: .5; }
-        50%      { transform: scale(1.22) rotate(4deg); opacity: .85; }
+        0%, 100% { transform: scale(1) rotate(-4deg); opacity: .12; }
+        50%      { transform: scale(1.18) rotate(4deg); opacity: .26; }
       }
       .plan-embers { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
       .plan-ember { position: absolute; transform-origin: center bottom; animation: planFlameFlicker 1.5s ease-in-out infinite; will-change: transform, opacity; }
@@ -3009,7 +3009,8 @@
             ...(t.observers || []).map(o => ({ person: o, ring: '#3b82f6' }))
           ];
           const gColor = goalColor(t._goalNum);
-          const heat = planFireLevel(t.deadline);
+          // Completed tasks don't burn, no matter the date.
+          const heat = p === 100 ? 0 : planFireLevel(t.deadline);
           const burnBorder = heat >= 4 ? '#ef4444' : heat > 0 ? '#f97316' : (hasOverdue ? PLAN_COLORS.overdue : 'rgba(233,235,232,.8)');
           // Scatter `heat` flames around the card edges, behind the text.
           const EMBER_POS = ['top:5%;right:6%', 'bottom:7%;left:6%', 'top:46%;right:3%', 'bottom:26%;right:11%', 'top:15%;left:4%'];
@@ -3061,10 +3062,10 @@
         const periodPeople = [...peopleMap.values()].sort((a, b) => a.name.localeCompare(b.name, 'ru'));
         const periodName = (document.getElementById('periodBtnLabel')?.textContent || '').trim();
         const peopleHtml = periodPeople.length ? `
-          <section style="margin:8px 0 12px;padding:14px 22px 18px;background:linear-gradient(180deg,#f2f7ff,#eaf1fd);border:1px solid #d5e2f7;border-radius:18px">
-            <div style="font-size:14px;font-weight:900;letter-spacing:.6px;color:#2563eb;margin-bottom:14px;text-align:center;text-transform:uppercase">👥 Люди${periodName ? ' · ' + planEscape(periodName) : ''} · ${periodPeople.length}</div>
-            <div style="display:flex;flex-wrap:wrap;gap:16px 22px;justify-content:center">
-              ${periodPeople.map(p => `<span style="display:flex;flex-direction:column;align-items:center;gap:7px;width:82px">${planAvatar(p, 60, '#2563eb')}<span style="font-size:13.5px;font-weight:700;color:var(--text-main);text-align:center;line-height:1.2">${firstNameOnly(p.name)}</span></span>`).join('')}
+          <section style="margin:10px 0 14px;padding:20px 24px 24px;background:linear-gradient(180deg,#dbeafe,#c7dbf9);border:3px solid #3b82f6;border-radius:20px;box-shadow:0 6px 22px rgba(37,99,235,.14)">
+            <div style="font-size:20px;font-weight:900;letter-spacing:.6px;color:#1d4ed8;margin-bottom:18px;text-align:center;text-transform:uppercase">👥 Люди${periodName ? ' · ' + planEscape(periodName) : ''} · ${periodPeople.length}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:18px 26px;justify-content:center">
+              ${periodPeople.map(p => `<span style="display:flex;flex-direction:column;align-items:center;gap:8px;width:96px">${planAvatar(p, 74, '#2563eb')}<span style="font-size:16px;font-weight:800;color:var(--text-main);text-align:center;line-height:1.2">${firstNameOnly(p.name)}</span></span>`).join('')}
             </div>
           </section>` : '';
 
