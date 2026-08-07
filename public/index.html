@@ -2875,7 +2875,7 @@
           <span style="color:${markColor};font-weight:800;flex-shrink:0;width:19px;text-align:center;font-size:19px">${mark}</span>
           <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
           ${people ? `<span style="display:flex;gap:3px;flex-shrink:0">${people}</span>` : ''}
-          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:800;min-width:76px;text-align:right;font-size:18px">${planDateDow(s.deadline)}</span>
+          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:800;min-width:88px;text-align:right;font-size:21px;text-decoration:underline;text-underline-offset:3px">${planDateDow(s.deadline)}</span>
         </div>`;
       }
 
@@ -3020,7 +3020,7 @@
               <span style="flex-shrink:1;min-width:0;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</span>
               ${heat ? `<span style="flex-shrink:0;font-size:16px;letter-spacing:-2px">${'🔥'.repeat(heat)}</span>` : ''}
               <span style="margin-left:auto;font-weight:900;font-size:20px;color:${color};font-variant-numeric:tabular-nums;flex-shrink:0">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="color:${color};font-weight:900;font-size:23px;flex-shrink:0">${planDateDow(t.deadline)}</span>
+              <span style="color:${color};font-weight:900;font-size:26px;flex-shrink:0;text-decoration:underline;text-underline-offset:4px">${planDateDow(t.deadline)}</span>
             </div>
             <div style="font-weight:800;font-size:24px;line-height:1.4;color:var(--text-main)">${planEscape(t.title)}</div>
             ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 64, x.ring)).join('')}</div>` : ''}
