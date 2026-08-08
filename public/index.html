@@ -3606,6 +3606,16 @@
         const taskRowHtml = (titleHtml, metaHtml, row) =>
           `<div class="sd-overdue-item"><div class="sd-overdue-task">${titleHtml}<span>${metaHtml}</span></div>${taskChecklistBullets(row)}</div>`;
 
+        // A task counts as «выполнено» when it is closed OR still open but all of
+        // its checklist items are ticked (чек-лист(ы) выполнены).
+        const checklistAllDone = row => {
+          let items = [];
+          try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
+          return Array.isArray(items) && items.length > 0 && items.every(it => it.complete === true);
+        };
+        const isDoneRow = row =>
+          String(row['Состояние задачи'] || '').startsWith('Закрыта') || checklistAllDone(row);
+
         // Only departments that actually have overdue days appear in the
         // «Просрочка» block; the whole block is hidden when there are none.
         const overdueBarDepts = depts
@@ -3640,7 +3650,7 @@
 
         // «Выполнено» — completed tasks per department (mirror of «Просрочка»).
         const doneByDept = depts
-          .map(d => ({ d, done: d.rows.filter(r => String(r['Состояние задачи'] || '').startsWith('Закрыта')) }))
+          .map(d => ({ d, done: d.rows.filter(isDoneRow) }))
           .filter(x => x.done.length > 0)
           .sort((a, b) => b.done.length - a.done.length);
         const maxDone = Math.max(...doneByDept.map(x => x.done.length), 1);
