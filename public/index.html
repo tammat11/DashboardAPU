@@ -3383,7 +3383,13 @@
         depts.forEach(d => {
           d.score = completionOf(d.rows);
           d.employeeCount = rosterByDept.get(d.name)?.size || d.people.size;
-          d.workloadRatio = d.employeeCount ? d.rows.length / d.employeeCount : 0;
+          // Workload counts every task a person takes part in — as executor OR
+          // as co-executor/observer («Помогает»). helping is already deduped and
+          // never overlaps a person's own executor tasks, so no double counting.
+          const helpingTotal = Array.from(d.people.values())
+            .reduce((sum, e) => sum + (e.helping ? e.helping.size : 0), 0);
+          d.loadCount = d.rows.length + helpingTotal;
+          d.workloadRatio = d.employeeCount ? d.loadCount / d.employeeCount : 0;
           d.people.forEach(e => {
             e.score = completionOf(e.rows);
             e.planScore = completionOf(e.rows.filter(row => String(row['ID проекта'] || '') === OP_GROUP_ID));
@@ -3469,21 +3475,24 @@
           <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           ${ratioPoints}
         </svg>`;
+        // Per-person load = executor + participation («Помогает»), same basis as
+        // the department workload above.
+        const personLoad = emp => emp.rows.length + (emp.helping ? emp.helping.size : 0);
         const lowLoadPeople = depts.flatMap(d => {
           const threshold = Math.max(1, d.workloadRatio * .4);
           return Array.from(d.people.values())
-            .filter(emp => emp.rows.length < threshold)
-            .map(emp => ({ ...emp, deptName: d.name, deptRatio: d.workloadRatio }));
+            .filter(emp => personLoad(emp) < threshold)
+            .map(emp => ({ ...emp, load: personLoad(emp), deptName: d.name, deptRatio: d.workloadRatio }));
         }).sort((a, b) =>
-          a.rows.length - b.rows.length ||
+          a.load - b.load ||
           b.deptRatio - a.deptRatio ||
           a.name.localeCompare(b.name, 'ru')
         );
         const highLoadPeople = depts.flatMap(d =>
           Array.from(d.people.values())
-            .filter(emp => emp.rows.length > tbu)
-            .map(emp => ({ ...emp, deptName: d.name, deptRatio: d.workloadRatio }))
-        ).sort((a, b) => b.rows.length - a.rows.length || a.name.localeCompare(b.name, 'ru'));
+            .filter(emp => personLoad(emp) > tbu)
+            .map(emp => ({ ...emp, load: personLoad(emp), deptName: d.name, deptRatio: d.workloadRatio }))
+        ).sort((a, b) => b.load - a.load || a.name.localeCompare(b.name, 'ru'));
         const loadAvatar = emp => {
           const initials = escapeHtml(getInitials(emp.name));
           const fallback = `<span style="background:${avatarColor(emp.id || emp.name)}">${initials}</span>`;
@@ -3494,7 +3503,7 @@
           ? people.map(emp => `<div class="sd-lowload-card${high ? ' high' : ''}">
               ${loadAvatar(emp)}
               <span class="sd-lowload-name" title="${escapeHtml(emp.deptName)} · среднее ${emp.deptRatio.toFixed(1)}">${escapeHtml(emp.name)}</span>
-              <span class="sd-lowload-count">${emp.rows.length} зад.</span>
+              <span class="sd-lowload-count">${emp.load} зад.</span>
               <span class="sd-lowload-meta">${escapeHtml(emp.deptName)} · среднее ${emp.deptRatio.toFixed(1)}</span>
             </div>`).join('')
           : `<div class="sd-lowload-empty">${high ? 'Сотрудников выше ТБУ нет' : 'Сотрудников с очень низкой нагрузкой нет'}</div>`;
@@ -3741,7 +3750,7 @@
                 <span class="sd-health ${healthClass}">${health}</span>
               </div>
               <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад.${d.overdueTasks ? ` · ${d.overdueTasks} просроч.` : ''} · ${d.overdueDays} дн.</span>
-              <span class="sd-score" title="${d.rows.length} задач ÷ ${d.employeeCount} сотрудников">
+              <span class="sd-score" title="${d.loadCount} задач (с участием) ÷ ${d.employeeCount} сотрудников">
                 <strong>${d.workloadRatio.toFixed(1)}</strong>
                 <small>задач/сотр.</small>
               </span>
