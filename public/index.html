@@ -1330,6 +1330,14 @@
       .sd-people { padding: 0 12px 11px; }
       .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(170px,1fr) 68px 84px 78px 72px 72px minmax(150px,1fr) 34px; align-items: center; gap: 8px; }
       .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 6px; color: #687068; font-size: 12px; font-weight: 650; }
+      /* «По плану» filter → hide «Вне плана» (4) + «Помогает» (5) */
+      .sd-page.filter-plan .sd-person-head, .sd-page.filter-plan .sd-person { grid-template-columns: minmax(170px,1fr) 68px 84px 72px minmax(150px,1fr) 34px; }
+      .sd-page.filter-plan .sd-person-head > :nth-child(4), .sd-page.filter-plan .sd-person-head > :nth-child(5),
+      .sd-page.filter-plan .sd-person > :nth-child(4), .sd-page.filter-plan .sd-person > :nth-child(5) { display: none; }
+      /* «Вне плана» filter → hide «По плану» (2) + «Раб. группа» (3) */
+      .sd-page.filter-off .sd-person-head, .sd-page.filter-off .sd-person { grid-template-columns: minmax(170px,1fr) 78px 72px 72px minmax(150px,1fr) 34px; }
+      .sd-page.filter-off .sd-person-head > :nth-child(2), .sd-page.filter-off .sd-person-head > :nth-child(3),
+      .sd-page.filter-off .sd-person > :nth-child(2), .sd-page.filter-off .sd-person > :nth-child(3) { display: none; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
       .sd-person-card > summary { list-style: none; cursor: pointer; }
@@ -1461,6 +1469,8 @@
         .sd-dept-head { grid-template-columns: minmax(150px,1fr) auto 72px; gap: 8px; }
         .sd-dept-meta { display: none; }
         .sd-person-head, .sd-person { grid-template-columns: minmax(104px,1fr) 44px 52px 48px 46px 50px 72px 28px; gap: 4px; }
+        .sd-page.filter-plan .sd-person-head, .sd-page.filter-plan .sd-person { grid-template-columns: minmax(104px,1fr) 44px 52px 50px 72px 28px; }
+        .sd-page.filter-off .sd-person-head, .sd-page.filter-off .sd-person { grid-template-columns: minmax(104px,1fr) 48px 46px 50px 72px 28px; }
         .sd-task { grid-template-columns: minmax(150px,1fr) 90px; }
         .sd-task-deadline { grid-column: 2; }
       }
@@ -3855,7 +3865,9 @@
           </details>`;
         }).join('');
 
-        ids.structureWrap.innerHTML = `<div class="sd-page">
+        const planFilterClass = state.planFilter === 'plan' ? ' filter-plan'
+          : state.planFilter === 'off' ? ' filter-off' : '';
+        ids.structureWrap.innerHTML = `<div class="sd-page${planFilterClass}">
           <section class="sd-section">
             <h2 class="sd-title">Распределение</h2>
             <div class="sd-stack">${stack}</div>
