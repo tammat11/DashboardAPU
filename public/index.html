@@ -3545,6 +3545,34 @@
             </details>`;
           }).join('');
 
+        // «Выполнено» — completed tasks per department (mirror of «Просрочка»).
+        const doneByDept = depts
+          .map(d => ({ d, done: d.rows.filter(r => String(r['Состояние задачи'] || '').startsWith('Закрыта')) }))
+          .filter(x => x.done.length > 0)
+          .sort((a, b) => b.done.length - a.done.length);
+        const maxDone = Math.max(...doneByDept.map(x => x.done.length), 1);
+        const doneBars = doneByDept.map(({ d, done }) => {
+          const rows = done
+            .slice()
+            .sort((a, b) => String(b.closedDateRaw || '').localeCompare(String(a.closedDateRaw || '')))
+            .map(row => {
+              const taskId = String(row['ID задачи'] || '');
+              const title = escapeHtml(row['Название задачи'] || 'Без названия');
+              const titleHtml = state.portalHost && /^\d+$/.test(taskId)
+                ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${taskId}/">${title}</a>`
+                : title;
+              return `<div class="sd-overdue-task">${titleHtml}<span>${escapeHtml(row['Дата закрытия'] || row['Дедлайн'] || '')}</span></div>`;
+            }).join('');
+          return `<details class="sd-overdue-dept">
+              <summary class="sd-bar-row" title="Показать ${done.length} выполненных задач">
+                <span class="sd-bar-name" title="${escapeHtml(d.name)}">${escapeHtml(shortDeptName(d.name))}</span>
+                <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(done.length / maxDone * 100).toFixed(1)}%;background:linear-gradient(90deg,#4fce6b,#22a06b)"></div></div>
+                <span class="sd-bar-value">${done.length}</span>
+              </summary>
+              <div class="sd-overdue-tasks">${rows}</div>
+            </details>`;
+        }).join('');
+
         const healthFor = d => {
           if (d.score === null) return ['Нет оценки', 'stable'];
           if (d.score >= 90) return ['Лидер', 'leader'];
@@ -3742,6 +3770,11 @@
             <h2 class="sd-title">Просрочка</h2>
             <div class="sd-chart">${bars}</div>
             <div class="sd-axis"><span>0</span><span>${Math.round(maxOverdue / 2)}</span><span>${maxOverdue}</span></div>
+          </section>` : ''}
+          ${doneByDept.length ? `<section class="sd-section">
+            <h2 class="sd-title">Выполнено</h2>
+            <div class="sd-chart">${doneBars}</div>
+            <div class="sd-axis"><span>0</span><span>${Math.round(maxDone / 2)}</span><span>${maxDone}</span></div>
           </section>` : ''}
           <section class="sd-section">
             <h2 class="sd-title">Оценка</h2>
