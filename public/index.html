@@ -1289,6 +1289,11 @@
       .sd-overdue-task:last-child { border-bottom: 0; }
       .sd-overdue-task .task-link { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
       .sd-overdue-task span { color: #a04b4f; text-align: right; white-space: nowrap; }
+      /* «Выполнено» reuses the overdue markup but must read green, not red. */
+      .sd-done-dept[open] .sd-bar-name { color: #22a06b; }
+      .sd-done-dept .sd-overdue-tasks { border-color: #d7ecdc; background: #f8fdf9; }
+      .sd-done-dept .sd-overdue-task { border-bottom-color: #e6f2e9; }
+      .sd-done-dept .sd-overdue-task span { color: #4a8a63; }
       .sd-overdue-empty { padding: 10px; color: #777f78; font-size: 11px; text-align: center; }
       .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 11px; }
       .sd-subtitle { margin: -5px 0 12px; font-size: 12px; color: var(--text-muted); }
@@ -3330,6 +3335,7 @@
                 overdue: itemOverdue,
                 title: String(item.title || ''),
                 deadline: itemDeadline,
+                projectId: String(row['ID проекта'] || ''),
                 taskId,
                 taskTitle
               });
@@ -3367,10 +3373,20 @@
           const currentDiscipline = Math.max(0, 100 - currentOverdue.length * 20 - currentOverdueDays * 2);
           return Math.round(executionQuality * .7 + currentDiscipline * .3);
         };
-        // «Оценка» bars are filled by completion: done / total (0 if no tasks).
-        const completionOf = rows => rows.length
-          ? Math.round(rows.filter(row => String(row['Состояние задачи'] || '').startsWith('Закрыта')).length / rows.length * 100)
-          : 0;
+        // «Оценка» bars are filled by completion. The overall score counts both
+        // closed tasks AND completed checklist steps; the «по плану» score counts
+        // ONLY checklist-step completion (a план-задача progresses by its steps,
+        // not by the parent task's own closed state).
+        const closedTasks = rows => rows.filter(row => String(row['Состояние задачи'] || '').startsWith('Закрыта')).length;
+        const completionOf = (rows, items = []) => {
+          const total = rows.length + items.length;
+          if (!total) return 0;
+          const done = closedTasks(rows) + items.filter(i => i.complete).length;
+          return Math.round(done / total * 100);
+        };
+        // Checklist-only completion (used for «по плану»): done steps / all steps.
+        const checklistCompletion = items =>
+          items.length ? Math.round(items.filter(i => i.complete).length / items.length * 100) : 0;
         const rosterByDept = new Map();
         (state.allEmployees || []).forEach(emp => {
           if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
@@ -3380,8 +3396,17 @@
           if (!rosterByDept.has(deptName)) rosterByDept.set(deptName, new Set());
           rosterByDept.get(deptName).add(String(emp.id || emp.name));
         });
+        // Dedup a department's checklist items (an item shared by several people
+        // carries the same `taskId:itemId` key, so a Map collapses duplicates).
+        const deptChecklist = d => {
+          const m = new Map();
+          d.people.forEach(e => e.checklist && e.checklist.forEach((v, k) => m.set(k, v)));
+          return Array.from(m.values());
+        };
         depts.forEach(d => {
-          d.score = completionOf(d.rows);
+          const deptItems = deptChecklist(d);
+          d.score = completionOf(d.rows, deptItems);
+          d.planScore = checklistCompletion(deptItems.filter(i => i.projectId === OP_GROUP_ID));
           d.employeeCount = rosterByDept.get(d.name)?.size || d.people.size;
           // Workload counts every task a person takes part in — as executor OR
           // as co-executor/observer («Помогает»). helping is already deduped and
@@ -3391,8 +3416,9 @@
           d.loadCount = d.rows.length + helpingTotal;
           d.workloadRatio = d.employeeCount ? d.loadCount / d.employeeCount : 0;
           d.people.forEach(e => {
-            e.score = completionOf(e.rows);
-            e.planScore = completionOf(e.rows.filter(row => String(row['ID проекта'] || '') === OP_GROUP_ID));
+            const items = Array.from((e.checklist || new Map()).values());
+            e.score = completionOf(e.rows, items);
+            e.planScore = checklistCompletion(items.filter(i => i.projectId === OP_GROUP_ID));
           });
         });
         const ratioDepts = depts.filter(d => d.employeeCount > 0);
@@ -3572,7 +3598,7 @@
                 : title;
               return `<div class="sd-overdue-task">${titleHtml}<span>${escapeHtml(row['Дата закрытия'] || row['Дедлайн'] || '')}</span></div>`;
             }).join('');
-          return `<details class="sd-overdue-dept">
+          return `<details class="sd-overdue-dept sd-done-dept">
               <summary class="sd-bar-row" title="Показать ${done.length} выполненных задач">
                 <span class="sd-bar-name" title="${escapeHtml(d.name)}">${escapeHtml(shortDeptName(d.name))}</span>
                 <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(done.length / maxDone * 100).toFixed(1)}%;background:linear-gradient(90deg,#4fce6b,#22a06b)"></div></div>
@@ -3747,7 +3773,6 @@
               <div class="sd-dept-who">
                 <span class="sd-chevron">›</span>
                 <span class="sd-dept-name">${escapeHtml(d.name)}</span>
-                <span class="sd-health ${healthClass}">${health}</span>
               </div>
               <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад.${d.overdueTasks ? ` · ${d.overdueTasks} просроч.` : ''} · ${d.overdueDays} дн.</span>
               <span class="sd-score" title="${d.loadCount} задач (с участием) ÷ ${d.employeeCount} сотрудников">
@@ -3787,7 +3812,7 @@
           </section>` : ''}
           <section class="sd-section">
             <h2 class="sd-title">Оценка</h2>
-            <p class="sd-subtitle">Оценка — доля выполненных задач за период: «Все» — по всем задачам, «План» — по проекту 51 (0, если задач нет).</p>
+            <p class="sd-subtitle">Оценка за период: «Все» — доля закрытых задач и выполненных пунктов чек-листов; «План» — доля выполненных пунктов чек-листов по проекту 51 (0, если пунктов нет).</p>
             <div class="sd-departments">${cards}</div>
           </section>
           <section class="sd-section">
