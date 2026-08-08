@@ -1311,7 +1311,7 @@
       .sd-score strong { font-size: 18px; line-height: 1; font-weight: 800; }
       .sd-score small { margin-top: 3px; color: #788078; font-size: 10px; line-height: 1; font-weight: 650; }
       .sd-people { padding: 0 12px 11px; }
-      .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(160px,1fr) 62px 78px 72px 66px 68px 66px minmax(140px,1fr) 32px; align-items: center; gap: 8px; }
+      .sd-person-head, .sd-person { display: grid; grid-template-columns: minmax(170px,1fr) 68px 84px 78px 72px 72px minmax(150px,1fr) 34px; align-items: center; gap: 8px; }
       .sd-person-head { border-bottom: 1px solid #dfe3de; padding: 7px 0 6px; color: #687068; font-size: 12px; font-weight: 650; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
@@ -1443,7 +1443,7 @@
         .sd-axis { margin-left: 88px; }
         .sd-dept-head { grid-template-columns: minmax(150px,1fr) auto 72px; gap: 8px; }
         .sd-dept-meta { display: none; }
-        .sd-person-head, .sd-person { grid-template-columns: minmax(96px,1fr) 40px 50px 46px 44px 50px 46px 68px 26px; gap: 4px; }
+        .sd-person-head, .sd-person { grid-template-columns: minmax(104px,1fr) 44px 52px 48px 46px 50px 72px 28px; gap: 4px; }
         .sd-task { grid-template-columns: minmax(150px,1fr) 90px; }
         .sd-task-deadline { grid-column: 2; }
       }
@@ -3260,6 +3260,7 @@
           helpers.forEach(person => {
             const deptName = rootFor(person.dept);
             if (deptName === 'Без отдела') return;
+            if (isExcludedInDept(person.name, deptName)) return;
             if (!groups.has(deptName)) {
               groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
             }
@@ -3305,6 +3306,7 @@
               if (!employee || isExcludedPerson(employee.name)) return;
               const deptName = rootFor(employee.dept);
               if (deptName === 'Без отдела') return;
+              if (isExcludedInDept(employee.name, deptName)) return;
               if (!groups.has(deptName)) {
                 groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
               }
@@ -3365,21 +3367,26 @@
           const currentDiscipline = Math.max(0, 100 - currentOverdue.length * 20 - currentOverdueDays * 2);
           return Math.round(executionQuality * .7 + currentDiscipline * .3);
         };
+        // «Оценка» bars are filled by completion: done / total (0 if no tasks).
+        const completionOf = rows => rows.length
+          ? Math.round(rows.filter(row => String(row['Состояние задачи'] || '').startsWith('Закрыта')).length / rows.length * 100)
+          : 0;
         const rosterByDept = new Map();
         (state.allEmployees || []).forEach(emp => {
           if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
           const deptName = rootFor(emp.dept);
           if (deptName === 'Без отдела') return;
+          if (isExcludedInDept(emp.name, deptName)) return;
           if (!rosterByDept.has(deptName)) rosterByDept.set(deptName, new Set());
           rosterByDept.get(deptName).add(String(emp.id || emp.name));
         });
         depts.forEach(d => {
-          d.score = scoreForRows(d.rows);
+          d.score = completionOf(d.rows);
           d.employeeCount = rosterByDept.get(d.name)?.size || d.people.size;
           d.workloadRatio = d.employeeCount ? d.rows.length / d.employeeCount : 0;
           d.people.forEach(e => {
-            e.score = scoreForRows(e.rows);
-            e.planScore = scoreForRows(e.rows.filter(row => String(row['ID проекта'] || '') === OP_GROUP_ID));
+            e.score = completionOf(e.rows);
+            e.planScore = completionOf(e.rows.filter(row => String(row['ID проекта'] || '') === OP_GROUP_ID));
           });
         });
         const ratioDepts = depts.filter(d => d.employeeCount > 0);
@@ -3486,7 +3493,7 @@
         const renderLoadCards = (people, high = false) => people.length
           ? people.map(emp => `<div class="sd-lowload-card${high ? ' high' : ''}">
               ${loadAvatar(emp)}
-              <span class="sd-lowload-name" title="${escapeHtml(emp.deptName)} · среднее ${emp.deptRatio.toFixed(1)}">${escapeHtml(emp.name)} · ${escapeHtml(emp.deptName)}</span>
+              <span class="sd-lowload-name" title="${escapeHtml(emp.deptName)} · среднее ${emp.deptRatio.toFixed(1)}">${escapeHtml(emp.name)}</span>
               <span class="sd-lowload-count">${emp.rows.length} зад.</span>
               <span class="sd-lowload-meta">${escapeHtml(emp.deptName)} · среднее ${emp.deptRatio.toFixed(1)}</span>
             </div>`).join('')
@@ -3689,7 +3696,6 @@
                 <span class="sd-help-count" title="Наблюдатель/соисполнитель в проекте 51">${planGroupCount || ''}</span>
                 <span class="sd-person-num">${outsideTaskCount ? `${outsideTaskCount} зад.` : ''}</span>
                 <span class="sd-help-count">${offHelpingCount || ''}</span>
-                <span class="sd-person-num${checklistItems.length ? ' sd-checklist-cell' : ''}"${checklistItems.length ? ` data-ckey="${pkey}" role="button" tabindex="0"` : ''} title="${checklistItems.length ? 'Показать чек-лист' : 'Выполнено / всего пунктов чек-листа'}${overdueChecklistItems ? ` · просрочено: ${overdueChecklistItems}` : ''}">${checklistItems.length ? `${completedChecklistItems}/${checklistItems.length}${overdueChecklistItems ? `<span class="sd-checklist-overdue">${overdueChecklistItems}</span>` : ''}` : ''}</span>
                 <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
                 <div class="sd-person-scores">
                   <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
@@ -3706,14 +3712,14 @@
                 <span class="sd-dept-name">${escapeHtml(d.name)}</span>
                 <span class="sd-health ${healthClass}">${health}</span>
               </div>
-              <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад. · ${d.overdueDays} дн.</span>
+              <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад.${d.overdueTasks ? ` · ${d.overdueTasks} просроч.` : ''} · ${d.overdueDays} дн.</span>
               <span class="sd-score" title="${d.rows.length} задач ÷ ${d.employeeCount} сотрудников">
                 <strong>${d.workloadRatio.toFixed(1)}</strong>
                 <small>задач/сотр.</small>
               </span>
             </summary>
             <div class="sd-people">
-              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span title="Наблюдатель/соисполнитель в проекте 51">Раб. группа</span><span>Вне плана</span><span>Помогает</span><span>Чек-лист</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
+              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span title="Наблюдатель/соисполнитель в проекте 51">Раб. группа</span><span>Вне плана</span><span>Помогает</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
               ${peopleRows}
             </div>
           </details>`;
@@ -3756,7 +3762,9 @@
         </div>`;
 
         bindPersonTaskPopup();
-        renderStats(state.filteredRows);
+        // Top stat cards must match what the report actually counts (after all
+        // exclusions), not every filtered row — otherwise the totals disagree.
+        renderStats(depts.flatMap(d => d.rows));
       }
 
       // Popup with a person's task breakdown, opened from an «Оценка» row.
