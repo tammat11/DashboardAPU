@@ -1310,6 +1310,29 @@
       .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 11px; }
       .sd-subtitle { margin: -5px 0 12px; font-size: 12px; color: var(--text-muted); }
       .sd-departments { display: flex; flex-direction: column; gap: 8px; }
+      /* Executive summary: headline KPIs + ranked risks */
+      .sd-exec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+      .sd-exec-period { color: var(--text-muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
+      .sd-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 10px; }
+      .sd-kpi { display: flex; flex-direction: column; gap: 3px; padding: 14px 15px; border: 1px solid var(--border-color); border-left-width: 4px; border-radius: 12px; background: #fff; }
+      .sd-kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #7b827b; }
+      .sd-kpi-value { font-size: 27px; font-weight: 800; line-height: 1.05; color: var(--text-dark); }
+      .sd-kpi-sub { font-size: 11.5px; color: #828a82; }
+      .sd-kpi.good { border-left-color: #22a06b; }
+      .sd-kpi.good .sd-kpi-value { color: #1c8a5b; }
+      .sd-kpi.warn { border-left-color: #e0a52e; }
+      .sd-kpi.warn .sd-kpi-value { color: #b7791f; }
+      .sd-kpi.bad { border-left-color: #dc2626; }
+      .sd-kpi.bad .sd-kpi-value { color: #c0453f; }
+      .sd-kpi.info { border-left-color: #317fd4; }
+      .sd-insights { margin-top: 14px; border: 1px solid var(--border-color); border-radius: 12px; background: #fbfcfa; padding: 12px 15px; }
+      .sd-insights-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: #7b827b; margin-bottom: 8px; }
+      .sd-insight { display: flex; gap: 9px; align-items: flex-start; padding: 5px 0; font-size: 13px; color: #3f463f; line-height: 1.4; }
+      .sd-insight::before { content: ''; flex: none; width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: #c3c7cc; }
+      .sd-insight.bad::before { background: #dc2626; }
+      .sd-insight.warn::before { background: #e0a52e; }
+      .sd-insight.good::before { background: #22a06b; }
+      .sd-insight.info::before { background: #317fd4; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
       .sd-dept summary::-webkit-details-marker { display: none; }
@@ -3389,20 +3412,27 @@
           const currentDiscipline = Math.max(0, 100 - currentOverdue.length * 20 - currentOverdueDays * 2);
           return Math.round(executionQuality * .7 + currentDiscipline * .3);
         };
-        // «Оценка» bars are filled by completion. The overall score counts both
-        // closed tasks AND completed checklist steps; the «по плану» score counts
-        // ONLY checklist-step completion (a план-задача progresses by its steps,
-        // not by the parent task's own closed state).
+        // «Оценка: все» — доля закрытых задач (по статусу задачи).
         const closedTasks = rows => rows.filter(row => String(row['Состояние задачи'] || '').startsWith('Закрыта')).length;
-        const completionOf = (rows, items = []) => {
-          const total = rows.length + items.length;
-          if (!total) return 0;
-          const done = closedTasks(rows) + items.filter(i => i.complete).length;
-          return Math.round(done / total * 100);
+        const completionOf = rows => rows.length ? Math.round(closedTasks(rows) / rows.length * 100) : 0;
+        // «Оценка: план» — прогресс по чек-листам задач ОП 2026 (проект 51). У этих
+        // пунктов пустые MEMBERS, поэтому по людям их не разложить — считаем по
+        // задачам исполнителя/отдела, читая чек-лист прямо из строки задачи.
+        const planStepsOf = rowsList => {
+          const m = new Map();
+          rowsList.forEach(row => {
+            if (String(row['ID проекта'] || '') !== OP_GROUP_ID) return;
+            let items = [];
+            try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
+            const tid = String(row['ID задачи'] || '');
+            items.forEach(it => m.set(`${tid}:${it.id}`, it.complete === true));
+          });
+          return Array.from(m.values());
         };
-        // Checklist-only completion (used for «по плану»): done steps / all steps.
-        const checklistCompletion = items =>
-          items.length ? Math.round(items.filter(i => i.complete).length / items.length * 100) : 0;
+        const planPctOf = rowsList => {
+          const steps = planStepsOf(rowsList);
+          return steps.length ? Math.round(steps.filter(Boolean).length / steps.length * 100) : 0;
+        };
         const rosterByDept = new Map();
         (state.allEmployees || []).forEach(emp => {
           if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
@@ -3412,17 +3442,9 @@
           if (!rosterByDept.has(deptName)) rosterByDept.set(deptName, new Set());
           rosterByDept.get(deptName).add(String(emp.id || emp.name));
         });
-        // Dedup a department's checklist items (an item shared by several people
-        // carries the same `taskId:itemId` key, so a Map collapses duplicates).
-        const deptChecklist = d => {
-          const m = new Map();
-          d.people.forEach(e => e.checklist && e.checklist.forEach((v, k) => m.set(k, v)));
-          return Array.from(m.values());
-        };
         depts.forEach(d => {
-          const deptItems = deptChecklist(d);
-          d.score = completionOf(d.rows, deptItems);
-          d.planScore = checklistCompletion(deptItems.filter(i => i.projectId === OP_GROUP_ID));
+          d.score = completionOf(d.rows);
+          d.planScore = planPctOf(d.rows);
           d.employeeCount = rosterByDept.get(d.name)?.size || d.people.size;
           // Workload counts every task a person takes part in — as executor OR
           // as co-executor/observer («Помогает»). helping is already deduped and
@@ -3432,9 +3454,8 @@
           d.loadCount = d.rows.length + helpingTotal;
           d.workloadRatio = d.employeeCount ? d.loadCount / d.employeeCount : 0;
           d.people.forEach(e => {
-            const items = Array.from((e.checklist || new Map()).values());
-            e.score = completionOf(e.rows, items);
-            e.planScore = checklistCompletion(items.filter(i => i.projectId === OP_GROUP_ID));
+            e.score = completionOf(e.rows);
+            e.planScore = planPctOf(e.rows);
           });
           // Overdue is counted for BOTH executed and participated tasks (наблюдатель/
           // соисполнитель) — same basis as «Нагрузка». Dedup per person and per
@@ -3865,9 +3886,84 @@
           </details>`;
         }).join('');
 
+        // ── Executive summary: headline KPIs + ranked risk callouts ───────
+        // Everything below is derived from the current snapshot only — no
+        // fabricated period-over-period trends.
+        const execRows = depts.flatMap(d => d.rows);
+        const uniqBy = (list, key) => new Set(list.map(key).filter(Boolean)).size;
+        const execTotal = uniqBy(execRows, r => r['ID задачи']);
+        const execDone = uniqBy(execRows.filter(isDoneRow), r => r['ID задачи']);
+        const completionPct = execTotal ? Math.round(execDone / execTotal * 100) : 0;
+        const closedRows = execRows.filter(r => String(r['Состояние задачи'] || '').startsWith('Закрыта'));
+        const closedInTime = closedRows.filter(r => r['Состояние задачи'] === 'Закрыта в срок').length;
+        const onTimePct = closedRows.length ? Math.round(closedInTime / closedRows.length * 100) : 0;
+        const overdueRowsAll = new Map();
+        depts.forEach(d => (d.overdueRows || []).forEach(r =>
+          overdueRowsAll.set(String(r['ID задачи'] || r['Название задачи'] || ''), r)));
+        const overdueTasksTotal = overdueRowsAll.size;
+        const overdueDaysTotal = Array.from(overdueRowsAll.values())
+          .reduce((s, r) => s + Math.max(0, parseInt(r['Просрочка, дней']) || 0), 0);
+        const planSteps = planStepsOf(state.filteredRows);
+        const planDoneAll = planSteps.filter(Boolean).length;
+        const planPct = planSteps.length ? Math.round(planDoneAll / planSteps.length * 100) : 0;
+        const overCount = highLoadPeople.length;
+        const underCount = lowLoadPeople.length;
+
+        const gradeCls = (v, good = 75, warn = 50) => v >= good ? 'good' : v >= warn ? 'warn' : 'bad';
+        const kpi = (label, value, sub, cls) =>
+          `<div class="sd-kpi ${cls}"><span class="sd-kpi-label">${label}</span><span class="sd-kpi-value">${value}</span><span class="sd-kpi-sub">${sub}</span></div>`;
+        const kpiCards = [
+          kpi('Выполнение', `${completionPct}%`, `${execDone} из ${execTotal} задач`, gradeCls(completionPct)),
+          kpi('В срок', `${onTimePct}%`, `${closedInTime} из ${closedRows.length} закрытых`, gradeCls(onTimePct, 80, 60)),
+          kpi('Просрочка', `${overdueTasksTotal}`, `${overdueDaysTotal} дн. суммарно`, overdueTasksTotal ? 'bad' : 'good'),
+          kpi('ОП 2026', `${planPct}%`, planSteps.length ? `${planDoneAll} из ${planSteps.length} шагов` : 'нет шагов', planSteps.length ? gradeCls(planPct, 60, 30) : 'info'),
+          kpi('Баланс нагрузки', `${overCount}/${underCount}`, `перегруж/недогруж · ТБУ ${tbu.toFixed(1)}`, overCount ? 'warn' : 'good')
+        ].join('');
+
+        const insights = [];
+        if (overdueTasksTotal > 0 && overdueBarDepts.length) {
+          const w = overdueBarDepts[0];
+          insights.push({ level: 'bad', text: `Просрочено ${overdueTasksTotal} задач на ${overdueDaysTotal} дн. Критичнее всего — ${escapeHtml(w.name)}: ${w.overdueDays} дн. в ${w.overdueTasks} задачах.` });
+        }
+        if (overCount > 0) {
+          const t = highLoadPeople[0];
+          insights.push({ level: 'warn', text: `${overCount} сотр. выше ТБУ (${tbu.toFixed(1)} задач/чел.). Пик — ${escapeHtml(t.name)}: ${t.load} задач (${escapeHtml(t.deptName)}).` });
+        }
+        const weakDepts = depts.filter(d => d.rows.length >= 3 && d.score < 50).sort((a, b) => a.score - b.score);
+        if (weakDepts.length) {
+          insights.push({ level: 'warn', text: `Ниже 50% выполнения: ${weakDepts.slice(0, 3).map(d => `${escapeHtml(d.name)} (${d.score}%)`).join(', ')}${weakDepts.length > 3 ? ` и ещё ${weakDepts.length - 3}` : ''}.` });
+        }
+        if (planSteps.length) {
+          insights.push({ level: planPct >= 60 ? 'good' : 'warn', text: `Оперативный план 2026 выполнен на ${planPct}% (${planDoneAll} из ${planSteps.length} шагов).` });
+        }
+        if (underCount > 0) {
+          insights.push({ level: 'info', text: `${underCount} сотр. значительно ниже средней нагрузки — есть резерв для перераспределения.` });
+        }
+        const leaderDept = depts.filter(d => d.rows.length >= 3).sort((a, b) => b.score - a.score)[0];
+        if (leaderDept && leaderDept.score >= 75) {
+          insights.push({ level: 'good', text: `Лидер по выполнению — ${escapeHtml(leaderDept.name)}: ${leaderDept.score}%.` });
+        }
+        const sevRank = { bad: 0, warn: 1, info: 2, good: 3 };
+        const insightRows = insights
+          .map((it, i) => ({ ...it, i }))
+          .sort((a, b) => (sevRank[a.level] - sevRank[b.level]) || (a.i - b.i))
+          .slice(0, 5)
+          .map(it => `<div class="sd-insight ${it.level}">${it.text}</div>`)
+          .join('');
+        const execPeriod = (document.getElementById('periodBtnLabel')?.textContent || '').trim();
+        const execSection = `<section class="sd-section sd-exec">
+            <div class="sd-exec-head">
+              <h2 class="sd-title">Ключевые показатели</h2>
+              <span class="sd-exec-period">${escapeHtml(execPeriod)} · ${depts.length} отделов · ${execTotal} задач</span>
+            </div>
+            <div class="sd-kpi-grid">${kpiCards}</div>
+            ${insightRows ? `<div class="sd-insights"><div class="sd-insights-title">Требует внимания</div>${insightRows}</div>` : ''}
+          </section>`;
+
         const planFilterClass = state.planFilter === 'plan' ? ' filter-plan'
           : state.planFilter === 'off' ? ' filter-off' : '';
         ids.structureWrap.innerHTML = `<div class="sd-page${planFilterClass}">
+          ${execSection}
           <section class="sd-section">
             <h2 class="sd-title">Распределение</h2>
             <div class="sd-stack">${stack}</div>
@@ -3892,7 +3988,7 @@
           </section>` : ''}
           <section class="sd-section">
             <h2 class="sd-title">Оценка</h2>
-            <p class="sd-subtitle">Оценка за период: «Все» — доля закрытых задач и выполненных пунктов чек-листов; «План» — доля выполненных пунктов чек-листов по проекту 51 (0, если пунктов нет).</p>
+            <p class="sd-subtitle">Оценка за период: «Все» — доля закрытых задач; «План» — прогресс по чек-листам задач ОП 2026 (выполненные пункты / все пункты; 0, если пунктов нет).</p>
             <div class="sd-departments">${cards}</div>
           </section>
           <section class="sd-section">
