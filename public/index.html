@@ -1248,6 +1248,7 @@
       .sd-stack { display: flex; min-height: 58px; overflow: hidden; border-radius: 12px; background: #eef0ed; box-shadow: inset 0 0 0 1px rgba(255,255,255,.35); }
       .sd-stack-item { min-width: 52px; padding: 9px 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; text-align: center; }
       .sd-stack-value { font-size: 16px; line-height: 1; font-weight: 800; }
+      .sd-stack-pct { margin-left: 5px; font-size: 11px; font-weight: 700; opacity: .8; }
       .sd-stack-label { margin-top: 4px; max-width: 100%; overflow: hidden; font-size: 12px; font-weight: 700; line-height: 1.15; text-overflow: ellipsis; white-space: nowrap; opacity: .92; }
       .sd-ratio-head { position: relative; display: flex; align-items: center; justify-content: center; gap: 12px; }
       .sd-ratio-head .sd-tbu { position: absolute; top: 0; right: 0; }
@@ -1310,29 +1311,6 @@
       .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 11px; }
       .sd-subtitle { margin: -5px 0 12px; font-size: 12px; color: var(--text-muted); }
       .sd-departments { display: flex; flex-direction: column; gap: 8px; }
-      /* Executive summary: headline KPIs + ranked risks */
-      .sd-exec-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
-      .sd-exec-period { color: var(--text-muted); font-size: 12px; font-weight: 600; white-space: nowrap; }
-      .sd-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px,1fr)); gap: 10px; }
-      .sd-kpi { display: flex; flex-direction: column; gap: 3px; padding: 14px 15px; border: 1px solid var(--border-color); border-left-width: 4px; border-radius: 12px; background: #fff; }
-      .sd-kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #7b827b; }
-      .sd-kpi-value { font-size: 27px; font-weight: 800; line-height: 1.05; color: var(--text-dark); }
-      .sd-kpi-sub { font-size: 11.5px; color: #828a82; }
-      .sd-kpi.good { border-left-color: #22a06b; }
-      .sd-kpi.good .sd-kpi-value { color: #1c8a5b; }
-      .sd-kpi.warn { border-left-color: #e0a52e; }
-      .sd-kpi.warn .sd-kpi-value { color: #b7791f; }
-      .sd-kpi.bad { border-left-color: #dc2626; }
-      .sd-kpi.bad .sd-kpi-value { color: #c0453f; }
-      .sd-kpi.info { border-left-color: #317fd4; }
-      .sd-insights { margin-top: 14px; border: 1px solid var(--border-color); border-radius: 12px; background: #fbfcfa; padding: 12px 15px; }
-      .sd-insights-title { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: #7b827b; margin-bottom: 8px; }
-      .sd-insight { display: flex; gap: 9px; align-items: flex-start; padding: 5px 0; font-size: 13px; color: #3f463f; line-height: 1.4; }
-      .sd-insight::before { content: ''; flex: none; width: 8px; height: 8px; margin-top: 5px; border-radius: 50%; background: #c3c7cc; }
-      .sd-insight.bad::before { background: #dc2626; }
-      .sd-insight.warn::before { background: #e0a52e; }
-      .sd-insight.good::before { background: #22a06b; }
-      .sd-insight.info::before { background: #317fd4; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
       .sd-dept summary::-webkit-details-marker { display: none; }
@@ -3412,9 +3390,18 @@
           const currentDiscipline = Math.max(0, 100 - currentOverdue.length * 20 - currentOverdueDays * 2);
           return Math.round(executionQuality * .7 + currentDiscipline * .3);
         };
-        // «Оценка: все» — доля закрытых задач (по статусу задачи).
+        // «Оценка: все» — доля выполненного среди всех единиц работы: задачи
+        // (по статусу «Закрыта») ПЛЮС пункты чек-листов ОП 2026 (каждый пункт —
+        // отдельная единица). Чек-листы важны, поэтому считаем их наравне с задачами.
         const closedTasks = rows => rows.filter(row => String(row['Состояние задачи'] || '').startsWith('Закрыта')).length;
-        const completionOf = rows => rows.length ? Math.round(closedTasks(rows) / rows.length * 100) : 0;
+        const completionUnits = rows => {
+          const steps = planStepsOf(rows);
+          return { done: closedTasks(rows) + steps.filter(Boolean).length, total: rows.length + steps.length };
+        };
+        const completionOf = rows => {
+          const u = completionUnits(rows);
+          return u.total ? Math.round(u.done / u.total * 100) : 0;
+        };
         // «Оценка: план» — прогресс по чек-листам задач ОП 2026 (проект 51). У этих
         // пунктов пустые MEMBERS, поэтому по людям их не разложить — считаем по
         // задачам исполнителя/отдела, читая чек-лист прямо из строки задачи.
@@ -3545,22 +3532,33 @@
             <text x="${chartLeft - 18}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="#7c837c" font-size="12">${value.toFixed(1)}</text>`;
         }).join('');
         const ratioPath = ratioSorted.map((d, index) => `${xFor(index).toFixed(1)},${yFor(d.workloadRatio).toFixed(1)}`).join(' ');
+        // Soft area under the load line for readability.
+        const ratioArea = ratioSorted.length
+          ? `<polygon points="${xFor(0).toFixed(1)},${chartBottom} ${ratioPath} ${xFor(ratioSorted.length - 1).toFixed(1)},${chartBottom}" fill="#317fd4" opacity="0.08"/>`
+          : '';
         const ratioPoints = ratioSorted.map((d, index) => {
           const x = xFor(index);
           const y = yFor(d.workloadRatio);
+          // Point colour flags the department vs ТБУ: red = above the norm
+          // (overloaded), blue = at or below.
+          const over = d.workloadRatio > tbu;
+          const dot = over ? '#e54c50' : '#317fd4';
+          const valColor = over ? '#c0453f' : '#243024';
           const labelLines = chartDeptLines(d.name);
           const label = labelLines.map((line, lineIndex) =>
             `<tspan x="${x.toFixed(1)}" dy="${lineIndex ? 14 : 0}">${escapeHtml(line)}</tspan>`
           ).join('');
-          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="#317fd4" stroke="#ffffff" stroke-width="2"/>
-            <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="#243024" font-size="14" font-weight="600">${d.workloadRatio.toFixed(1)}</text>
+          return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="7" fill="${dot}" stroke="#ffffff" stroke-width="2"/>
+            <text x="${x.toFixed(1)}" y="${(y - 13).toFixed(1)}" text-anchor="middle" fill="${valColor}" font-size="14" font-weight="700">${d.workloadRatio.toFixed(1)}</text>
             <text x="${x.toFixed(1)}" y="${chartBottom + 22}" text-anchor="middle" fill="#354035" font-size="11.5" font-weight="600">${label}</text>`;
         }).join('');
         const tbuY = yFor(tbu);
         const ratioDiagram = `<svg class="sd-ratio-svg" viewBox="0 0 1000 215" role="img" aria-label="Диаграмма нагрузки по отделам и средняя линия ТБУ">
           ${ratioGrid}
+          ${ratioArea}
           <line x1="${chartLeft}" y1="${chartBottom}" x2="${chartRight}" y2="${chartBottom}" stroke="#aeb5ae" stroke-width="1.5"/>
           <line x1="${chartLeft}" y1="${tbuY.toFixed(1)}" x2="${chartRight}" y2="${tbuY.toFixed(1)}" stroke="#e54c50" stroke-width="2" stroke-dasharray="8 7"/>
+          <text x="${chartRight}" y="${(tbuY - 6).toFixed(1)}" text-anchor="end" fill="#e54c50" font-size="11" font-weight="700">ТБУ ${tbu.toFixed(1)}</text>
           <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           ${ratioPoints}
         </svg>`;
@@ -3603,9 +3601,13 @@
         const totalTasks = depts.reduce((sum, d) => sum + d.rows.length, 0);
         const stack = depts.map((d, index) => {
           const width = totalTasks ? d.rows.length / totalTasks * 100 : 0;
-          return `<div class="sd-stack-item" style="width:${width.toFixed(2)}%;background:${palette[index % palette.length]}">
-            <span class="sd-stack-value">${d.rows.length}</span>
-            <span class="sd-stack-label" title="${escapeHtml(d.name)}">${escapeHtml(shortDeptName(d.name))}</span>
+          const pct = Math.round(width);
+          // Thin segments only keep the count — the name would just clip; the
+          // full name and share stay in the hover tooltip.
+          const roomy = width >= 6;
+          return `<div class="sd-stack-item" style="width:${width.toFixed(2)}%;background:${palette[index % palette.length]}" title="${escapeHtml(d.name)} · ${d.rows.length} задач · ${pct}%">
+            <span class="sd-stack-value">${d.rows.length}<span class="sd-stack-pct">${pct}%</span></span>
+            ${roomy ? `<span class="sd-stack-label">${escapeHtml(shortDeptName(d.name))}</span>` : ''}
           </div>`;
         }).join('');
 
@@ -3886,84 +3888,9 @@
           </details>`;
         }).join('');
 
-        // ── Executive summary: headline KPIs + ranked risk callouts ───────
-        // Everything below is derived from the current snapshot only — no
-        // fabricated period-over-period trends.
-        const execRows = depts.flatMap(d => d.rows);
-        const uniqBy = (list, key) => new Set(list.map(key).filter(Boolean)).size;
-        const execTotal = uniqBy(execRows, r => r['ID задачи']);
-        const execDone = uniqBy(execRows.filter(isDoneRow), r => r['ID задачи']);
-        const completionPct = execTotal ? Math.round(execDone / execTotal * 100) : 0;
-        const closedRows = execRows.filter(r => String(r['Состояние задачи'] || '').startsWith('Закрыта'));
-        const closedInTime = closedRows.filter(r => r['Состояние задачи'] === 'Закрыта в срок').length;
-        const onTimePct = closedRows.length ? Math.round(closedInTime / closedRows.length * 100) : 0;
-        const overdueRowsAll = new Map();
-        depts.forEach(d => (d.overdueRows || []).forEach(r =>
-          overdueRowsAll.set(String(r['ID задачи'] || r['Название задачи'] || ''), r)));
-        const overdueTasksTotal = overdueRowsAll.size;
-        const overdueDaysTotal = Array.from(overdueRowsAll.values())
-          .reduce((s, r) => s + Math.max(0, parseInt(r['Просрочка, дней']) || 0), 0);
-        const planSteps = planStepsOf(state.filteredRows);
-        const planDoneAll = planSteps.filter(Boolean).length;
-        const planPct = planSteps.length ? Math.round(planDoneAll / planSteps.length * 100) : 0;
-        const overCount = highLoadPeople.length;
-        const underCount = lowLoadPeople.length;
-
-        const gradeCls = (v, good = 75, warn = 50) => v >= good ? 'good' : v >= warn ? 'warn' : 'bad';
-        const kpi = (label, value, sub, cls) =>
-          `<div class="sd-kpi ${cls}"><span class="sd-kpi-label">${label}</span><span class="sd-kpi-value">${value}</span><span class="sd-kpi-sub">${sub}</span></div>`;
-        const kpiCards = [
-          kpi('Выполнение', `${completionPct}%`, `${execDone} из ${execTotal} задач`, gradeCls(completionPct)),
-          kpi('В срок', `${onTimePct}%`, `${closedInTime} из ${closedRows.length} закрытых`, gradeCls(onTimePct, 80, 60)),
-          kpi('Просрочка', `${overdueTasksTotal}`, `${overdueDaysTotal} дн. суммарно`, overdueTasksTotal ? 'bad' : 'good'),
-          kpi('ОП 2026', `${planPct}%`, planSteps.length ? `${planDoneAll} из ${planSteps.length} шагов` : 'нет шагов', planSteps.length ? gradeCls(planPct, 60, 30) : 'info'),
-          kpi('Баланс нагрузки', `${overCount}/${underCount}`, `перегруж/недогруж · ТБУ ${tbu.toFixed(1)}`, overCount ? 'warn' : 'good')
-        ].join('');
-
-        const insights = [];
-        if (overdueTasksTotal > 0 && overdueBarDepts.length) {
-          const w = overdueBarDepts[0];
-          insights.push({ level: 'bad', text: `Просрочено ${overdueTasksTotal} задач на ${overdueDaysTotal} дн. Критичнее всего — ${escapeHtml(w.name)}: ${w.overdueDays} дн. в ${w.overdueTasks} задачах.` });
-        }
-        if (overCount > 0) {
-          const t = highLoadPeople[0];
-          insights.push({ level: 'warn', text: `${overCount} сотр. выше ТБУ (${tbu.toFixed(1)} задач/чел.). Пик — ${escapeHtml(t.name)}: ${t.load} задач (${escapeHtml(t.deptName)}).` });
-        }
-        const weakDepts = depts.filter(d => d.rows.length >= 3 && d.score < 50).sort((a, b) => a.score - b.score);
-        if (weakDepts.length) {
-          insights.push({ level: 'warn', text: `Ниже 50% выполнения: ${weakDepts.slice(0, 3).map(d => `${escapeHtml(d.name)} (${d.score}%)`).join(', ')}${weakDepts.length > 3 ? ` и ещё ${weakDepts.length - 3}` : ''}.` });
-        }
-        if (planSteps.length) {
-          insights.push({ level: planPct >= 60 ? 'good' : 'warn', text: `Оперативный план 2026 выполнен на ${planPct}% (${planDoneAll} из ${planSteps.length} шагов).` });
-        }
-        if (underCount > 0) {
-          insights.push({ level: 'info', text: `${underCount} сотр. значительно ниже средней нагрузки — есть резерв для перераспределения.` });
-        }
-        const leaderDept = depts.filter(d => d.rows.length >= 3).sort((a, b) => b.score - a.score)[0];
-        if (leaderDept && leaderDept.score >= 75) {
-          insights.push({ level: 'good', text: `Лидер по выполнению — ${escapeHtml(leaderDept.name)}: ${leaderDept.score}%.` });
-        }
-        const sevRank = { bad: 0, warn: 1, info: 2, good: 3 };
-        const insightRows = insights
-          .map((it, i) => ({ ...it, i }))
-          .sort((a, b) => (sevRank[a.level] - sevRank[b.level]) || (a.i - b.i))
-          .slice(0, 5)
-          .map(it => `<div class="sd-insight ${it.level}">${it.text}</div>`)
-          .join('');
-        const execPeriod = (document.getElementById('periodBtnLabel')?.textContent || '').trim();
-        const execSection = `<section class="sd-section sd-exec">
-            <div class="sd-exec-head">
-              <h2 class="sd-title">Ключевые показатели</h2>
-              <span class="sd-exec-period">${escapeHtml(execPeriod)} · ${depts.length} отделов · ${execTotal} задач</span>
-            </div>
-            <div class="sd-kpi-grid">${kpiCards}</div>
-            ${insightRows ? `<div class="sd-insights"><div class="sd-insights-title">Требует внимания</div>${insightRows}</div>` : ''}
-          </section>`;
-
         const planFilterClass = state.planFilter === 'plan' ? ' filter-plan'
           : state.planFilter === 'off' ? ' filter-off' : '';
         ids.structureWrap.innerHTML = `<div class="sd-page${planFilterClass}">
-          ${execSection}
           <section class="sd-section">
             <h2 class="sd-title">Распределение</h2>
             <div class="sd-stack">${stack}</div>
