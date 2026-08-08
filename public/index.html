@@ -1670,6 +1670,13 @@
         return EXCLUDED_NAMES.some(ex => n.includes(ex.toLowerCase()));
       }
 
+      // Department-specific exclusions in the «Отчёт» view. Лейла is not counted
+      // under «Управление качеством».
+      function isExcludedInDept(name, deptName) {
+        const n = String(name || '').toLowerCase();
+        return deptName === 'Управление качеством' && n.includes('лейла');
+      }
+
       // Deadline written inside a checklist item title as «до DD.MM.YYYY».
       // Returns end-of-day Date or null. Used only to flag overdue checklist
       // items — it does not affect scores or the «Просрочка» chart.
@@ -3181,6 +3188,7 @@
           if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
           const deptName = rootFor(emp.dept);
           if (deptName === 'Без отдела') return;
+          if (isExcludedInDept(emp.name, deptName)) return;
           if (!groups.has(deptName)) {
             groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
           }
@@ -3202,6 +3210,7 @@
           const person = row['Исполнитель'] || '';
           if (!person || isExcludedPerson(person)) return;
           const deptName = rootFor(row['Отдел']);
+          if (isExcludedInDept(person, deptName)) return;
           if (!groups.has(deptName)) {
             groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
           }
@@ -3503,8 +3512,10 @@
           .sort((a, b) => b.overdueDays - a.overdueDays);
         const bars = overdueBarDepts
           .map(d => {
+            // Only genuinely overdue tasks (the ones that make up the day count),
+            // not every open task — otherwise future-deadline tasks look «overdue».
             const unfinished = d.rows
-              .filter(row => !String(row['Состояние задачи'] || '').startsWith('Закрыта'))
+              .filter(row => String(row['Состояние задачи'] || '') === 'Открыта просрочена')
               .sort((a, b) => String(a.deadlineRaw || '9999').localeCompare(String(b.deadlineRaw || '9999')));
             const unfinishedRows = unfinished.length
               ? unfinished.map(row => {
@@ -3513,11 +3524,12 @@
                   const titleHtml = state.portalHost && /^\d+$/.test(taskId)
                     ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${taskId}/">${title}</a>`
                     : title;
-                  return `<div class="sd-overdue-task">${titleHtml}<span>${escapeHtml(row['Дедлайн'] || 'Без срока')}</span></div>`;
+                  const od = Math.max(0, parseInt(row['Просрочка, дней']) || 0);
+                  return `<div class="sd-overdue-task">${titleHtml}<span>${escapeHtml(row['Дедлайн'] || 'Без срока')}${od ? ` · ${od} дн.` : ''}</span></div>`;
                 }).join('')
-              : '<div class="sd-overdue-empty">Незавершённых задач нет</div>';
+              : '<div class="sd-overdue-empty">Просроченных задач нет</div>';
             return `<details class="sd-overdue-dept">
-              <summary class="sd-bar-row" title="Показать ${unfinished.length} незавершённых задач">
+              <summary class="sd-bar-row" title="Показать ${unfinished.length} просроченных задач">
                 <span class="sd-bar-name" title="${escapeHtml(d.name)}">${escapeHtml(shortDeptName(d.name))}</span>
                 <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(d.overdueDays / maxOverdue * 100).toFixed(1)}%"></div></div>
                 <span class="sd-bar-value">${d.overdueDays}</span>
