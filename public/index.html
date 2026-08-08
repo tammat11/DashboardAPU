@@ -1291,10 +1291,16 @@
       .sd-overdue-task .task-link { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
       .sd-overdue-task span { color: #a04b4f; text-align: right; white-space: nowrap; }
       .sd-cl-bullets { list-style: none; margin: 0 10px 7px 22px; padding: 0; }
-      .sd-cl-bullet { position: relative; padding: 2px 0 2px 16px; font-size: 10.5px; color: #6b6f74; line-height: 1.35; }
+      .sd-cl-bullet { position: relative; display: flex; gap: 10px; justify-content: space-between; padding: 2px 0 2px 16px; font-size: 10.5px; color: #6b6f74; line-height: 1.35; }
       .sd-cl-bullet::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: #c3c7cc; }
+      .sd-cl-txt { min-width: 0; }
+      .sd-cl-date { flex: none; color: #9a9ea3; white-space: nowrap; font-variant-numeric: tabular-nums; }
       .sd-cl-bullet.done { color: #4a8a63; }
+      .sd-cl-bullet.done .sd-cl-date { color: #4a8a63; }
       .sd-cl-bullet.done::before { background: #22a06b; }
+      .sd-cl-bullet.overdue { color: #c0453f; }
+      .sd-cl-bullet.overdue .sd-cl-date { color: #c0453f; font-weight: 650; }
+      .sd-cl-bullet.overdue::before { background: #dc2626; }
       /* «Выполнено» reuses the overdue markup but must read green, not red. */
       .sd-done-dept[open] .sd-bar-name { color: #22a06b; }
       .sd-done-dept .sd-overdue-tasks { border-color: #d7ecdc; background: #f8fdf9; }
@@ -3580,13 +3586,20 @@
           .replace(/\s*·\s*до\s+\d{1,2}\.\d{1,2}\.\d{4}\s*/i, ' ')
           .replace(/^\s*\d+(?:\.\d+)*\s+/, '')
           .trim();
+        const fmtDate = dt => `${String(dt.getDate()).padStart(2, '0')}.${String(dt.getMonth() + 1).padStart(2, '0')}.${dt.getFullYear()}`;
         const taskChecklistBullets = row => {
           let items = [];
           try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
           if (!Array.isArray(items) || !items.length) return '';
           const lis = items.map(it => {
             const done = it.complete === true;
-            return `<li class="sd-cl-bullet${done ? ' done' : ''}">${escapeHtml(cleanStepTitle(it.title) || 'Пункт чек-листа')}</li>`;
+            const dl = checklistItemDeadline(it.title);
+            // Overdue is judged by the checklist step's own «до …» date, not the
+            // parent task — a step past its date and not done reads red.
+            const overdue = !done && !!dl && dl.getTime() < Date.now();
+            const cls = done ? ' done' : overdue ? ' overdue' : '';
+            const dateHtml = dl ? `<span class="sd-cl-date">${fmtDate(dl)}</span>` : '';
+            return `<li class="sd-cl-bullet${cls}"><span class="sd-cl-txt">${escapeHtml(cleanStepTitle(it.title) || 'Пункт чек-листа')}</span>${dateHtml}</li>`;
           }).join('');
           return `<ul class="sd-cl-bullets">${lis}</ul>`;
         };
