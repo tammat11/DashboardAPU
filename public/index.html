@@ -3226,11 +3226,7 @@
             groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
           }
           const group = groups.get(deptName);
-          const isOpenOverdue = row['Состояние задачи'] === 'Открыта просрочена';
-          const overdue = isOpenOverdue ? Math.max(0, parseInt(row['Просрочка, дней']) || 0) : 0;
           group.rows.push(row);
-          group.overdueDays += overdue;
-          if (isOpenOverdue) group.overdueTasks++;
           if (!group.people.has(person)) {
             group.people.set(person, {
               name: person,
@@ -3245,8 +3241,6 @@
           }
           const emp = group.people.get(person);
           emp.rows.push(row);
-          emp.overdueDays += overdue;
-          if (isOpenOverdue) emp.overdueTasks++;
         });
 
         // Add tasks where the employee participates without being the main
@@ -3426,6 +3420,32 @@
             e.score = completionOf(e.rows, items);
             e.planScore = checklistCompletion(items.filter(i => i.projectId === OP_GROUP_ID));
           });
+          // Overdue is counted for BOTH executed and participated tasks (наблюдатель/
+          // соисполнитель) — same basis as «Нагрузка». Dedup per person and per
+          // department by task id, so one task never inflates a единицу дважды.
+          const collectOverdue = rowsList => {
+            const m = new Map();
+            rowsList.forEach(row => {
+              if (String(row['Состояние задачи'] || '') !== 'Открыта просрочена') return;
+              const key = String(row['ID задачи'] || '') || row['Название задачи'] || Math.random();
+              if (!m.has(key)) m.set(key, row);
+            });
+            return m;
+          };
+          const overdueDaysOf = row => Math.max(0, parseInt(row['Просрочка, дней']) || 0);
+          d.people.forEach(e => {
+            const helpRows = Array.from((e.helping || new Map()).values()).map(h => h.row);
+            const m = collectOverdue([...e.rows, ...helpRows]);
+            e.overdueTasks = m.size;
+            e.overdueDays = Array.from(m.values()).reduce((s, row) => s + overdueDaysOf(row), 0);
+          });
+          const helpRowsAll = Array.from(d.people.values())
+            .flatMap(e => Array.from((e.helping || new Map()).values()).map(h => h.row));
+          const deptOverdue = collectOverdue([...d.rows, ...helpRowsAll]);
+          d.overdueRows = Array.from(deptOverdue.values())
+            .sort((a, b) => String(a.deadlineRaw || '9999').localeCompare(String(b.deadlineRaw || '9999')));
+          d.overdueTasks = deptOverdue.size;
+          d.overdueDays = d.overdueRows.reduce((s, row) => s + overdueDaysOf(row), 0);
         });
         const ratioDepts = depts.filter(d => d.employeeCount > 0);
         const tbu = ratioDepts.length
@@ -3558,6 +3578,7 @@
         const cleanStepTitle = t => String(t || '')
           .replace(/\s*·\s*исполнитель\s*:.*$/i, '')
           .replace(/\s*·\s*до\s+\d{1,2}\.\d{1,2}\.\d{4}\s*/i, ' ')
+          .replace(/^\s*\d+(?:\.\d+)*\s+/, '')
           .trim();
         const taskChecklistBullets = row => {
           let items = [];
@@ -3580,11 +3601,9 @@
           .sort((a, b) => b.overdueDays - a.overdueDays);
         const bars = overdueBarDepts
           .map(d => {
-            // Only genuinely overdue tasks (the ones that make up the day count),
-            // not every open task — otherwise future-deadline tasks look «overdue».
-            const unfinished = d.rows
-              .filter(row => String(row['Состояние задачи'] || '') === 'Открыта просрочена')
-              .sort((a, b) => String(a.deadlineRaw || '9999').localeCompare(String(b.deadlineRaw || '9999')));
+            // Overdue tasks the department is exposed to — executed OR participated
+            // in (наблюдатель/соисполнитель), deduped by task id above.
+            const unfinished = d.overdueRows || [];
             const unfinishedRows = unfinished.length
               ? unfinished.map(row => {
                   const taskId = String(row['ID задачи'] || '');
