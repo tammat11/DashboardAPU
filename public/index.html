@@ -1285,10 +1285,16 @@
       .sd-bar-fill { height: 100%; min-width: 2px; background: linear-gradient(90deg, #ee5b60, #df454a); border-radius: 999px; }
       .sd-bar-value { font-size: 14px; font-weight: 700; color: #697069; }
       .sd-overdue-tasks { max-height: 190px; margin: 1px 44px 3px 120px; overflow-y: auto; border: 1px solid #eadcdc; border-radius: 10px; background: #fffafa; }
-      .sd-overdue-task { display: grid; grid-template-columns: minmax(180px,1fr) 120px; gap: 10px; padding: 7px 10px; align-items: center; border-bottom: 1px solid #f0e5e5; font-size: 11px; }
-      .sd-overdue-task:last-child { border-bottom: 0; }
+      .sd-overdue-item { border-bottom: 1px solid #f0e5e5; }
+      .sd-overdue-item:last-child { border-bottom: 0; }
+      .sd-overdue-task { display: grid; grid-template-columns: minmax(180px,1fr) 120px; gap: 10px; padding: 7px 10px; align-items: center; font-size: 11px; }
       .sd-overdue-task .task-link { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
       .sd-overdue-task span { color: #a04b4f; text-align: right; white-space: nowrap; }
+      .sd-cl-bullets { list-style: none; margin: 0 10px 7px 22px; padding: 0; }
+      .sd-cl-bullet { position: relative; padding: 2px 0 2px 16px; font-size: 10.5px; color: #6b6f74; line-height: 1.35; }
+      .sd-cl-bullet::before { content: ''; position: absolute; left: 3px; top: 8px; width: 5px; height: 5px; border-radius: 50%; background: #c3c7cc; }
+      .sd-cl-bullet.done { color: #4a8a63; }
+      .sd-cl-bullet.done::before { background: #22a06b; }
       /* «Выполнено» reuses the overdue markup but must read green, not red. */
       .sd-done-dept[open] .sd-bar-name { color: #22a06b; }
       .sd-done-dept .sd-overdue-tasks { border-color: #d7ecdc; background: #f8fdf9; }
@@ -3546,6 +3552,26 @@
           </div>`;
         }).join('');
 
+        // Render a task's checklist steps as bullets under its title (used in the
+        // «Просрочка» и «Выполнено» lists). Strips the old «· до …/· исполнитель:»
+        // suffixes from step titles.
+        const cleanStepTitle = t => String(t || '')
+          .replace(/\s*·\s*исполнитель\s*:.*$/i, '')
+          .replace(/\s*·\s*до\s+\d{1,2}\.\d{1,2}\.\d{4}\s*/i, ' ')
+          .trim();
+        const taskChecklistBullets = row => {
+          let items = [];
+          try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
+          if (!Array.isArray(items) || !items.length) return '';
+          const lis = items.map(it => {
+            const done = it.complete === true;
+            return `<li class="sd-cl-bullet${done ? ' done' : ''}">${escapeHtml(cleanStepTitle(it.title) || 'Пункт чек-листа')}</li>`;
+          }).join('');
+          return `<ul class="sd-cl-bullets">${lis}</ul>`;
+        };
+        const taskRowHtml = (titleHtml, metaHtml, row) =>
+          `<div class="sd-overdue-item"><div class="sd-overdue-task">${titleHtml}<span>${metaHtml}</span></div>${taskChecklistBullets(row)}</div>`;
+
         // Only departments that actually have overdue days appear in the
         // «Просрочка» block; the whole block is hidden when there are none.
         const overdueBarDepts = depts
@@ -3567,7 +3593,7 @@
                     ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${taskId}/">${title}</a>`
                     : title;
                   const od = Math.max(0, parseInt(row['Просрочка, дней']) || 0);
-                  return `<div class="sd-overdue-task">${titleHtml}<span>${escapeHtml(row['Дедлайн'] || 'Без срока')}${od ? ` · ${od} дн.` : ''}</span></div>`;
+                  return taskRowHtml(titleHtml, `${escapeHtml(row['Дедлайн'] || 'Без срока')}${od ? ` · ${od} дн.` : ''}`, row);
                 }).join('')
               : '<div class="sd-overdue-empty">Просроченных задач нет</div>';
             return `<details class="sd-overdue-dept">
@@ -3596,7 +3622,7 @@
               const titleHtml = state.portalHost && /^\d+$/.test(taskId)
                 ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${taskId}/">${title}</a>`
                 : title;
-              return `<div class="sd-overdue-task">${titleHtml}<span>${escapeHtml(row['Дата закрытия'] || row['Дедлайн'] || '')}</span></div>`;
+              return taskRowHtml(titleHtml, escapeHtml(row['Дата закрытия'] || row['Дедлайн'] || ''), row);
             }).join('');
           return `<details class="sd-overdue-dept sd-done-dept">
               <summary class="sd-bar-row" title="Показать ${done.length} выполненных задач">
