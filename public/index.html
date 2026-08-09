@@ -3091,11 +3091,10 @@
                         : p === 100        ? PLAN_COLORS.done
                         : t.soonSteps > 0  ? PLAN_COLORS.soon
                         : 'var(--text-muted)';
-            return `<div style="display:flex;align-items:center;gap:14px;padding:11px 16px;border:1px solid rgba(233,235,232,.9);border-left:5px solid ${color};border-radius:11px;background:var(--surface)">
-              <span style="flex:1;min-width:0;font-size:17px;font-weight:700;line-height:1.35;color:var(--text-main)">${planEscape(t.title)}</span>
-              ${t.overdueSteps ? `<span style="flex-shrink:0;font-size:14px;font-weight:800;color:${PLAN_COLORS.overdue}">${t.overdueSteps} проср.</span>` : ''}
-              <span style="flex-shrink:0;font-weight:900;font-size:18px;color:${color};font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="flex-shrink:0;font-weight:800;font-size:16px;color:${color};min-width:78px;text-align:right;text-decoration:underline;text-underline-offset:3px">${planDateDow(t.deadline)}</span>
+            return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid rgba(233,235,232,.9);border-left:5px solid ${color};border-radius:10px;background:var(--surface)">
+              <span title="${planEscape(t.title)}" style="flex:1;min-width:0;font-size:15px;font-weight:650;line-height:1.3;color:var(--text-main);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${planEscape(t.title)}</span>
+              <span style="flex-shrink:0;font-weight:900;font-size:16px;color:${color};font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
+              <span style="flex-shrink:0;font-weight:800;font-size:14px;color:${color};min-width:64px;text-align:right">${planDateDow(t.deadline)}</span>
             </div>`;
           };
           const goalCards = shownGoals
@@ -3200,6 +3199,22 @@
         if (!scaler) return;
         scaler.style.transform = '';
         scaler.style.width = '';
+        // На больших периодах план не влезает в один экран читабельно — не сжимаем,
+        // даём обычную вертикальную прокрутку. Kiosk-fit только для недельных.
+        const weekly = ['week', 'week2', 'lastWeek'].includes(state.period || 'all');
+        if (!weekly) {
+          const parent0 = scaler.parentElement;
+          if (parent0) { parent0.style.height = ''; parent0.style.overflow = ''; }
+          if (!planFitBound) {
+            planFitBound = true;
+            let rt0;
+            window.addEventListener('resize', () => {
+              clearTimeout(rt0);
+              rt0 = setTimeout(() => { if (state.viewMode === 'table6') fitPlanToScreen(); }, 150);
+            });
+          }
+          return;
+        }
         // Defer so layout is settled (images/fonts) before measuring.
         setTimeout(() => {
           const s2 = document.getElementById('planScaler');
