@@ -3373,7 +3373,7 @@
           return;
         }
 
-        const maxOverdue = Math.max(...depts.map(d => d.overdueDays), 1);
+        const maxOverdue = Math.max(...depts.map(d => d.overdueCount), 1);
         const taskQuality = row => {
           const status = String(row['Состояние задачи'] || '');
           const days = Math.max(0, parseInt(row['Просрочка, дней']) || 0);
@@ -3439,25 +3439,25 @@
         const nowMs = Date.now();
         const rowOverdue = row => {
           if (String(row['ID проекта'] || '') === OP_GROUP_ID) {
-            if (String(row['Состояние задачи'] || '').startsWith('Закрыта')) return { overdue: false, days: 0, date: null };
+            if (String(row['Состояние задачи'] || '').startsWith('Закрыта')) return { overdue: false, count: 0, days: 0, date: null };
             let items = [];
             try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
-            let worst = 0, any = false, worstDl = null;
+            let worst = 0, count = 0, worstDl = null;
             (Array.isArray(items) ? items : []).forEach(it => {
               if (it.complete === true || !stepInRange(it)) return;
               const dl = checklistItemDeadline(it.title);
               if (dl && dl.getTime() < nowMs) {
-                any = true;
+                count++; // каждый просроченный пункт чек-листа — единица просрочки
                 const days = Math.floor((nowMs - dl.getTime()) / 864e5);
                 if (days > worst) { worst = days; worstDl = dl; }
               }
             });
-            return { overdue: any, days: worst, date: worstDl };
+            return { overdue: count > 0, count, days: worst, date: worstDl };
           }
           if (String(row['Состояние задачи'] || '') === 'Открыта просрочена') {
-            return { overdue: true, days: Math.max(0, parseInt(row['Просрочка, дней']) || 0), date: null };
+            return { overdue: true, count: 1, days: Math.max(0, parseInt(row['Просрочка, дней']) || 0), date: null };
           }
-          return { overdue: false, days: 0, date: null };
+          return { overdue: false, count: 0, days: 0, date: null };
         };
         const rosterByDept = new Map();
         (state.allEmployees || []).forEach(emp => {
@@ -3495,7 +3495,7 @@
               const info = rowOverdue(row);
               if (!info.overdue) return;
               const key = String(row['ID задачи'] || '') || row['Название задачи'] || Math.random();
-              if (!m.has(key)) m.set(key, { row, days: info.days });
+              if (!m.has(key)) m.set(key, { row, days: info.days, count: info.count });
             });
             return m;
           };
@@ -3503,15 +3503,19 @@
             const helpRows = Array.from((e.helping || new Map()).values()).map(h => h.row);
             const m = collectOverdue([...e.rows, ...helpRows]);
             e.overdueTasks = m.size;
+            // «Просрочка» = количество просроченных пунктов чек-листа (обычная
+            // просроченная задача считается как 1).
+            e.overdueCount = Array.from(m.values()).reduce((s, x) => s + x.count, 0);
             e.overdueDays = Array.from(m.values()).reduce((s, x) => s + x.days, 0);
           });
           const helpRowsAll = Array.from(d.people.values())
             .flatMap(e => Array.from((e.helping || new Map()).values()).map(h => h.row));
           const deptOverdue = collectOverdue([...d.rows, ...helpRowsAll]);
           d.overdueRows = Array.from(deptOverdue.values())
-            .sort((a, b) => b.days - a.days)
+            .sort((a, b) => b.count - a.count || b.days - a.days)
             .map(x => x.row);
           d.overdueTasks = deptOverdue.size;
+          d.overdueCount = Array.from(deptOverdue.values()).reduce((s, x) => s + x.count, 0);
           d.overdueDays = Array.from(deptOverdue.values()).reduce((s, x) => s + x.days, 0);
         });
         const ratioDepts = depts.filter(d => d.employeeCount > 0);
@@ -3710,8 +3714,8 @@
         // «Просрочка» block; the whole block is hidden when there are none.
         const overdueBarDepts = depts
           .slice()
-          .filter(d => d.overdueDays > 0)
-          .sort((a, b) => b.overdueDays - a.overdueDays);
+          .filter(d => d.overdueCount > 0)
+          .sort((a, b) => b.overdueCount - a.overdueCount);
         const bars = overdueBarDepts
           .map(d => {
             // Overdue tasks the department is exposed to — executed OR participated
@@ -3728,14 +3732,14 @@
                   // Для план-задач показываем срок ПО ЧЕК-ЛИСТУ (дата просроченного
                   // пункта), а не дедлайн всей задачи — иначе дата не бьётся с «дн.».
                   const dateStr = info.date ? fmtDate(info.date) : (row['Дедлайн'] || 'Без срока');
-                  return taskRowHtml(titleHtml, `${escapeHtml(dateStr)}${info.days ? ` · ${info.days} дн.` : ''}`, row, 'overdue');
+                  return taskRowHtml(titleHtml, `${escapeHtml(dateStr)}${info.count ? ` · ${info.count} просроч.` : ''}`, row, 'overdue');
                 }).join('')
               : '<div class="sd-overdue-empty">Просроченных задач нет</div>';
             return `<details class="sd-overdue-dept">
               <summary class="sd-bar-row" title="Показать ${unfinished.length} просроченных задач">
                 <span class="sd-bar-name" title="${escapeHtml(d.name)}">${escapeHtml(shortDeptName(d.name))}</span>
-                <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(d.overdueDays / maxOverdue * 100).toFixed(1)}%"></div></div>
-                <span class="sd-bar-value">${d.overdueDays}</span>
+                <div class="sd-bar-track"><div class="sd-bar-fill" style="width:${(d.overdueCount / maxOverdue * 100).toFixed(1)}%"></div></div>
+                <span class="sd-bar-value">${d.overdueCount}</span>
               </summary>
               <div class="sd-overdue-tasks">${unfinishedRows}</div>
             </details>`;
@@ -3868,7 +3872,7 @@
               planGroupCount ? `Раб. группа: ${planGroupCount}` : '',
               outsideTaskCount ? `Вне плана: ${outsideTaskCount}` : '',
               offHelpingCount ? `Помогает: ${offHelpingCount}` : '',
-              emp.overdueDays ? `Просрочка: ${emp.overdueDays} дн.` : ''
+              emp.overdueCount ? `Просрочка: ${emp.overdueCount}` : ''
             ].filter(Boolean).join(' · ');
             state.personDetails[pkey] = { title: modalTitle, meta: modalMeta, html: taskSections };
             // Checklist popup: what to do and which task each item belongs to.
@@ -3930,7 +3934,7 @@
                 <span class="sd-help-count" title="Наблюдатель/соисполнитель в проекте 51">${planGroupCount || ''}</span>
                 <span class="sd-person-num">${outsideTaskCount ? `${outsideTaskCount} зад.` : ''}</span>
                 <span class="sd-help-count">${offHelpingCount || ''}</span>
-                <span class="sd-person-num">${emp.overdueDays ? `${emp.overdueDays} дн.` : ''}</span>
+                <span class="sd-person-num">${emp.overdueCount ? `${emp.overdueCount}` : ''}</span>
                 <div class="sd-person-scores">
                   <div class="sd-score-line"><span class="sd-score-label">Все</span><div class="sd-person-bar"><div class="sd-person-fill" style="width:${emp.score ?? 0}%"></div></div></div>
                   <div class="sd-score-line"><span class="sd-score-label">План</span><div class="sd-person-bar"><div class="sd-person-fill plan" style="width:${emp.planScore ?? 0}%"></div></div></div>
@@ -3945,7 +3949,7 @@
                 <span class="sd-chevron">›</span>
                 <span class="sd-dept-name">${escapeHtml(d.name)}</span>
               </div>
-              <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад.${d.overdueTasks ? ` · ${d.overdueTasks} просроч.` : ''} · ${d.overdueDays} дн.</span>
+              <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад.${d.overdueCount ? ` · ${d.overdueCount} просроч.` : ''}</span>
               <span class="sd-score" title="${d.loadCount} задач (с участием) ÷ ${d.employeeCount} сотрудников">
                 <strong>${d.workloadRatio.toFixed(1)}</strong>
                 <small>задач/сотр.</small>
