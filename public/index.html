@@ -3083,40 +3083,33 @@
         } else if (isWeekPeriod) {
           planBody = `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${flatTacts.map(t => renderTactCard(t)).join('')}</div>`;
         } else {
-          // Компактная строка тактической задачи: без разворота подзадач и без
-          // аватарок — только суть (название, прогресс N/M, просрочка, срок).
-          const renderTactLine = t => {
-            const p = pct(t.doneSteps, t.totalSteps);
-            const color = t.overdueSteps > 0 ? PLAN_COLORS.overdue
-                        : p === 100        ? PLAN_COLORS.done
-                        : t.soonSteps > 0  ? PLAN_COLORS.soon
-                        : 'var(--text-muted)';
-            return `<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid rgba(233,235,232,.9);border-left:5px solid ${color};border-radius:10px;background:var(--surface)">
-              <span title="${planEscape(t.title)}" style="flex:1;min-width:0;font-size:15px;font-weight:650;line-height:1.3;color:var(--text-main);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">${planEscape(t.title)}</span>
-              <span style="flex-shrink:0;font-weight:900;font-size:16px;color:${color};font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
-              <span style="flex-shrink:0;font-weight:800;font-size:14px;color:${color};min-width:64px;text-align:right">${planDateDow(t.deadline)}</span>
-            </div>`;
-          };
+          // Большой период — только ОБЗОР выполнения целей: без списка задач.
+          // Карточка цели: название, % выполнения, шкала, счётчики.
           const goalCards = shownGoals
             .slice()
             .sort((a, b) => (a.num || 0) - (b.num || 0))
             .map(g => {
               const gColor = goalColor(g.num);
               const gp = pct(g.doneSteps, g.totalSteps);
-              const tacts = g.tacts
-                .slice()
-                .sort((a, b) => ((b.overdueSteps > 0) - (a.overdueSteps > 0))
-                  || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
-              // Вертикальная карточка цели: шапка с прогрессом + задачи стопкой внутри.
-              return `<div style="display:flex;flex-direction:column;border:1px solid rgba(233,235,232,.9);border-top:6px solid ${gColor};border-radius:16px;background:var(--surface);overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.02)">
-                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:${gColor}14">
-                  <span style="flex:1;min-width:0;font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:${gColor};line-height:1.25">${planEscape(g.title)}</span>
-                  <span style="flex-shrink:0;font-weight:900;font-size:18px;color:${gColor};font-variant-numeric:tabular-nums">${g.doneSteps}/${g.totalSteps} · ${gp}%</span>
+              const barColor = gp >= 67 ? PLAN_COLORS.done
+                             : gp >= 34 ? PLAN_COLORS.soon
+                             : gp > 0   ? PLAN_COLORS.overdue
+                             : '#c3c7cc';
+              return `<div style="display:flex;flex-direction:column;gap:16px;border:1px solid rgba(233,235,232,.9);border-top:6px solid ${gColor};border-radius:16px;background:var(--surface);padding:22px 24px;box-shadow:0 4px 15px rgba(0,0,0,.02)">
+                <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:${gColor};line-height:1.3;min-height:47px">${planEscape(g.title)}</div>
+                <div style="display:flex;align-items:baseline;gap:12px">
+                  <span style="font-size:46px;font-weight:900;color:${barColor};line-height:1">${gp}%</span>
+                  <span style="font-size:16px;font-weight:700;color:var(--text-muted)">${g.doneSteps}/${g.totalSteps} шагов</span>
                 </div>
-                <div style="display:flex;flex-direction:column;gap:9px;padding:12px 14px">${tacts.map(renderTactLine).join('')}</div>
+                <div style="height:12px;background:#eef0ed;border-radius:6px;overflow:hidden"><div style="height:100%;width:${gp}%;background:${barColor};border-radius:6px"></div></div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px 18px;font-size:15px;font-weight:700">
+                  <span style="color:var(--text-muted)">${g.tacts.length} задач</span>
+                  ${g.overdueSteps ? `<span style="color:${PLAN_COLORS.overdue}">${g.overdueSteps} просрочено</span>` : ''}
+                  ${g.soonSteps ? `<span style="color:${PLAN_COLORS.soon}">${g.soonSteps} горит</span>` : ''}
+                </div>
               </div>`;
             }).join('');
-          planBody = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:16px;align-items:start;padding-bottom:16px">${goalCards}</div>`;
+          planBody = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;align-items:start;padding-bottom:16px">${goalCards}</div>`;
         }
 
         const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
