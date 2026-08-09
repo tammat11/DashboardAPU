@@ -3406,6 +3406,15 @@
           const u = completionUnits(rows);
           return u.total ? Math.round(u.done / u.total * 100) : 0;
         };
+        // Период фильтрует пункты чек-листа по ИХ СОБСТВЕННОЙ дате «до …», а не по
+        // дедлайну задачи (он = дата последнего пункта). Так «на этой неделе»
+        // считает именно пункты со сроком на этой неделе. null = «Все время».
+        const periodRange = getPeriodRange(state.period);
+        const stepInRange = item => {
+          if (!periodRange) return true;
+          const dl = checklistItemDeadline(item.title);
+          return !!dl && dl >= periodRange.start && dl <= periodRange.end;
+        };
         // «Оценка: план» — прогресс по чек-листам задач ОП 2026 (проект 51). У этих
         // пунктов пустые MEMBERS, поэтому по людям их не разложить — считаем по
         // задачам исполнителя/отдела, читая чек-лист прямо из строки задачи.
@@ -3416,7 +3425,7 @@
             let items = [];
             try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
             const tid = String(row['ID задачи'] || '');
-            items.forEach(it => m.set(`${tid}:${it.id}`, it.complete === true));
+            items.forEach(it => { if (stepInRange(it)) m.set(`${tid}:${it.id}`, it.complete === true); });
           });
           return Array.from(m.values());
         };
@@ -4895,6 +4904,18 @@
             const closed = parseDate('closedDateRaw', 'Дата закрытия');
 
             const isDeadlineIn = deadline && deadline >= start && deadline <= end;
+
+            // План-задача (проект 51): её дедлайн = дата последнего пункта, поэтому
+            // впускаем в период, если у неё есть ПУНКТ чек-листа со сроком в периоде.
+            if (String(row['ID проекта'] || '') === OP_GROUP_ID) {
+              let items = [];
+              try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
+              const hasStepInRange = Array.isArray(items) && items.some(it => {
+                const dl = checklistItemDeadline(it.title);
+                return dl && dl >= start && dl <= end;
+              });
+              return hasStepInRange || isDeadlineIn;
+            }
 
             return isDeadlineIn;
           });
