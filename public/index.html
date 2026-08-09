@@ -3667,11 +3667,19 @@
           .replace(/^\s*\d+(?:\.\d+)*\s+/, '')
           .trim();
         const fmtDate = dt => `${String(dt.getDate()).padStart(2, '0')}.${String(dt.getMonth() + 1).padStart(2, '0')}.${dt.getFullYear()}`;
-        const taskChecklistBullets = row => {
+        const taskChecklistBullets = (row, only) => {
           let items = [];
           try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
           // Показываем только пункты со сроком в выбранном периоде («Все время» — все).
           items = (Array.isArray(items) ? items : []).filter(stepInRange);
+          // only==='overdue' — в блоке «Просрочка» показываем ТОЛЬКО просроченные пункты.
+          if (only === 'overdue') {
+            items = items.filter(it => {
+              if (it.complete === true) return false;
+              const dl = checklistItemDeadline(it.title);
+              return dl && dl.getTime() < Date.now();
+            });
+          }
           if (!items.length) return '';
           const lis = items.map(it => {
             const done = it.complete === true;
@@ -3685,8 +3693,8 @@
           }).join('');
           return `<ul class="sd-cl-bullets">${lis}</ul>`;
         };
-        const taskRowHtml = (titleHtml, metaHtml, row) =>
-          `<div class="sd-overdue-item"><div class="sd-overdue-task">${titleHtml}<span>${metaHtml}</span></div>${taskChecklistBullets(row)}</div>`;
+        const taskRowHtml = (titleHtml, metaHtml, row, only) =>
+          `<div class="sd-overdue-item"><div class="sd-overdue-task">${titleHtml}<span>${metaHtml}</span></div>${taskChecklistBullets(row, only)}</div>`;
 
         // A task counts as «выполнено» when it is closed OR still open but all of
         // its checklist items are ticked (чек-лист(ы) выполнены).
@@ -3720,7 +3728,7 @@
                   // Для план-задач показываем срок ПО ЧЕК-ЛИСТУ (дата просроченного
                   // пункта), а не дедлайн всей задачи — иначе дата не бьётся с «дн.».
                   const dateStr = info.date ? fmtDate(info.date) : (row['Дедлайн'] || 'Без срока');
-                  return taskRowHtml(titleHtml, `${escapeHtml(dateStr)}${info.days ? ` · ${info.days} дн.` : ''}`, row);
+                  return taskRowHtml(titleHtml, `${escapeHtml(dateStr)}${info.days ? ` · ${info.days} дн.` : ''}`, row, 'overdue');
                 }).join('')
               : '<div class="sd-overdue-empty">Просроченных задач нет</div>';
             return `<details class="sd-overdue-dept">
