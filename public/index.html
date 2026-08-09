@@ -3034,7 +3034,9 @@
         const planCols = Math.max(1, Math.min(5, Math.ceil(flatTacts.length / 2)));
         const cardBasis = `calc(${(100 / planCols).toFixed(4)}% - 14px)`;
 
-        const cards = flatTacts.map(t => {
+        // Одна карточка тактической задачи (тактическая задача + её подзадачи-шаги).
+        // basis — гибкая ширина в flex-раскладке.
+        const renderTactCard = (t, basis) => {
           const p = pct(t.doneSteps, t.totalSteps);
           const color = t.overdueSteps > 0 ? PLAN_COLORS.overdue
                       : p === 100        ? PLAN_COLORS.done
@@ -3058,7 +3060,7 @@
           return `<div style="background:var(--surface);border-radius:18px;padding:24px 26px;
                       border:2px solid ${burnBorder};border-left:7px solid ${gColor};
                       box-shadow:0 4px 15px rgba(0,0,0,.01);display:flex;flex-direction:column;gap:14px;
-                      flex:1 1 ${cardBasis};min-width:280px">
+                      flex:1 1 ${basis || cardBasis};min-width:280px">
             <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
               <span style="flex-shrink:1;min-width:0;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:${gColor};overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${planEscape(t._goalTitle || '')}</span>
               ${heat ? `<span style="flex-shrink:0;font-size:16px;letter-spacing:-2px">${'🔥'.repeat(heat)}</span>` : ''}
@@ -3069,8 +3071,39 @@
             ${peopleRow.length ? `<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">${peopleRow.map(x => planAvatar(x.person, 64, x.ring)).join('')}</div>` : ''}
             <div style="border-top:1px solid rgba(233,235,232,.8);padding-top:8px">${stepsHtml}</div>
           </div>`;
-        }).join('');
+        };
         const shownAny = flatTacts.length > 0;
+
+        // Недельные периоды — плоская сетка карточек (как было). Прочие периоды
+        // (месяц / «Все время») — чёткая иерархия: Цель → Задачи → подзадачи.
+        const isWeekPeriod = ['week', 'week2', 'lastWeek'].includes(period);
+        let planBody;
+        if (!shownAny) {
+          planBody = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`;
+        } else if (isWeekPeriod) {
+          planBody = `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${flatTacts.map(t => renderTactCard(t)).join('')}</div>`;
+        } else {
+          planBody = shownGoals
+            .slice()
+            .sort((a, b) => (a.num || 0) - (b.num || 0))
+            .map(g => {
+              const gColor = goalColor(g.num);
+              const gp = pct(g.doneSteps, g.totalSteps);
+              const tacts = g.tacts
+                .map(t => Object.assign(t, { _goalTitle: g.title, _goalCode: g.code, _goalNum: g.num }))
+                .sort((a, b) => ((b.overdueSteps > 0) - (a.overdueSteps > 0))
+                  || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
+              const cols = Math.min(3, Math.max(1, tacts.length));
+              const basis = `calc(${(100 / cols).toFixed(4)}% - 14px)`;
+              return `<section style="margin-bottom:28px">
+                <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-left:9px solid ${gColor};background:${gColor}14;border-radius:14px;margin-bottom:16px">
+                  <span style="flex:1;min-width:0;font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:${gColor}">${planEscape(g.title)}</span>
+                  <span style="flex-shrink:0;font-weight:900;font-size:24px;color:${gColor};font-variant-numeric:tabular-nums">${g.doneSteps}/${g.totalSteps} · ${gp}%</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch">${tacts.map(t => renderTactCard(t, basis)).join('')}</div>
+              </section>`;
+            }).join('');
+        }
 
         const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
 
@@ -3133,9 +3166,7 @@
 
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
-          ${shownAny
-            ? `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${cards}</div>`
-            : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`}
+          ${planBody}
           ${peopleHtml}
           ${attentionHtml}
           </div>`;
