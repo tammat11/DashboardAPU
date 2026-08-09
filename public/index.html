@@ -3083,6 +3083,21 @@
         } else if (isWeekPeriod) {
           planBody = `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${flatTacts.map(t => renderTactCard(t)).join('')}</div>`;
         } else {
+          // Компактная строка тактической задачи: без разворота подзадач и без
+          // аватарок — только суть (название, прогресс N/M, просрочка, срок).
+          const renderTactLine = t => {
+            const p = pct(t.doneSteps, t.totalSteps);
+            const color = t.overdueSteps > 0 ? PLAN_COLORS.overdue
+                        : p === 100        ? PLAN_COLORS.done
+                        : t.soonSteps > 0  ? PLAN_COLORS.soon
+                        : 'var(--text-muted)';
+            return `<div style="display:flex;align-items:center;gap:14px;padding:11px 16px;border:1px solid rgba(233,235,232,.9);border-left:5px solid ${color};border-radius:11px;background:var(--surface)">
+              <span style="flex:1;min-width:0;font-size:17px;font-weight:700;line-height:1.35;color:var(--text-main)">${planEscape(t.title)}</span>
+              ${t.overdueSteps ? `<span style="flex-shrink:0;font-size:14px;font-weight:800;color:${PLAN_COLORS.overdue}">${t.overdueSteps} проср.</span>` : ''}
+              <span style="flex-shrink:0;font-weight:900;font-size:18px;color:${color};font-variant-numeric:tabular-nums">${t.doneSteps}/${t.totalSteps}</span>
+              <span style="flex-shrink:0;font-weight:800;font-size:16px;color:${color};min-width:78px;text-align:right;text-decoration:underline;text-underline-offset:3px">${planDateDow(t.deadline)}</span>
+            </div>`;
+          };
           planBody = shownGoals
             .slice()
             .sort((a, b) => (a.num || 0) - (b.num || 0))
@@ -3090,17 +3105,15 @@
               const gColor = goalColor(g.num);
               const gp = pct(g.doneSteps, g.totalSteps);
               const tacts = g.tacts
-                .map(t => Object.assign(t, { _goalTitle: g.title, _goalCode: g.code, _goalNum: g.num }))
+                .slice()
                 .sort((a, b) => ((b.overdueSteps > 0) - (a.overdueSteps > 0))
                   || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
-              const cols = Math.min(3, Math.max(1, tacts.length));
-              const basis = `calc(${(100 / cols).toFixed(4)}% - 14px)`;
-              return `<section style="margin-bottom:28px">
-                <div style="display:flex;align-items:center;gap:14px;padding:14px 18px;border-left:9px solid ${gColor};background:${gColor}14;border-radius:14px;margin-bottom:16px">
-                  <span style="flex:1;min-width:0;font-size:24px;font-weight:900;text-transform:uppercase;letter-spacing:.6px;color:${gColor}">${planEscape(g.title)}</span>
-                  <span style="flex-shrink:0;font-weight:900;font-size:24px;color:${gColor};font-variant-numeric:tabular-nums">${g.doneSteps}/${g.totalSteps} · ${gp}%</span>
+              return `<section style="margin-bottom:22px">
+                <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-left:9px solid ${gColor};background:${gColor}14;border-radius:12px;margin-bottom:12px">
+                  <span style="flex:1;min-width:0;font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:${gColor}">${planEscape(g.title)}</span>
+                  <span style="flex-shrink:0;font-weight:900;font-size:22px;color:${gColor};font-variant-numeric:tabular-nums">${g.doneSteps}/${g.totalSteps} · ${gp}%</span>
                 </div>
-                <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch">${tacts.map(t => renderTactCard(t, basis)).join('')}</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:10px">${tacts.map(renderTactLine).join('')}</div>
               </section>`;
             }).join('');
         }
