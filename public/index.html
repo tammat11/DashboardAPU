@@ -1698,11 +1698,13 @@
         return EXCLUDED_NAMES.some(ex => n.includes(ex.toLowerCase()));
       }
 
-      // Department-specific exclusions in the «Отчёт» view. Лейла is not counted
-      // under «Управление качеством».
-      function isExcludedInDept(name, deptName) {
+      // Лейла Имирова числится в УРК, но её задачи в Bitrix помечены отделом
+      // «Управление качеством». Считаем её работу в её настоящем отделе — УРК,
+      // а не исключаем (иначе она пропадает из отчёта совсем).
+      function remapDept(name, deptName) {
         const n = String(name || '').toLowerCase();
-        return deptName === 'Управление качеством' && n.includes('лейла');
+        if (n.includes('лейла')) return 'УРК';
+        return deptName;
       }
 
       // Deadline written inside a checklist item title as «до DD.MM.YYYY».
@@ -3214,9 +3216,8 @@
         // period contains no tasks for it.
         (state.allEmployees || []).forEach(emp => {
           if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
-          const deptName = rootFor(emp.dept);
+          const deptName = remapDept(emp.name, rootFor(emp.dept));
           if (deptName === 'Без отдела') return;
-          if (isExcludedInDept(emp.name, deptName)) return;
           if (!groups.has(deptName)) {
             groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
           }
@@ -3237,8 +3238,7 @@
         state.filteredRows.forEach(row => {
           const person = row['Исполнитель'] || '';
           if (!person || isExcludedPerson(person)) return;
-          const deptName = rootFor(row['Отдел']);
-          if (isExcludedInDept(person, deptName)) return;
+          const deptName = remapDept(person, rootFor(row['Отдел']));
           if (!groups.has(deptName)) {
             groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
           }
@@ -3280,9 +3280,8 @@
           addHelpers('Наблюдатели', 'Наблюдатель');
 
           helpers.forEach(person => {
-            const deptName = rootFor(person.dept);
+            const deptName = remapDept(person.name, rootFor(person.dept));
             if (deptName === 'Без отдела') return;
-            if (isExcludedInDept(person.name, deptName)) return;
             if (!groups.has(deptName)) {
               groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
             }
@@ -3326,9 +3325,8 @@
               const memberId = String(member.id || '');
               const employee = employeeById.get(memberId);
               if (!employee || isExcludedPerson(employee.name)) return;
-              const deptName = rootFor(employee.dept);
+              const deptName = remapDept(employee.name, rootFor(employee.dept));
               if (deptName === 'Без отдела') return;
-              if (isExcludedInDept(employee.name, deptName)) return;
               if (!groups.has(deptName)) {
                 groups.set(deptName, { name: deptName, rows: [], people: new Map(), overdueDays: 0, overdueTasks: 0 });
               }
@@ -3423,9 +3421,8 @@
         const rosterByDept = new Map();
         (state.allEmployees || []).forEach(emp => {
           if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
-          const deptName = rootFor(emp.dept);
+          const deptName = remapDept(emp.name, rootFor(emp.dept));
           if (deptName === 'Без отдела') return;
-          if (isExcludedInDept(emp.name, deptName)) return;
           if (!rosterByDept.has(deptName)) rosterByDept.set(deptName, new Set());
           rosterByDept.get(deptName).add(String(emp.id || emp.name));
         });
@@ -3598,15 +3595,19 @@
         const lowLoadCards = renderLoadCards(lowLoadPeople);
 
         const palette = ['#317fd4', '#92938c', '#5141aa', '#1eae79', '#f26a3d', '#7666c8', '#2c9db1'];
-        const totalTasks = depts.reduce((sum, d) => sum + d.rows.length, 0);
+        // Объём работы = задачи + пункты чек-листов ОП 2026 (каждый пункт — единица).
+        const deptUnits = d => d.rows.length + planStepsOf(d.rows).length;
+        const totalUnits = depts.reduce((sum, d) => sum + deptUnits(d), 0);
         const stack = depts.map((d, index) => {
-          const width = totalTasks ? d.rows.length / totalTasks * 100 : 0;
+          const units = deptUnits(d);
+          const steps = units - d.rows.length;
+          const width = totalUnits ? units / totalUnits * 100 : 0;
           const pct = Math.round(width);
           // Thin segments only keep the count — the name would just clip; the
           // full name and share stay in the hover tooltip.
           const roomy = width >= 6;
-          return `<div class="sd-stack-item" style="width:${width.toFixed(2)}%;background:${palette[index % palette.length]}" title="${escapeHtml(d.name)} · ${d.rows.length} задач · ${pct}%">
-            <span class="sd-stack-value">${d.rows.length}<span class="sd-stack-pct">${pct}%</span></span>
+          return `<div class="sd-stack-item" style="width:${width.toFixed(2)}%;background:${palette[index % palette.length]}" title="${escapeHtml(d.name)} · ${units} ед. (${d.rows.length} задач + ${steps} пунктов) · ${pct}%">
+            <span class="sd-stack-value">${units}<span class="sd-stack-pct">${pct}%</span></span>
             ${roomy ? `<span class="sd-stack-label">${escapeHtml(shortDeptName(d.name))}</span>` : ''}
           </div>`;
         }).join('');
@@ -3894,7 +3895,7 @@
           <section class="sd-section">
             <h2 class="sd-title">Распределение</h2>
             <div class="sd-stack">${stack}</div>
-            <p class="sd-note">Ширина блока — доля отдела в общем объёме ${totalTasks} задач.</p>
+            <p class="sd-note">Ширина блока — доля отдела в общем объёме ${totalUnits} ед. (задачи + пункты чек-листов).</p>
           </section>
           <section class="sd-section">
             <div class="sd-ratio-head">
