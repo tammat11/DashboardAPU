@@ -1339,6 +1339,9 @@
       .sd-page.filter-off .sd-person-head, .sd-page.filter-off .sd-person { grid-template-columns: minmax(170px,1fr) 78px 72px 72px minmax(150px,1fr) 34px; }
       .sd-page.filter-off .sd-person-head > :nth-child(2), .sd-page.filter-off .sd-person-head > :nth-child(3),
       .sd-page.filter-off .sd-person > :nth-child(2), .sd-page.filter-off .sd-person > :nth-child(3) { display: none; }
+      /* Оценка: при фильтре «По плану» оставляем только полосу «План», при «Вне плана» — только «Все». */
+      .sd-page.filter-plan .sd-score-line:first-child, .sd-page.filter-plan .sd-person-score > span:not(.plan) { display: none; }
+      .sd-page.filter-off .sd-score-line:last-child, .sd-page.filter-off .sd-person-score > span.plan { display: none; }
       .sd-person-card { border-bottom: 1px solid rgba(0,0,0,.055); }
       .sd-person-card:last-child { border-bottom: 0; }
       .sd-person-card > summary { list-style: none; cursor: pointer; }
@@ -3442,7 +3445,11 @@
           d.workloadRatio = d.employeeCount ? d.loadCount / d.employeeCount : 0;
           d.people.forEach(e => {
             e.score = completionOf(e.rows);
-            e.planScore = planPctOf(e.rows);
+            // «План» учитывает чек-листы всех план-задач, где человек участвует —
+            // как исполнитель, ТАК и наблюдатель/соисполнитель (он реально
+            // закрывает пункты). planPctOf дедупит пункты по задаче.
+            const helpRows = Array.from((e.helping || new Map()).values()).map(h => h.row);
+            e.planScore = planPctOf([...e.rows, ...helpRows]);
           });
           // Overdue is counted for BOTH executed and participated tasks (наблюдатель/
           // соисполнитель) — same basis as «Нагрузка». Dedup per person and per
@@ -3726,6 +3733,8 @@
         state.personDetails = {};
         state.personChecklists = {};
         let personSeq = 0;
+        const scoreHead = state.planFilter === 'plan' ? 'Оценка: по плану'
+          : state.planFilter === 'off' ? 'Оценка: вне плана' : 'Оценка: все / по плану';
         const cards = depts.map((d, index) => {
           const [health, healthClass] = healthFor(d);
           const departmentHeadId = String(depByName.get(d.name)?.UF_HEAD || '');
@@ -3892,7 +3901,7 @@
               </span>
             </summary>
             <div class="sd-people">
-              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span title="Наблюдатель/соисполнитель в проекте 51">Раб. группа</span><span>Вне плана</span><span>Помогает</span><span>Проср.</span><span>Оценка: все / по плану</span><span></span></div>
+              <div class="sd-person-head"><span>Исполнитель</span><span>По плану</span><span title="Наблюдатель/соисполнитель в проекте 51">Раб. группа</span><span>Вне плана</span><span>Помогает</span><span>Проср.</span><span>${scoreHead}</span><span></span></div>
               ${peopleRows}
             </div>
           </details>`;
