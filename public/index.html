@@ -3098,7 +3098,7 @@
               <span style="flex-shrink:0;font-weight:800;font-size:16px;color:${color};min-width:78px;text-align:right;text-decoration:underline;text-underline-offset:3px">${planDateDow(t.deadline)}</span>
             </div>`;
           };
-          planBody = shownGoals
+          const goalCards = shownGoals
             .slice()
             .sort((a, b) => (a.num || 0) - (b.num || 0))
             .map(g => {
@@ -3108,14 +3108,16 @@
                 .slice()
                 .sort((a, b) => ((b.overdueSteps > 0) - (a.overdueSteps > 0))
                   || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
-              return `<section style="margin-bottom:22px">
-                <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-left:9px solid ${gColor};background:${gColor}14;border-radius:12px;margin-bottom:12px">
-                  <span style="flex:1;min-width:0;font-size:22px;font-weight:900;text-transform:uppercase;letter-spacing:.5px;color:${gColor}">${planEscape(g.title)}</span>
-                  <span style="flex-shrink:0;font-weight:900;font-size:22px;color:${gColor};font-variant-numeric:tabular-nums">${g.doneSteps}/${g.totalSteps} · ${gp}%</span>
+              // Вертикальная карточка цели: шапка с прогрессом + задачи стопкой внутри.
+              return `<div style="display:flex;flex-direction:column;border:1px solid rgba(233,235,232,.9);border-top:6px solid ${gColor};border-radius:16px;background:var(--surface);overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.02)">
+                <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:${gColor}14">
+                  <span style="flex:1;min-width:0;font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:${gColor};line-height:1.25">${planEscape(g.title)}</span>
+                  <span style="flex-shrink:0;font-weight:900;font-size:18px;color:${gColor};font-variant-numeric:tabular-nums">${g.doneSteps}/${g.totalSteps} · ${gp}%</span>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:10px">${tacts.map(renderTactLine).join('')}</div>
-              </section>`;
+                <div style="display:flex;flex-direction:column;gap:9px;padding:12px 14px">${tacts.map(renderTactLine).join('')}</div>
+              </div>`;
             }).join('');
+          planBody = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:16px;align-items:start;padding-bottom:16px">${goalCards}</div>`;
         }
 
         const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
