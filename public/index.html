@@ -1454,7 +1454,10 @@
       .sd-task-plan-group .sd-task-list { margin-left: 10px; margin-right: 10px; }
       .sd-task-section-title { margin: 8px 0 5px 22px; color: #687068; font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .04em; }
       .sd-task-section-title.help { color: #32628b; }
-      .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 120px 115px; align-items: center; gap: 10px; padding: 8px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 12px; }
+      .sd-task { display: grid; grid-template-columns: minmax(220px,1fr) 120px 115px; align-items: start; gap: 10px; padding: 8px 9px; border-bottom: 1px solid rgba(0,0,0,.05); font-size: 12px; }
+      .sd-task-cl { margin-top: 6px; }
+      .sd-task-cl-head { display: inline-block; margin: 0 0 2px 2px; font-size: 10.5px; font-weight: 750; color: #687068; }
+      .sd-task-cl .sd-cl-bullets { margin: 0 0 0 2px; }
       .sd-task:last-child { border-bottom: 0; }
       .sd-task-title { min-width: 0; line-height: 1.3; }
       .sd-task-title .task-link { font-weight: 650; }
@@ -3749,8 +3752,14 @@
               const statusClass = status === 'Открыта просрочена'
                 ? 'danger'
                 : (status.startsWith('Закрыта') ? 'success' : '');
+              // Прогресс по чек-листу задачи (важно для задач ОП 2026).
+              let clItems = [];
+              try { clItems = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
+              const clHtml = (Array.isArray(clItems) && clItems.length)
+                ? `<div class="sd-task-cl"><span class="sd-task-cl-head">Чек-лист ${clItems.filter(i => i.complete === true).length}/${clItems.length}</span>${taskChecklistBullets(row)}</div>`
+                : '';
               return `<div class="sd-task">
-                <div class="sd-task-title">${titleHtml}${roles.length ? `<span class="sd-task-role">${escapeHtml(roles.join(' · '))}</span>` : ''}</div>
+                <div class="sd-task-title">${titleHtml}${roles.length ? `<span class="sd-task-role">${escapeHtml(roles.join(' · '))}</span>` : ''}${clHtml}</div>
                 <span class="sd-task-status ${statusClass}">${escapeHtml(status)}</span>
                 <span class="sd-task-deadline">${escapeHtml(row['Дедлайн'] || 'Без срока')}</span>
               </div>`;
