@@ -3433,6 +3433,32 @@
           const steps = planStepsOf(rowsList);
           return steps.length ? Math.round(steps.filter(Boolean).length / steps.length * 100) : 0;
         };
+        // Просрочка задачи. Для план-задач (проект 51) срок ВСЕГДА по чек-листу:
+        // задача просрочена, если есть невыполненный пункт с прошедшей датой;
+        // дней = по самому давнему такому пункту. Для остальных — по статусу задачи.
+        const nowMs = Date.now();
+        const rowOverdue = row => {
+          if (String(row['ID проекта'] || '') === OP_GROUP_ID) {
+            if (String(row['Состояние задачи'] || '').startsWith('Закрыта')) return { overdue: false, days: 0 };
+            let items = [];
+            try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
+            let worst = 0, any = false;
+            (Array.isArray(items) ? items : []).forEach(it => {
+              if (it.complete === true || !stepInRange(it)) return;
+              const dl = checklistItemDeadline(it.title);
+              if (dl && dl.getTime() < nowMs) {
+                any = true;
+                const days = Math.floor((nowMs - dl.getTime()) / 864e5);
+                if (days > worst) worst = days;
+              }
+            });
+            return { overdue: any, days: worst };
+          }
+          if (String(row['Состояние задачи'] || '') === 'Открыта просрочена') {
+            return { overdue: true, days: Math.max(0, parseInt(row['Просрочка, дней']) || 0) };
+          }
+          return { overdue: false, days: 0 };
+        };
         const rosterByDept = new Map();
         (state.allEmployees || []).forEach(emp => {
           if (!emp || !emp.name || isExcludedPerson(emp.name)) return;
@@ -3466,26 +3492,27 @@
           const collectOverdue = rowsList => {
             const m = new Map();
             rowsList.forEach(row => {
-              if (String(row['Состояние задачи'] || '') !== 'Открыта просрочена') return;
+              const info = rowOverdue(row);
+              if (!info.overdue) return;
               const key = String(row['ID задачи'] || '') || row['Название задачи'] || Math.random();
-              if (!m.has(key)) m.set(key, row);
+              if (!m.has(key)) m.set(key, { row, days: info.days });
             });
             return m;
           };
-          const overdueDaysOf = row => Math.max(0, parseInt(row['Просрочка, дней']) || 0);
           d.people.forEach(e => {
             const helpRows = Array.from((e.helping || new Map()).values()).map(h => h.row);
             const m = collectOverdue([...e.rows, ...helpRows]);
             e.overdueTasks = m.size;
-            e.overdueDays = Array.from(m.values()).reduce((s, row) => s + overdueDaysOf(row), 0);
+            e.overdueDays = Array.from(m.values()).reduce((s, x) => s + x.days, 0);
           });
           const helpRowsAll = Array.from(d.people.values())
             .flatMap(e => Array.from((e.helping || new Map()).values()).map(h => h.row));
           const deptOverdue = collectOverdue([...d.rows, ...helpRowsAll]);
           d.overdueRows = Array.from(deptOverdue.values())
-            .sort((a, b) => String(a.deadlineRaw || '9999').localeCompare(String(b.deadlineRaw || '9999')));
+            .sort((a, b) => b.days - a.days)
+            .map(x => x.row);
           d.overdueTasks = deptOverdue.size;
-          d.overdueDays = d.overdueRows.reduce((s, row) => s + overdueDaysOf(row), 0);
+          d.overdueDays = Array.from(deptOverdue.values()).reduce((s, x) => s + x.days, 0);
         });
         const ratioDepts = depts.filter(d => d.employeeCount > 0);
         const tbu = ratioDepts.length
@@ -3687,7 +3714,7 @@
                   const titleHtml = state.portalHost && /^\d+$/.test(taskId)
                     ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${taskId}/">${title}</a>`
                     : title;
-                  const od = Math.max(0, parseInt(row['Просрочка, дней']) || 0);
+                  const od = rowOverdue(row).days;
                   return taskRowHtml(titleHtml, `${escapeHtml(row['Дедлайн'] || 'Без срока')}${od ? ` · ${od} дн.` : ''}`, row);
                 }).join('')
               : '<div class="sd-overdue-empty">Просроченных задач нет</div>';
@@ -4905,16 +4932,16 @@
 
             const isDeadlineIn = deadline && deadline >= start && deadline <= end;
 
-            // План-задача (проект 51): её дедлайн = дата последнего пункта, поэтому
-            // впускаем в период, если у неё есть ПУНКТ чек-листа со сроком в периоде.
+            // План-задача (проект 51): срок ВСЕГДА по чек-листу, а не по дедлайну
+            // задачи. Впускаем в период, только если у неё есть ПУНКТ со сроком в
+            // периоде.
             if (String(row['ID проекта'] || '') === OP_GROUP_ID) {
               let items = [];
               try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
-              const hasStepInRange = Array.isArray(items) && items.some(it => {
+              return Array.isArray(items) && items.some(it => {
                 const dl = checklistItemDeadline(it.title);
                 return dl && dl >= start && dl <= end;
               });
-              return hasStepInRange || isDeadlineIn;
             }
 
             return isDeadlineIn;
