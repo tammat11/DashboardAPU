@@ -3439,25 +3439,25 @@
         const nowMs = Date.now();
         const rowOverdue = row => {
           if (String(row['ID проекта'] || '') === OP_GROUP_ID) {
-            if (String(row['Состояние задачи'] || '').startsWith('Закрыта')) return { overdue: false, days: 0 };
+            if (String(row['Состояние задачи'] || '').startsWith('Закрыта')) return { overdue: false, days: 0, date: null };
             let items = [];
             try { items = JSON.parse(row['Чек-лист'] || '[]'); } catch {}
-            let worst = 0, any = false;
+            let worst = 0, any = false, worstDl = null;
             (Array.isArray(items) ? items : []).forEach(it => {
               if (it.complete === true || !stepInRange(it)) return;
               const dl = checklistItemDeadline(it.title);
               if (dl && dl.getTime() < nowMs) {
                 any = true;
                 const days = Math.floor((nowMs - dl.getTime()) / 864e5);
-                if (days > worst) worst = days;
+                if (days > worst) { worst = days; worstDl = dl; }
               }
             });
-            return { overdue: any, days: worst };
+            return { overdue: any, days: worst, date: worstDl };
           }
           if (String(row['Состояние задачи'] || '') === 'Открыта просрочена') {
-            return { overdue: true, days: Math.max(0, parseInt(row['Просрочка, дней']) || 0) };
+            return { overdue: true, days: Math.max(0, parseInt(row['Просрочка, дней']) || 0), date: null };
           }
-          return { overdue: false, days: 0 };
+          return { overdue: false, days: 0, date: null };
         };
         const rosterByDept = new Map();
         (state.allEmployees || []).forEach(emp => {
@@ -3716,8 +3716,11 @@
                   const titleHtml = state.portalHost && /^\d+$/.test(taskId)
                     ? `<a class="task-link" target="_blank" href="https://${escapeHtml(state.portalHost)}/company/personal/user/0/tasks/task/view/${taskId}/">${title}</a>`
                     : title;
-                  const od = rowOverdue(row).days;
-                  return taskRowHtml(titleHtml, `${escapeHtml(row['Дедлайн'] || 'Без срока')}${od ? ` · ${od} дн.` : ''}`, row);
+                  const info = rowOverdue(row);
+                  // Для план-задач показываем срок ПО ЧЕК-ЛИСТУ (дата просроченного
+                  // пункта), а не дедлайн всей задачи — иначе дата не бьётся с «дн.».
+                  const dateStr = info.date ? fmtDate(info.date) : (row['Дедлайн'] || 'Без срока');
+                  return taskRowHtml(titleHtml, `${escapeHtml(dateStr)}${info.days ? ` · ${info.days} дн.` : ''}`, row);
                 }).join('')
               : '<div class="sd-overdue-empty">Просроченных задач нет</div>';
             return `<details class="sd-overdue-dept">
