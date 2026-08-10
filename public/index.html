@@ -3525,12 +3525,13 @@
           d.score = completionOf(d.rows);
           d.planScore = planPctOf(d.rows);
           d.employeeCount = rosterByDept.get(d.name)?.size || d.people.size;
-          // Workload counts every task a person takes part in — as executor OR
-          // as co-executor/observer («Помогает»). helping is already deduped and
-          // never overlaps a person's own executor tasks, so no double counting.
+          // Нагрузка = единицы работы: задачи (исполнитель) + участие («Помогает»)
+          // + пункты чек-листов ОП 2026 (в периоде). helping дедуплен и не
+          // пересекается с собственными задачами — двойного счёта нет.
           const helpingTotal = Array.from(d.people.values())
             .reduce((sum, e) => sum + (e.helping ? e.helping.size : 0), 0);
-          d.loadCount = d.rows.length + helpingTotal;
+          const deptStepCount = planStepsOf(d.rows).length;
+          d.loadCount = d.rows.length + helpingTotal + deptStepCount;
           d.workloadRatio = d.employeeCount ? d.loadCount / d.employeeCount : 0;
           d.people.forEach(e => {
             e.score = completionOf(e.rows);
@@ -3665,7 +3666,7 @@
         </svg>`;
         // Per-person load = executor + participation («Помогает»), same basis as
         // the department workload above.
-        const personLoad = emp => emp.rows.length + (emp.helping ? emp.helping.size : 0);
+        const personLoad = emp => emp.rows.length + (emp.helping ? emp.helping.size : 0) + planStepsOf(emp.rows).length;
         const lowLoadPeople = depts.flatMap(d => {
           const threshold = Math.max(1, d.workloadRatio * .4);
           return Array.from(d.people.values())
@@ -4004,7 +4005,7 @@
                 <span class="sd-dept-name">${escapeHtml(d.name)}</span>
               </div>
               <span class="sd-dept-meta">${d.employeeCount} сотр. · ${d.rows.length} зад.${d.overdueCount ? ` · ${d.overdueCount} просроч.` : ''}</span>
-              <span class="sd-score" title="${d.loadCount} задач (с участием) ÷ ${d.employeeCount} сотрудников">
+              <span class="sd-score" title="${d.loadCount} ед. (задачи + участие + пункты чек-листов) ÷ ${d.employeeCount} сотрудников">
                 <strong>${d.workloadRatio.toFixed(1)}</strong>
                 <small>задач/сотр.</small>
               </span>
