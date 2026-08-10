@@ -3095,21 +3095,21 @@
                              : gp >= 34 ? PLAN_COLORS.soon
                              : gp > 0   ? PLAN_COLORS.overdue
                              : '#c3c7cc';
-              return `<div style="display:flex;flex-direction:column;gap:16px;border:1px solid rgba(233,235,232,.9);border-top:6px solid ${gColor};border-radius:16px;background:var(--surface);padding:22px 24px;box-shadow:0 4px 15px rgba(0,0,0,.02)">
-                <div style="font-size:18px;font-weight:900;text-transform:uppercase;letter-spacing:.4px;color:${gColor};line-height:1.3;min-height:47px">${planEscape(g.title)}</div>
-                <div style="display:flex;align-items:baseline;gap:12px">
-                  <span style="font-size:46px;font-weight:900;color:${barColor};line-height:1">${gp}%</span>
-                  <span style="font-size:16px;font-weight:700;color:var(--text-muted)">${g.doneSteps}/${g.totalSteps} шагов</span>
+              return `<div style="display:flex;flex-direction:column;gap:9px;border:1px solid rgba(233,235,232,.9);border-top:4px solid ${gColor};border-radius:12px;background:var(--surface);padding:13px 15px;box-shadow:0 3px 10px rgba(0,0,0,.02)">
+                <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;color:${gColor};line-height:1.25;min-height:32px">${planEscape(g.title)}</div>
+                <div style="display:flex;align-items:baseline;gap:8px">
+                  <span style="font-size:27px;font-weight:900;color:${barColor};line-height:1">${gp}%</span>
+                  <span style="font-size:12px;font-weight:700;color:var(--text-muted)">${g.doneSteps}/${g.totalSteps} шагов</span>
                 </div>
-                <div style="height:12px;background:#eef0ed;border-radius:6px;overflow:hidden"><div style="height:100%;width:${gp}%;background:${barColor};border-radius:6px"></div></div>
-                <div style="display:flex;flex-wrap:wrap;gap:8px 18px;font-size:15px;font-weight:700">
+                <div style="height:7px;background:#eef0ed;border-radius:4px;overflow:hidden"><div style="height:100%;width:${gp}%;background:${barColor};border-radius:4px"></div></div>
+                <div style="display:flex;flex-wrap:wrap;gap:4px 12px;font-size:12px;font-weight:700">
                   <span style="color:var(--text-muted)">${g.tacts.length} задач</span>
-                  ${g.overdueSteps ? `<span style="color:${PLAN_COLORS.overdue}">${g.overdueSteps} просрочено</span>` : ''}
+                  ${g.overdueSteps ? `<span style="color:${PLAN_COLORS.overdue}">${g.overdueSteps} просроч.</span>` : ''}
                   ${g.soonSteps ? `<span style="color:${PLAN_COLORS.soon}">${g.soonSteps} горит</span>` : ''}
                 </div>
               </div>`;
             }).join('');
-          planBody = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;align-items:start;padding-bottom:16px">${goalCards}</div>`;
+          planBody = `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:11px;align-items:start;padding-bottom:16px">${goalCards}</div>`;
         }
 
         const updAt = j.fetchedAt ? new Date(j.fetchedAt).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }) : '';
