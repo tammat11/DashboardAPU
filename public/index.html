@@ -2997,10 +2997,10 @@
 
         // ── Metric strip ────────────────────────────────────────────────
         const metric = (label, value, color) => `
-          <div style="background:var(--surface);border:1px solid rgba(233,235,232,.8);border-radius:16px;
-                      padding:16px 22px;box-shadow:0 4px 15px rgba(0,0,0,.01);flex:1;min-width:150px">
-            <div style="font-size:13px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text-muted)">${label}</div>
-            <strong style="font-size:34px;font-weight:900;color:${color || 'var(--text-main)'};line-height:1.2">${value}</strong>
+          <div style="background:var(--surface);border:1px solid rgba(233,235,232,.8);border-radius:13px;
+                      padding:11px 16px;box-shadow:0 3px 10px rgba(0,0,0,.01);flex:1;min-width:130px">
+            <div style="font-size:11px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--text-muted)">${label}</div>
+            <strong style="font-size:25px;font-weight:900;color:${color || 'var(--text-main)'};line-height:1.2">${value}</strong>
           </div>`;
 
         const metrics = [
@@ -3174,7 +3174,7 @@
           <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">${metrics}</div>
 
           ${planBody}
-          ${peopleHtml}
+          ${isWeekPeriod ? peopleHtml : ''}
           ${attentionHtml}
           </div>`;
 
