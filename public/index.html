@@ -1289,6 +1289,8 @@
       .sd-overdue-item { border-bottom: 1px solid #f0e5e5; }
       .sd-overdue-item:last-child { border-bottom: 0; }
       .sd-overdue-task { display: grid; grid-template-columns: minmax(180px,1fr) 120px; gap: 10px; padding: 7px 10px; align-items: center; font-size: 11px; }
+      .sd-ov-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+      .sd-ov-exec { font-size: 10.5px; font-weight: 600; color: #8a8f88; }
       .sd-overdue-task .task-link { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
       .sd-overdue-task span { color: #a04b4f; text-align: right; white-space: nowrap; }
       .sd-cl-bullets { list-style: none; margin: 0 10px 7px 22px; padding: 0; }
@@ -3752,8 +3754,10 @@
           }).join('');
           return `<ul class="sd-cl-bullets">${lis}</ul>`;
         };
-        const taskRowHtml = (titleHtml, metaHtml, row, only) =>
-          `<div class="sd-overdue-item"><div class="sd-overdue-task">${titleHtml}<span>${metaHtml}</span></div>${taskChecklistBullets(row, only)}</div>`;
+        const taskRowHtml = (titleHtml, metaHtml, row, only) => {
+          const exec = escapeHtml(String(row['Исполнитель'] || '').trim());
+          return `<div class="sd-overdue-item"><div class="sd-overdue-task"><span class="sd-ov-title">${titleHtml}${exec ? `<span class="sd-ov-exec">${exec}</span>` : ''}</span><span>${metaHtml}</span></div>${taskChecklistBullets(row, only)}</div>`;
+        };
 
         // A task counts as «выполнено» when it is closed OR still open but all of
         // its checklist items are ticked (чек-лист(ы) выполнены).
