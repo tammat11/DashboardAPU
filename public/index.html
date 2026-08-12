@@ -1290,7 +1290,7 @@
       .sd-overdue-item:last-child { border-bottom: 0; }
       .sd-overdue-task { display: grid; grid-template-columns: minmax(180px,1fr) 120px; gap: 10px; padding: 7px 10px; align-items: center; font-size: 11px; }
       .sd-ov-title { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-      .sd-ov-exec { font-size: 10.5px; font-weight: 600; color: #8a8f88; }
+      .sd-ov-exec { display: block; margin-top: 2px; font-size: 10.5px; font-weight: 600; color: #8a8f88; }
       .sd-overdue-task .task-link { overflow: hidden; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
       .sd-overdue-task span { color: #a04b4f; text-align: right; white-space: nowrap; }
       .sd-cl-bullets { list-style: none; margin: 0 10px 7px 22px; padding: 0; }
@@ -3881,8 +3881,9 @@
               const clHtml = clItems.length
                 ? `<div class="sd-task-cl"><span class="sd-task-cl-head">Чек-лист ${clItems.filter(i => i.complete === true).length}/${clItems.length}</span>${taskChecklistBullets(row)}</div>`
                 : '';
+              const exec = escapeHtml(String(row['Исполнитель'] || '').trim());
               return `<div class="sd-task">
-                <div class="sd-task-title">${titleHtml}${roles.length ? `<span class="sd-task-role">${escapeHtml(roles.join(' · '))}</span>` : ''}${clHtml}</div>
+                <div class="sd-task-title">${titleHtml}${exec ? `<span class="sd-ov-exec">${exec}</span>` : ''}${roles.length ? `<span class="sd-task-role">${escapeHtml(roles.join(' · '))}</span>` : ''}${clHtml}</div>
                 <span class="sd-task-status ${statusClass}">${escapeHtml(status)}</span>
                 <span class="sd-task-deadline">${escapeHtml(row['Дедлайн'] || 'Без срока')}</span>
               </div>`;
