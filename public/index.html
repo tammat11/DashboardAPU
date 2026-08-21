@@ -1545,7 +1545,8 @@
           <span class="divider"></span>
           <span class="search-wrap" title="Поиск по имени исполнителя">
             <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-muted);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-            <input id="searchInput" class="search-input" type="text" placeholder="Имя исполнителя…" autocomplete="off" spellcheck="false">
+            <input id="searchInput" class="search-input" type="text" placeholder="Искать: имя человека…" autocomplete="off" spellcheck="false" list="peopleList">
+            <datalist id="peopleList"></datalist>
             <button id="searchClear" class="search-clear" tabindex="-1" title="Очистить">✕</button>
           </span>
           <span class="divider"></span>
@@ -2962,11 +2963,26 @@
         const range = getPeriodRange(period);
         const now = Date.now();
 
+        // Поиск по человеку из навбара: оставляем только задачи, где он участвует
+        // (ответственный, наблюдатель или в шагах чек-листа).
+        const q = (state.searchQuery || '').toLowerCase().trim();
+        const tactMatchesPerson = t => {
+          if (!q) return true;
+          const names = [];
+          if (t.responsible) names.push(t.responsible.name);
+          (t.observers || []).forEach(o => names.push(o.name));
+          (t.steps || []).forEach(s => {
+            (s.executors || []).forEach(p => names.push(p.name));
+            (s.observers || []).forEach(p => names.push(p.name));
+          });
+          return names.some(n => String(n || '').toLowerCase().includes(q));
+        };
+
         // Recompute every aggregate from the tasks in the period, bottom-up
         const goals = rawGoals.map(g => {
           const tacts = g.children
             .flatMap(s => s.tacts || [])
-            .filter(t => planTactInPeriod(t, range))
+            .filter(t => planTactInPeriod(t, range) && tactMatchesPerson(t))
             .map(t => planTactStats(t, now));
 
           return {
@@ -3218,7 +3234,9 @@
           const top = s2.getBoundingClientRect().top;
           const avail = window.innerHeight - top - 60;
           if (s2.scrollHeight <= 0) return;
-          const clamp = v => Math.max(0.3, Math.min(1.8, v));
+          // Нижний предел повыше — чтобы текст не мельчал; если не влезает,
+          // появляется вертикальная прокрутка (крупнее важнее, чем «в один экран»).
+          const clamp = v => Math.max(0.62, Math.min(1.8, v));
           // Width and height are coupled (wider box → less wrapping → shorter),
           // so iterate a few times until the scale settles.
           let scale = clamp(avail / s2.scrollHeight);
@@ -4955,6 +4973,22 @@
         }
       }
 
+      // Наполняем список подсказок людей для поиска (имена сотрудников + участники
+      // строк). Делаем один раз — как только появились сотрудники.
+      let peopleListDone = false;
+      function populatePeopleList() {
+        if (peopleListDone) return;
+        const dl = document.getElementById('peopleList');
+        if (!dl) return;
+        const names = new Set();
+        (state.allEmployees || []).forEach(e => { if (e && e.name && !isExcludedPerson(e.name)) names.add(String(e.name).trim()); });
+        (state.rows || []).forEach(r => { const n = String(r['Исполнитель'] || '').trim(); if (n) names.add(n); });
+        if (!names.size) return;
+        dl.innerHTML = Array.from(names).sort((a, b) => a.localeCompare(b, 'ru'))
+          .map(n => `<option value="${escapeHtml(n)}"></option>`).join('');
+        peopleListDone = true;
+      }
+
       function applyFilters() {
         const period = state.period || 'all';
 
@@ -5048,6 +5082,7 @@
         }
 
         state.filteredRows = filtered;
+        populatePeopleList();
         
         // We do NOT clear/re-populate state.expandedNodes here anymore.
         // This ensures the tree starts collapsed by default initially,
