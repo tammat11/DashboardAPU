@@ -3234,9 +3234,7 @@
           const top = s2.getBoundingClientRect().top;
           const avail = window.innerHeight - top - 60;
           if (s2.scrollHeight <= 0) return;
-          // Нижний предел повыше — чтобы текст не мельчал; если не влезает,
-          // появляется вертикальная прокрутка (крупнее важнее, чем «в один экран»).
-          const clamp = v => Math.max(0.62, Math.min(1.8, v));
+          const clamp = v => Math.max(0.3, Math.min(1.8, v));
           // Width and height are coupled (wider box → less wrapping → shorter),
           // so iterate a few times until the scale settles.
           let scale = clamp(avail / s2.scrollHeight);
