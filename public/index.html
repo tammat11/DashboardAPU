@@ -1313,6 +1313,15 @@
       .sd-axis { margin-left: 120px; display: flex; justify-content: space-between; border-top: 1px solid #dfe3de; padding-top: 5px; color: #949a94; font-size: 11px; }
       .sd-subtitle { margin: -5px 0 12px; font-size: 12px; color: var(--text-muted); }
       .sd-departments { display: flex; flex-direction: column; gap: 8px; }
+      /* «План» ↔ «Excel» переключатель + таблица «Свод Финал» */
+      .plan-view-toggle { display: flex; gap: 6px; justify-content: center; margin: 2px 0 10px; }
+      .plan-view-btn { padding: 7px 18px; border: 1px solid #d4dccb; border-radius: 10px; background: #fff; color: #5a6157; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s ease; }
+      .plan-view-btn:hover { border-color: #a2c037; }
+      .plan-view-btn.active { background: #222221; color: #fff; border-color: #222221; }
+      .svod-wrap { overflow: auto; max-height: calc(100vh - 200px); border: 1px solid #cfd4c8; border-radius: 10px; }
+      .svod-table { border-collapse: collapse; width: max-content; min-width: 100%; background: #fff; }
+      .svod-table th { position: sticky; top: 0; z-index: 2; background: #222221; color: #fff; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .2px; padding: 9px 8px; border: 1px solid #3a3a38; text-align: center; vertical-align: middle; white-space: normal; }
+      .svod-table td { border: 1px solid #dde1d7; padding: 6px 9px; white-space: pre-wrap; line-height: 1.35; vertical-align: top; overflow-wrap: anywhere; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
       .sd-dept summary::-webkit-details-marker { display: none; }
@@ -2806,7 +2815,58 @@
       if (ids.chatClose) ids.chatClose.addEventListener('click', closeChat);
 
       // ── ОП 2026 Plan dashboard ───────────────────────────────────────────
-      const planState = { loading: false, data: null, error: null };
+      const planState = { loading: false, data: null, error: null, excel: false, svod: null };
+
+      // Переключатель вида «План» ↔ «Excel (Свод Финал)».
+      function planToggleHtml() {
+        return `<div class="plan-view-toggle">
+            <button class="plan-view-btn${planState.excel ? '' : ' active'}" data-pv="plan">📊 План</button>
+            <button class="plan-view-btn${planState.excel ? ' active' : ''}" data-pv="excel">📋 Excel</button>
+          </div>`;
+      }
+      function bindPlanToggle() {
+        document.querySelectorAll('.plan-view-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const want = btn.dataset.pv === 'excel';
+            if (want === planState.excel) return;
+            planState.excel = want;
+            if (planState.data) drawPlan(planState.data);
+          });
+        });
+      }
+
+      async function drawPlanExcel() {
+        const toggle = planToggleHtml();
+        if (!planState.svod) {
+          ids.planWrap.innerHTML = `<div id="planScaler">${toggle}<div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка листа…</div></div>`;
+          bindPlanToggle();
+          try {
+            const r = await fetch('svod-final.json', { cache: 'force-cache' });
+            planState.svod = await r.json();
+          } catch (e) {
+            ids.planWrap.innerHTML = `<div id="planScaler">${toggle}<div style="padding:40px;text-align:center;color:#c0392b">Не удалось загрузить «Свод Финал»</div></div>`;
+            bindPlanToggle();
+            return;
+          }
+        }
+        const s = planState.svod;
+        const cols = Object.keys(s.widths).map(L => `<col style="width:${s.widths[L]}px">`).join('');
+        const headTh = s.header.map(h => `<th>${planEscape(h)}</th>`).join('');
+        const bodyRows = s.rows.map(cells => {
+          const tds = cells.map(cell => {
+            const st = `background:${cell.bg || 'transparent'};color:${cell.fc || '#2a2a28'};font-weight:${cell.b ? '800' : '400'};font-size:${Math.round(cell.sz * 1.18)}px;text-align:${cell.ha};vertical-align:${cell.va === 'center' ? 'middle' : (cell.va || 'top')}`;
+            return `<td${cell.rs > 1 ? ` rowspan="${cell.rs}"` : ''}${cell.cs > 1 ? ` colspan="${cell.cs}"` : ''} style="${st}">${planEscape(cell.v)}</td>`;
+          }).join('');
+          return `<tr>${tds}</tr>`;
+        }).join('');
+        ids.planWrap.innerHTML = `<div id="planScaler">
+            ${toggle}
+            <div style="font-weight:900;font-size:22px;text-align:center;margin:4px 0 12px;color:var(--text-main)">${planEscape(s.title)}</div>
+            <div class="svod-wrap"><table class="svod-table"><colgroup>${cols}</colgroup>
+              <thead><tr>${headTh}</tr></thead><tbody>${bodyRows}</tbody></table></div>
+          </div>`;
+        bindPlanToggle();
+      }
 
       async function renderPlan() {
         ids.tableWrap.hidden = true;
@@ -2955,6 +3015,9 @@
           ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">В группе ОП 2026 нет задач с тегами вида «ОП2026:1.1»</div>`;
           return;
         }
+
+        // Excel-вид (лист «Свод Финал») — отдельная отрисовка.
+        if (planState.excel) { drawPlanExcel(); return; }
 
         const pct = (d, t) => t ? Math.round(d / t * 100) : 0;
         const sum = (arr, key) => arr.reduce((a, x) => a + x[key], 0);
@@ -3181,6 +3244,7 @@
 
         ids.planWrap.innerHTML = `
           <div id="planScaler" style="transform-origin:top left">
+          ${planToggleHtml()}
           <div style="padding:6px 0 12px;position:relative;text-align:center">
             <div style="font-weight:900;font-size:30px;color:var(--text-main);line-height:1.2">Оперативный план IC Group 2026</div>
             <span style="position:absolute;top:6px;right:0;font-size:13px;color:var(--text-muted)">обновлено ${updAt}
@@ -3198,6 +3262,7 @@
 
         const btn = document.getElementById('planRefresh');
         if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
+        bindPlanToggle();
 
         // Kiosk fit: scale the whole plan down so it always fits one screen —
         // no scrolling or clicking needed (unusable with a TV remote).
@@ -3210,6 +3275,12 @@
         if (!scaler) return;
         scaler.style.transform = '';
         scaler.style.width = '';
+        // Excel-вид не подгоняем под экран — это большая таблица с прокруткой.
+        if (planState.excel) {
+          const p0 = scaler.parentElement;
+          if (p0) { p0.style.height = ''; p0.style.overflow = ''; }
+          return;
+        }
         // На больших периодах план не влезает в один экран читабельно — не сжимаем,
         // даём обычную вертикальную прокрутку. Kiosk-fit только для недельных.
         const weekly = ['week', 'week2', 'lastWeek'].includes(state.period || 'all');
