@@ -2873,17 +2873,29 @@
         // kiosk-подгонки обычного «Плана», — иначе Excel-таблица обрезается.
         ids.planWrap.style.height = '';
         ids.planWrap.style.overflow = '';
-        if (!planState.svod) {
-          ids.planWrap.innerHTML = `<div id="planScaler"><div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка листа…</div></div>`;
-          try {
-            const r = await fetch('svod-final.json', { cache: 'no-store' });
-            planState.svod = await r.json();
-          } catch (e) {
-            ids.planWrap.innerHTML = `<div id="planScaler"><div style="padding:40px;text-align:center;color:#c0392b">Не удалось загрузить «Свод Финал»</div></div>`;
-            return;
-          }
+        // ФУЛ-СИНК: таблица целиком строится из живого дерева проекта 51 (op-plan),
+        // без статичного svod-final.json. Формат строки — массив A…K, чтобы дальше
+        // работали те же рендер/фильтры/объединения.
+        if (!planState.data || !Array.isArray(planState.data.goals)) {
+          ids.planWrap.innerHTML = `<div id="planScaler"><div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка плана ОП 2026…</div></div>`;
+          return;
         }
-        const s = planState.svod;
+        const fmtD = iso => { if (!iso) return ''; const d = new Date(iso); return isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`; };
+        const isBoiler = txt => /указать результат/i.test(String(txt || ''));
+        const svodRows = [];
+        (planState.data.goals || []).slice().sort((a, b) => (a.num || 0) - (b.num || 0)).forEach(g => {
+          (g.children || []).forEach(str => {
+            (str.tacts || []).forEach(t => {
+              const steps = (t.steps || []).filter(st => !isBoiler(st.text));
+              if (!steps.length) {
+                svodRows.push([g.title, str.title, t.code, t.title, '', '', '', fmtD(t.deadline), '', '', '']);
+              } else {
+                steps.forEach(st => svodRows.push([g.title, str.title, t.code, t.title, st.code, st.text, '', fmtD(st.deadline), '', '', '']));
+              }
+            });
+          });
+        });
+        const s = { rows: svodRows };
         // Живой статус из проекта 51 по коду подзадачи (1.1.1.1).
         const codeStatus = new Map();
         (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => (t.steps || []).forEach(st => {
@@ -2907,6 +2919,10 @@
             obs: (t.observers || []).map(x => x.name)
           });
         })));
+        const teamNames = code => {
+          const tt = tactTeam.get(String(code).trim());
+          return tt ? [tt.resp, ...tt.acc, ...tt.obs].filter(Boolean).join(' ').toLowerCase() : '';
+        };
         const teamCell = code => {
           const tt = tactTeam.get(String(code).trim());
           if (!tt) return '';
@@ -2934,8 +2950,8 @@
         const q = (planState.svodQ || '').toLowerCase().trim();
         const personQ = (state.searchQuery || '').toLowerCase().trim();
         const f = planState.svodF || 'all';
-        const passText = r => !q || r.some(v => String(v || '').toLowerCase().includes(q));
-        const passPerson = r => !personQ || [r[8], r[9], r[10]].some(v => String(v || '').toLowerCase().includes(personQ));
+        const passText = r => !q || r.some(v => String(v || '').toLowerCase().includes(q)) || teamNames(r[2]).includes(q);
+        const passPerson = r => !personQ || teamNames(r[2]).includes(personQ);
         const goalSel = planState.svodGoals || [];
         const passGoal = r => !goalSel.length || goalSel.includes(r[0]);
         const passFilter = r => {
@@ -2985,21 +3001,22 @@
                      : st === 'pending' ? '<span style="color:#b0b6ae;font-weight:900;margin-right:6px">○</span>' : '';
           tds += `<td class="g-snum">${planEscape(r[4])}</td>`;
           tds += `<td class="g-sub">${mark}${planEscape(r[5])}</td>`;
-          tds += `<td class="g-form">${planEscape(r[6])}</td>`;
           tds += `<td class="g-due${st === 'overdue' ? ' over' : ''}">${planEscape(r[7])}</td>`;
           // Команда — одна ячейка на тактическую задачу (объединена по строкам).
           if (firstT) tds += `<td class="g-team" rowspan="${span(i, kT)}">${teamCell(r[2])}</td>`;
           // Жирнее разделитель между тактическими задачами.
           body += `<tr class="${firstT && i > 0 ? 'tstart' : ''}" style="${trBg}">${tds}</tr>`;
         }
-        const cols = [210, 175, 56, 300, 66, 330, 175, 84, 220].map(w => `<col style="width:${w}px">`).join('');
-        const headers = ['Стратегические цели', 'Стратегические задачи', '№', 'Тактические задачи', '№', 'Тактические подзадачи', 'Форма результата', 'Срок', 'Команда'];
+        const cols = [210, 175, 56, 320, 66, 360, 96, 240].map(w => `<col style="width:${w}px">`).join('');
+        const headers = ['Стратегические цели', 'Стратегические задачи', '№', 'Тактические задачи', '№', 'Тактические подзадачи', 'Срок', 'Команда'];
         const headTh = headers.map(h => `<th>${planEscape(h)}</th>`).join('');
         const chip = (key, label, n, cls) =>
           `<button class="svod-chip${f === key ? ' active' : ''}${cls ? ' ' + cls : ''}" data-f="${key}">${label} <b>${n}</b></button>`;
         // Цели — мультивыбор (римская метка + полное название в подсказке).
         const goalsList = [...new Set(s.rows.map(r => r[0]))];
-        const romanOf = t => (String(t).match(/^([IVX]+)\./) || [, ''])[1] || String(t).slice(0, 2);
+        const goalRoman = new Map();
+        (planState.data.goals || []).forEach(g => goalRoman.set(g.title, g.code || ''));
+        const romanOf = t => goalRoman.get(t) || (String(t).match(/^([IVX]+)\./) || [, ''])[1] || String(t).slice(0, 3);
         const goalChips = goalsList.map(g =>
           `<button class="svod-gchip${goalSel.includes(g) ? ' active' : ''}" data-g="${planEscape(g)}" title="${planEscape(g)}">${planEscape(romanOf(g))}</button>`).join('');
         const shownN = rows.filter(r => statusOf(r[4])).length;
