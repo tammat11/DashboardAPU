@@ -1354,6 +1354,8 @@
       .svod-table td.g-team { font-size: 11px; }
       .svod-table .svod-rg { color: #8a8f88; font-size: 10px; margin-top: 2px; }
       .svod-table .svod-res { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; white-space: nowrap; }
+      .svod-table .svod-tlink { color: inherit; text-decoration: none; cursor: pointer; }
+      .svod-table .svod-tlink:hover { color: #1d4ed8; text-decoration: underline; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
       .sd-dept summary::-webkit-details-marker { display: none; }
@@ -2864,6 +2866,10 @@
       function bindPlanToggle() { syncPlanViewToggleUI(); }
 
       async function drawPlanExcel() {
+        // Сбрасываем возможную фиксированную высоту/overflow, оставшуюся от
+        // kiosk-подгонки обычного «Плана», — иначе Excel-таблица обрезается.
+        ids.planWrap.style.height = '';
+        ids.planWrap.style.overflow = '';
         if (!planState.svod) {
           ids.planWrap.innerHTML = `<div id="planScaler"><div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка листа…</div></div>`;
           try {
@@ -2882,9 +2888,11 @@
         }))));
         // Кол-во прикреплённых результатов (вкладка «Результат») по тактической задаче.
         const tactRes = new Map();
+        const tactId = new Map();      // код тактической задачи → id задачи Bitrix
         (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
-          if (t.code) tactRes.set(String(t.code).trim(), t.resultCount || 0);
+          if (t.code) { tactRes.set(String(t.code).trim(), t.resultCount || 0); if (t.id) tactId.set(String(t.code).trim(), String(t.id)); }
         })));
+        const portal = state.portalHost || 'tootopbrass.bitrix24.kz';
         const totalResults = Array.from(tactRes.values()).reduce((a, b) => a + b, 0);
         const nowT = Date.now();
         const statusOf = code => {
@@ -2945,7 +2953,11 @@
           if (firstT) {
             const rc = tactRes.get(String(r[2]).trim()) || 0;
             const badge = rc ? `<span class="svod-res" title="Прикреплено результатов">📎 ${rc}</span>` : '';
-            tds += `<td class="g-tnum" rowspan="${span(i, kT)}">${planEscape(r[2])}</td><td class="g-ttask" rowspan="${span(i, kT)}">${planEscape(r[3])}${badge}</td>`;
+            const tid = tactId.get(String(r[2]).trim());
+            const titleHtml = tid
+              ? `<a class="svod-tlink" href="https://${planEscape(portal)}/company/personal/user/0/tasks/task/view/${tid}/" target="_blank" rel="noopener" title="Открыть задачу в Bitrix">${planEscape(r[3])}</a>`
+              : planEscape(r[3]);
+            tds += `<td class="g-tnum" rowspan="${span(i, kT)}">${planEscape(r[2])}</td><td class="g-ttask" rowspan="${span(i, kT)}">${titleHtml}${badge}</td>`;
           }
           const mark = st === 'done' ? '<span style="color:#22a06b;font-weight:900;margin-right:6px">✓</span>'
                      : st === 'overdue' ? '<span style="color:#ef4444;font-weight:900;margin-right:6px">●</span>'
@@ -4431,9 +4443,10 @@
         if (pvtBox) { pvtBox.hidden = !isPlan; if (typeof syncPlanViewToggleUI === 'function') syncPlanViewToggleUI(); }
         const statsGrid = document.querySelector('.stats-grid');
         if (statsGrid) statsGrid.style.display = isPlan ? 'none' : '';
-        // TV kiosk: no scrolling and no floating chat button on the plan.
-        document.documentElement.style.overflow = isPlan ? 'hidden' : '';
-        document.body.style.overflow = isPlan ? 'hidden' : '';
+        // TV kiosk: no scrolling on the normal plan; Excel-вид — со скроллом.
+        const kioskLock = isPlan && !planState.excel;
+        document.documentElement.style.overflow = kioskLock ? 'hidden' : '';
+        document.body.style.overflow = kioskLock ? 'hidden' : '';
         const chatFab = document.querySelector('.chat-fab');
         if (chatFab) chatFab.style.display = isPlan ? 'none' : '';
         if (ids.structureWrap) ids.structureWrap.hidden = true;
