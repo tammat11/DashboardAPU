@@ -1318,7 +1318,11 @@
       .plan-view-btn { padding: 7px 18px; border: 1px solid #d4dccb; border-radius: 10px; background: #fff; color: #5a6157; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s ease; }
       .plan-view-btn:hover { border-color: #a2c037; }
       .plan-view-btn.active { background: #222221; color: #fff; border-color: #222221; }
-      .svod-wrap { overflow: auto; max-height: calc(100vh - 200px); border: 1px solid #cfd4c8; border-radius: 10px; }
+      .svod-summary { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center; align-items: center; margin: 0 0 12px; font-size: 14px; color: var(--text-main); }
+      .svod-summary b { font-size: 16px; }
+      .svod-summary .svod-legend { font-size: 12px; color: var(--text-muted); }
+      .svod-summary .svod-legend i { font-style: normal; font-weight: 900; }
+      .svod-wrap { overflow: auto; max-height: calc(100vh - 240px); border: 1px solid #cfd4c8; border-radius: 10px; }
       .svod-table { border-collapse: collapse; width: max-content; min-width: 100%; background: #fff; }
       .svod-table th { position: sticky; top: 0; z-index: 2; background: #222221; color: #fff; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .2px; padding: 9px 8px; border: 1px solid #3a3a38; text-align: center; vertical-align: middle; white-space: normal; }
       .svod-table td { border: 1px solid #dde1d7; padding: 6px 9px; white-space: pre-wrap; line-height: 1.35; vertical-align: top; overflow-wrap: anywhere; }
@@ -2850,18 +2854,56 @@
           }
         }
         const s = planState.svod;
+        // Живой статус из проекта 51: сопоставляем по коду подзадачи (1.1.1.1).
+        const codeStatus = new Map();
+        (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => (t.steps || []).forEach(st => {
+          if (st.code) codeStatus.set(String(st.code).trim(), { done: st.done === true, dl: st.deadline ? new Date(st.deadline) : null });
+        }))));
+        const nowT = Date.now();
+        let doneN = 0, overN = 0, pendN = 0, totalN = 0, matched = 0;
         const cols = Object.keys(s.widths).map(L => `<col style="width:${s.widths[L]}px">`).join('');
         const headTh = s.header.map(h => `<th>${planEscape(h)}</th>`).join('');
         const bodyRows = s.rows.map(cells => {
+          const eCell = cells.find(c => c.c === 5);
+          const code = eCell && String(eCell.v || '').trim();
+          let status = null;
+          if (code && codeStatus.has(code)) {
+            matched++; totalN++;
+            const info = codeStatus.get(code);
+            if (info.done) { status = 'done'; doneN++; }
+            else if (info.dl && info.dl.getTime() < nowT) { status = 'overdue'; overN++; }
+            else { status = 'pending'; pendN++; }
+          }
+          const trBg = status === 'done' ? 'background:rgba(34,160,107,.12)'
+                     : status === 'overdue' ? 'background:rgba(239,68,68,.10)' : '';
           const tds = cells.map(cell => {
-            const st = `background:${cell.bg || 'transparent'};color:${cell.fc || '#2a2a28'};font-weight:${cell.b ? '800' : '400'};font-size:${Math.round(cell.sz * 1.18)}px;text-align:${cell.ha};vertical-align:${cell.va === 'center' ? 'middle' : (cell.va || 'top')}`;
-            return `<td${cell.rs > 1 ? ` rowspan="${cell.rs}"` : ''}${cell.cs > 1 ? ` colspan="${cell.cs}"` : ''} style="${st}">${planEscape(cell.v)}</td>`;
+            let st = `background:${cell.bg || 'transparent'};color:${cell.fc || '#2a2a28'};font-weight:${cell.b ? '800' : '400'};font-size:${Math.round(cell.sz * 1.18)}px;text-align:${cell.ha};vertical-align:${cell.va === 'center' ? 'middle' : (cell.va || 'top')}`;
+            let content = planEscape(cell.v);
+            // Маркер факта в колонке «Подзадача» + подсветка просроченного срока.
+            if (cell.c === 6 && status) {
+              const m = status === 'done' ? '✓' : status === 'overdue' ? '●' : '○';
+              const mc = status === 'done' ? '#22a06b' : status === 'overdue' ? '#ef4444' : '#b0b6ae';
+              content = `<span style="color:${mc};font-weight:900;margin-right:7px">${m}</span>${content}`;
+            }
+            if (cell.c === 8 && status === 'overdue') st += ';color:#ef4444;font-weight:800';
+            return `<td${cell.rs > 1 ? ` rowspan="${cell.rs}"` : ''}${cell.cs > 1 ? ` colspan="${cell.cs}"` : ''} style="${st}">${content}</td>`;
           }).join('');
-          return `<tr>${tds}</tr>`;
+          return `<tr style="${trBg}">${tds}</tr>`;
         }).join('');
+        const factPct = totalN ? Math.round(doneN / totalN * 100) : 0;
+        const summary = matched
+          ? `<div class="svod-summary">
+              <span><b style="color:#22a06b">${doneN}</b> выполнено</span>
+              <span><b style="color:#ef4444">${overN}</b> просрочено</span>
+              <span><b style="color:#8a8f88">${pendN}</b> в работе</span>
+              <span>Прогресс: <b>${factPct}%</b> (${doneN}/${totalN})</span>
+              <span class="svod-legend"><i style="color:#22a06b">✓</i> выполнено · <i style="color:#ef4444">●</i> просрочено · <i style="color:#b0b6ae">○</i> в срок</span>
+            </div>`
+          : `<div class="svod-summary"><span style="color:var(--text-muted)">Факт из проекта 51 подгрузится после загрузки «Плана»</span></div>`;
         ids.planWrap.innerHTML = `<div id="planScaler">
             ${toggle}
-            <div style="font-weight:900;font-size:22px;text-align:center;margin:4px 0 12px;color:var(--text-main)">${planEscape(s.title)}</div>
+            <div style="font-weight:900;font-size:22px;text-align:center;margin:4px 0 10px;color:var(--text-main)">${planEscape(s.title)}</div>
+            ${summary}
             <div class="svod-wrap"><table class="svod-table"><colgroup>${cols}</colgroup>
               <thead><tr>${headTh}</tr></thead><tbody>${bodyRows}</tbody></table></div>
           </div>`;
