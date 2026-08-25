@@ -1322,6 +1322,17 @@
       .svod-summary b { font-size: 15px; }
       .svod-hide { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600; color: #5a6157; }
       .svod-hide input { cursor: pointer; }
+      .svod-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; justify-content: center; margin: 0 0 12px; }
+      .svod-search { display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px; border: 1px solid #d4dccb; border-radius: 10px; background: #fff; color: var(--text-muted); }
+      .svod-search input { border: 0; outline: 0; background: transparent; font-size: 13px; width: 220px; color: var(--text-main); }
+      .svod-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .svod-chip { padding: 6px 12px; border: 1px solid #d4dccb; border-radius: 999px; background: #fff; color: #5a6157; font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all .12s ease; }
+      .svod-chip b { font-weight: 800; }
+      .svod-chip:hover { border-color: #a2c037; }
+      .svod-chip.active { background: #222221; color: #fff; border-color: #222221; }
+      .svod-chip.c-over.active { background: #ef4444; border-color: #ef4444; }
+      .svod-chip.c-done.active { background: #22a06b; border-color: #22a06b; }
+      .svod-chip.c-res.active { background: #1d4ed8; border-color: #1d4ed8; }
       .svod-wrap { overflow: auto; max-height: calc(100vh - 170px); border: 1px solid #cfd4c8; border-radius: 10px; }
       .svod-table { border-collapse: collapse; width: max-content; min-width: 100%; background: #fff; font-size: 11.5px; }
       .svod-table th { position: sticky; top: 0; z-index: 2; background: #222221; color: #fff; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: .2px; padding: 7px 7px; border: 1px solid #3a3a38; text-align: center; vertical-align: middle; white-space: normal; }
@@ -1329,7 +1340,8 @@
       .svod-table td.g-goal { background: #222221; color: #fff; font-weight: 800; font-size: 12px; text-align: center; vertical-align: middle; }
       .svod-table td.g-strat { background: #a2c037; color: #243024; font-weight: 800; text-align: center; vertical-align: middle; }
       .svod-table td.g-tnum { background: #e5ecc6; font-weight: 800; text-align: center; vertical-align: middle; }
-      .svod-table td.g-ttask { background: #e5ecc6; font-weight: 700; vertical-align: top; }
+      .svod-table td.g-ttask { background: #e5ecc6; font-weight: 700; vertical-align: middle; }
+      .svod-table tr.tstart td { border-top: 3px solid #9aa585; }
       .svod-table td.g-snum { text-align: center; white-space: nowrap; font-weight: 700; color: #5a6157; }
       .svod-table td.g-due { text-align: center; white-space: nowrap; }
       .svod-table td.g-due.over { color: #ef4444; font-weight: 800; }
@@ -2833,7 +2845,7 @@
       if (ids.chatClose) ids.chatClose.addEventListener('click', closeChat);
 
       // ── ОП 2026 Plan dashboard ───────────────────────────────────────────
-      const planState = { loading: false, data: null, error: null, excel: false, svod: null, hideDone: false };
+      const planState = { loading: false, data: null, error: null, excel: false, svod: null, hideDone: false, svodQ: '', svodF: 'all' };
 
       // Переключатель вида «План» ↔ «Excel (Свод Финал)» живёт в навбаре (#planViewToggle),
       // виден только на странице «План».
@@ -2876,15 +2888,26 @@
           if (info.dl && info.dl.getTime() < nowT) return 'overdue';
           return 'pending';
         };
-        // Сводка по всем пунктам (до скрытия).
+        // Сводка по всем пунктам (до фильтров).
         let doneN = 0, overN = 0, pendN = 0, totalN = 0;
         s.rows.forEach(r => { const st = statusOf(r[4]); if (st) { totalN++; if (st === 'done') doneN++; else if (st === 'overdue') overN++; else pendN++; } });
         const factPct = totalN ? Math.round(doneN / totalN * 100) : 0;
+        const resTactN = Array.from(tactRes.values()).filter(v => v > 0).length;
 
-        // Скрыть выполненные — фильтруем строки, объединения пересчитаются ниже.
-        const rows = planState.hideDone
-          ? s.rows.filter(r => statusOf(r[4]) !== 'done')
-          : s.rows;
+        // Поиск + фильтры (по статусу / с результатами) + «скрыть выполненные».
+        const q = (planState.svodQ || '').toLowerCase().trim();
+        const f = planState.svodF || 'all';
+        const passText = r => !q || r.some(v => String(v || '').toLowerCase().includes(q));
+        const passFilter = r => {
+          const stt = statusOf(r[4]);
+          if (f === 'overdue') return stt === 'overdue';
+          if (f === 'pending') return stt === 'pending';
+          if (f === 'done') return stt === 'done';
+          if (f === 'results') return (tactRes.get(String(r[2]).trim()) || 0) > 0;
+          return true;
+        };
+        const rows = s.rows.filter(r =>
+          passText(r) && passFilter(r) && !(planState.hideDone && statusOf(r[4]) === 'done'));
 
         // Пересчёт объединений: группируем подряд идущие строки по A / A|B / A|B|C.
         const kG = r => r[0], kS = r => r[0] + '¦' + r[1], kT = r => r[0] + '¦' + r[1] + '¦' + r[2];
@@ -2921,26 +2944,58 @@
           tds += `<td class="g-form">${planEscape(r[6])}</td>`;
           tds += `<td class="g-due${st === 'overdue' ? ' over' : ''}">${planEscape(r[7])}</td>`;
           tds += `<td class="g-team">${team(r[8], r[9], r[10])}</td>`;
-          body += `<tr style="${trBg}">${tds}</tr>`;
+          // Жирнее разделитель между тактическими задачами.
+          body += `<tr class="${firstT && i > 0 ? 'tstart' : ''}" style="${trBg}">${tds}</tr>`;
         }
         const cols = [210, 175, 56, 300, 66, 330, 175, 84, 220].map(w => `<col style="width:${w}px">`).join('');
         const headers = ['Стратегические цели', 'Стратегические задачи', '№', 'Тактические задачи', '№', 'Тактические подзадачи', 'Форма результата', 'Срок', 'Команда'];
         const headTh = headers.map(h => `<th>${planEscape(h)}</th>`).join('');
+        const chip = (key, label, n, cls) =>
+          `<button class="svod-chip${f === key ? ' active' : ''}${cls ? ' ' + cls : ''}" data-f="${key}">${label} <b>${n}</b></button>`;
+        const shownN = rows.filter(r => statusOf(r[4])).length;
         const summary = `<div class="svod-summary">
             <span><b style="color:#22a06b">${doneN}</b> выполнено</span>
             <span><b style="color:#ef4444">${overN}</b> просрочено</span>
             <span><b style="color:#8a8f88">${pendN}</b> в работе</span>
             <span>Прогресс: <b>${factPct}%</b></span>
             <span><b>📎 ${totalResults}</b> результатов</span>
+          </div>
+          <div class="svod-toolbar">
+            <span class="svod-search"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              <input id="svodSearch" type="text" placeholder="Поиск по таблице…" value="${planEscape(planState.svodQ || '')}" autocomplete="off"></span>
+            <div class="svod-chips">
+              ${chip('all', 'Все', totalN)}
+              ${chip('overdue', '● Просрочено', overN, 'c-over')}
+              ${chip('pending', '○ В работе', pendN, 'c-pend')}
+              ${chip('done', '✓ Выполнено', doneN, 'c-done')}
+              ${chip('results', '📎 С результатами', resTactN, 'c-res')}
+            </div>
             <label class="svod-hide"><input type="checkbox" id="svodHideDone"${planState.hideDone ? ' checked' : ''}> Скрыть выполненные</label>
           </div>`;
         ids.planWrap.innerHTML = `<div id="planScaler">
             ${summary}
-            <div class="svod-wrap"><table class="svod-table"><colgroup>${cols}</colgroup>
-              <thead><tr>${headTh}</tr></thead><tbody>${body}</tbody></table></div>
+            <div class="svod-wrap">${rows.length ? `<table class="svod-table"><colgroup>${cols}</colgroup>
+              <thead><tr>${headTh}</tr></thead><tbody>${body}</tbody></table>` : `<div style="padding:40px;text-align:center;color:var(--text-muted)">Ничего не найдено</div>`}</div>
           </div>`;
         const hd = document.getElementById('svodHideDone');
         if (hd) hd.addEventListener('change', () => { planState.hideDone = hd.checked; drawPlanExcel(); });
+        document.querySelectorAll('.svod-chip').forEach(c => c.addEventListener('click', () => {
+          planState.svodF = c.dataset.f; drawPlanExcel();
+        }));
+        const se = document.getElementById('svodSearch');
+        if (se) {
+          let t0;
+          se.addEventListener('input', () => {
+            clearTimeout(t0);
+            const caret = se.selectionStart;
+            t0 = setTimeout(() => {
+              planState.svodQ = se.value;
+              drawPlanExcel();
+              const s2 = document.getElementById('svodSearch');
+              if (s2) { s2.focus(); try { s2.setSelectionRange(caret, caret); } catch (e) {} }
+            }, 180);
+          });
+        }
         bindPlanToggle();
       }
 
