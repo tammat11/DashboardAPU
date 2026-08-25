@@ -1333,6 +1333,12 @@
       .svod-chip.c-over.active { background: #ef4444; border-color: #ef4444; }
       .svod-chip.c-done.active { background: #22a06b; border-color: #22a06b; }
       .svod-chip.c-res.active { background: #1d4ed8; border-color: #1d4ed8; }
+      .svod-goals { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; justify-content: center; margin: -4px 0 12px; }
+      .svod-goals-lbl { font-size: 12px; font-weight: 700; color: #8a8f88; margin-right: 4px; }
+      .svod-gchip { min-width: 30px; padding: 4px 9px; border: 1px solid #d4dccb; border-radius: 8px; background: #fff; color: #5a6157; font-size: 12px; font-weight: 800; cursor: pointer; transition: all .12s ease; }
+      .svod-gchip:hover { border-color: #a2c037; }
+      .svod-gchip.active { background: #a2c037; color: #243024; border-color: #a2c037; }
+      .svod-gclear { font-weight: 700; color: #b23; }
       .svod-wrap { overflow: auto; max-height: calc(100vh - 170px); border: 1px solid #cfd4c8; border-radius: 10px; }
       .svod-table { border-collapse: collapse; width: max-content; min-width: 100%; background: #fff; font-size: 11.5px; }
       .svod-table th { position: sticky; top: 0; z-index: 2; background: #222221; color: #fff; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: .2px; padding: 7px 7px; border: 1px solid #3a3a38; text-align: center; vertical-align: middle; white-space: normal; }
@@ -2845,7 +2851,7 @@
       if (ids.chatClose) ids.chatClose.addEventListener('click', closeChat);
 
       // ── ОП 2026 Plan dashboard ───────────────────────────────────────────
-      const planState = { loading: false, data: null, error: null, excel: false, svod: null, hideDone: false, svodQ: '', svodF: 'all' };
+      const planState = { loading: false, data: null, error: null, excel: false, svod: null, hideDone: false, svodQ: '', svodF: 'all', svodGoals: [] };
 
       // Переключатель вида «План» ↔ «Excel (Свод Финал)» живёт в навбаре (#planViewToggle),
       // виден только на странице «План».
@@ -2894,10 +2900,15 @@
         const factPct = totalN ? Math.round(doneN / totalN * 100) : 0;
         const resTactN = Array.from(tactRes.values()).filter(v => v > 0).length;
 
-        // Поиск + фильтры (по статусу / с результатами) + «скрыть выполненные».
+        // Поиск + фильтры (по статусу / с результатами) + «скрыть выполненные»
+        // + фильтр по человеку из навбар-поиска (Ответственный/Исполнитель/Состав РГ).
         const q = (planState.svodQ || '').toLowerCase().trim();
+        const personQ = (state.searchQuery || '').toLowerCase().trim();
         const f = planState.svodF || 'all';
         const passText = r => !q || r.some(v => String(v || '').toLowerCase().includes(q));
+        const passPerson = r => !personQ || [r[8], r[9], r[10]].some(v => String(v || '').toLowerCase().includes(personQ));
+        const goalSel = planState.svodGoals || [];
+        const passGoal = r => !goalSel.length || goalSel.includes(r[0]);
         const passFilter = r => {
           const stt = statusOf(r[4]);
           if (f === 'overdue') return stt === 'overdue';
@@ -2907,7 +2918,7 @@
           return true;
         };
         const rows = s.rows.filter(r =>
-          passText(r) && passFilter(r) && !(planState.hideDone && statusOf(r[4]) === 'done'));
+          passText(r) && passPerson(r) && passGoal(r) && passFilter(r) && !(planState.hideDone && statusOf(r[4]) === 'done'));
 
         // Пересчёт объединений: группируем подряд идущие строки по A / A|B / A|B|C.
         const kG = r => r[0], kS = r => r[0] + '¦' + r[1], kT = r => r[0] + '¦' + r[1] + '¦' + r[2];
@@ -2952,6 +2963,11 @@
         const headTh = headers.map(h => `<th>${planEscape(h)}</th>`).join('');
         const chip = (key, label, n, cls) =>
           `<button class="svod-chip${f === key ? ' active' : ''}${cls ? ' ' + cls : ''}" data-f="${key}">${label} <b>${n}</b></button>`;
+        // Цели — мультивыбор (римская метка + полное название в подсказке).
+        const goalsList = [...new Set(s.rows.map(r => r[0]))];
+        const romanOf = t => (String(t).match(/^([IVX]+)\./) || [, ''])[1] || String(t).slice(0, 2);
+        const goalChips = goalsList.map(g =>
+          `<button class="svod-gchip${goalSel.includes(g) ? ' active' : ''}" data-g="${planEscape(g)}" title="${planEscape(g)}">${planEscape(romanOf(g))}</button>`).join('');
         const shownN = rows.filter(r => statusOf(r[4])).length;
         const summary = `<div class="svod-summary">
             <span><b style="color:#22a06b">${doneN}</b> выполнено</span>
@@ -2971,7 +2987,8 @@
               ${chip('results', '📎 С результатами', resTactN, 'c-res')}
             </div>
             <label class="svod-hide"><input type="checkbox" id="svodHideDone"${planState.hideDone ? ' checked' : ''}> Скрыть выполненные</label>
-          </div>`;
+          </div>
+          <div class="svod-goals"><span class="svod-goals-lbl">Цели:</span>${goalChips}${goalSel.length ? `<button class="svod-gchip svod-gclear" data-g="__clear">Сброс</button>` : ''}</div>`;
         ids.planWrap.innerHTML = `<div id="planScaler">
             ${summary}
             <div class="svod-wrap">${rows.length ? `<table class="svod-table"><colgroup>${cols}</colgroup>
@@ -2981,6 +2998,16 @@
         if (hd) hd.addEventListener('change', () => { planState.hideDone = hd.checked; drawPlanExcel(); });
         document.querySelectorAll('.svod-chip').forEach(c => c.addEventListener('click', () => {
           planState.svodF = c.dataset.f; drawPlanExcel();
+        }));
+        document.querySelectorAll('.svod-gchip').forEach(c => c.addEventListener('click', () => {
+          const g = c.dataset.g;
+          if (g === '__clear') { planState.svodGoals = []; }
+          else {
+            const set = new Set(planState.svodGoals);
+            set.has(g) ? set.delete(g) : set.add(g);   // мультивыбор
+            planState.svodGoals = [...set];
+          }
+          drawPlanExcel();
         }));
         const se = document.getElementById('svodSearch');
         if (se) {
@@ -3293,7 +3320,11 @@
         if (!shownAny) {
           planBody = `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Нет задач с крайним сроком в выбранном периоде</div>`;
         } else if (isWeekPeriod) {
-          planBody = `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${flatTacts.map(t => renderTactCard(t)).join('')}</div>`;
+          // В недельном виде не показываем задачи с полностью выполненным чек-листом.
+          const weekTacts = flatTacts.filter(t => !(t.totalSteps > 0 && t.doneSteps === t.totalSteps));
+          planBody = weekTacts.length
+            ? `<div style="display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;padding-bottom:16px">${weekTacts.map(t => renderTactCard(t)).join('')}</div>`
+            : `<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px">Все задачи периода выполнены 🎉</div>`;
         } else {
           // Большой период — только ОБЗОР выполнения целей: без списка задач.
           // Карточка цели: название, % выполнения, шкала, счётчики.
@@ -4393,6 +4424,11 @@
         document.body.classList.toggle('gallery-active', state.viewMode === 'table3' || state.viewMode === 'table7' || state.viewMode === 'table6');
         // On «План» the plan has its own metric strip, so hide the top task stats.
         const isPlan = state.viewMode === 'table6';
+        // На «Плане» в навбаре — переключатель План/Excel вместо фильтра «По плану…».
+        const pfBox = document.querySelector('.plan-filter[aria-label="Фильтр по плану"]');
+        const pvtBox = document.getElementById('planViewToggle');
+        if (pfBox) pfBox.hidden = isPlan;
+        if (pvtBox) { pvtBox.hidden = !isPlan; if (typeof syncPlanViewToggleUI === 'function') syncPlanViewToggleUI(); }
         const statsGrid = document.querySelector('.stats-grid');
         if (statsGrid) statsGrid.style.display = isPlan ? 'none' : '';
         // TV kiosk: no scrolling and no floating chat button on the plan.
@@ -5702,14 +5738,7 @@
         if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
         if (ids.viewBtn6) ids.viewBtn6.classList.toggle('active', mode === 'table6');
         if (ids.viewBtn7) ids.viewBtn7.classList.toggle('active', mode === 'table7');
-        // На странице «План» показываем переключатель План/Excel вместо фильтра
-        // «По плану/Вне плана/Все».
-        const isPlanPage = mode === 'table6';
-        const pf = document.querySelector('.plan-filter[aria-label="Фильтр по плану"]');
-        const pvt = document.getElementById('planViewToggle');
-        if (pf) pf.hidden = isPlanPage;
-        if (pvt) { pvt.hidden = !isPlanPage; syncPlanViewToggleUI(); }
-        renderTable();
+        renderTable(); // показ переключателя План/Excel — внутри renderTable
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
       if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
