@@ -3186,11 +3186,11 @@
           ...(s.executors || []).map(p => planAvatar(p, 22, '#7cc437')),
           ...(s.observers || []).map(p => planAvatar(p, 22, '#3b82f6'))
         ].join('');
-        return `<div style="display:flex;align-items:center;gap:10px;padding:11px 4px 11px 2px;font-size:21px;border-top:1px dashed rgba(0,0,0,.07)">
-          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:21px;text-align:center;font-size:22px">${mark}</span>
-          <span style="flex:1;min-width:0;line-height:1.5;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
+        return `<div style="display:flex;align-items:center;gap:11px;padding:13px 4px 13px 2px;font-size:25px;border-top:1px dashed rgba(0,0,0,.07)">
+          <span style="color:${markColor};font-weight:800;flex-shrink:0;width:24px;text-align:center;font-size:26px">${mark}</span>
+          <span style="flex:1;min-width:0;line-height:1.45;overflow-wrap:break-word;color:${s.done ? 'var(--text-muted)' : 'var(--text-main)'};${s.done ? 'text-decoration:line-through' : ''}">${planEscape(s.text)}</span>
           ${people ? `<span style="display:flex;gap:3px;flex-shrink:0">${people}</span>` : ''}
-          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:800;min-width:92px;text-align:right;font-size:23px;text-decoration:underline;text-underline-offset:3px">${planDateDow(s.deadline)}</span>
+          <span style="color:${overdue ? '#ef4444' : 'var(--text-muted)'};flex-shrink:0;font-weight:800;min-width:96px;text-align:right;font-size:26px;text-decoration:underline;text-underline-offset:3px">${planDateDow(s.deadline)}</span>
         </div>`;
       }
 
