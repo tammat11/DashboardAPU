@@ -56,6 +56,27 @@ async function fetchOpTasks() {
   return tasks;
 }
 
+// Кол-во прикреплённых результатов (вкладка «Результат» задачи Bitrix).
+async function fetchResultCounts(taskIds) {
+  const map = {};
+  for (let i = 0; i < taskIds.length; i += 45) {
+    const chunk = taskIds.slice(i, i + 45);
+    const cmd = {};
+    chunk.forEach(id => { cmd[`r${id}`] = `tasks.task.result.list?taskId=${id}`; });
+    try {
+      const r = await bx('batch', { halt: 0, cmd });
+      const result = r.result?.result || {};
+      Object.keys(result).forEach(k => {
+        let res = result[k];
+        if (res && res.result) res = res.result;
+        const arr = Array.isArray(res) ? res : Object.values(res || {});
+        map[k.slice(1)] = arr.length;
+      });
+    } catch { /* skip failed batch */ }
+  }
+  return map;
+}
+
 async function fetchChecklists(taskIds) {
   const map = {};
   for (let i = 0; i < taskIds.length; i += 45) {
@@ -163,6 +184,7 @@ export default async function handler(req, res) {
 
     const tactIds = tact.map(t => String(t.id || t.ID));
     const checklists = tactIds.length ? await fetchChecklists(tactIds) : {};
+    const resultCounts = tactIds.length ? await fetchResultCounts(tactIds) : {};
 
     // Build tactical task objects with their steps. Counters are deliberately NOT
     // computed here: the client aggregates them so the period filter can apply.
@@ -179,6 +201,7 @@ export default async function handler(req, res) {
         deadline: tt.deadline || tt.DEADLINE || null,
         responsibleId: String(tt.responsibleId || tt.RESPONSIBLE_ID || ''),
         auditorIds: idList(tt.auditors ?? tt.AUDITORS),
+        resultCount: resultCounts[id] || 0,
         steps: items.map(parseStep).filter(step => !isExcludedPerson(step.responsible))
       };
     }

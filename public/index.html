@@ -1335,6 +1335,7 @@
       .svod-table td.g-due.over { color: #ef4444; font-weight: 800; }
       .svod-table td.g-team { font-size: 11px; }
       .svod-table .svod-rg { color: #8a8f88; font-size: 10px; margin-top: 2px; }
+      .svod-table .svod-res { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; white-space: nowrap; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
       .sd-dept summary::-webkit-details-marker { display: none; }
@@ -2861,6 +2862,12 @@
         (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => (t.steps || []).forEach(st => {
           if (st.code) codeStatus.set(String(st.code).trim(), { done: st.done === true, dl: st.deadline ? new Date(st.deadline) : null });
         }))));
+        // Кол-во прикреплённых результатов (вкладка «Результат») по тактической задаче.
+        const tactRes = new Map();
+        (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
+          if (t.code) tactRes.set(String(t.code).trim(), t.resultCount || 0);
+        })));
+        const totalResults = Array.from(tactRes.values()).reduce((a, b) => a + b, 0);
         const nowT = Date.now();
         const statusOf = code => {
           const info = code && codeStatus.get(String(code).trim());
@@ -2901,7 +2908,11 @@
           let tds = '';
           if (firstG) tds += `<td class="g-goal" rowspan="${span(i, kG)}">${planEscape(r[0])}</td>`;
           if (firstS) tds += `<td class="g-strat" rowspan="${span(i, kS)}">${planEscape(r[1])}</td>`;
-          if (firstT) tds += `<td class="g-tnum" rowspan="${span(i, kT)}">${planEscape(r[2])}</td><td class="g-ttask" rowspan="${span(i, kT)}">${planEscape(r[3])}</td>`;
+          if (firstT) {
+            const rc = tactRes.get(String(r[2]).trim()) || 0;
+            const badge = rc ? `<span class="svod-res" title="Прикреплено результатов">📎 ${rc}</span>` : '';
+            tds += `<td class="g-tnum" rowspan="${span(i, kT)}">${planEscape(r[2])}</td><td class="g-ttask" rowspan="${span(i, kT)}">${planEscape(r[3])}${badge}</td>`;
+          }
           const mark = st === 'done' ? '<span style="color:#22a06b;font-weight:900;margin-right:6px">✓</span>'
                      : st === 'overdue' ? '<span style="color:#ef4444;font-weight:900;margin-right:6px">●</span>'
                      : st === 'pending' ? '<span style="color:#b0b6ae;font-weight:900;margin-right:6px">○</span>' : '';
@@ -2920,6 +2931,7 @@
             <span><b style="color:#ef4444">${overN}</b> просрочено</span>
             <span><b style="color:#8a8f88">${pendN}</b> в работе</span>
             <span>Прогресс: <b>${factPct}%</b></span>
+            <span><b>📎 ${totalResults}</b> результатов</span>
             <label class="svod-hide"><input type="checkbox" id="svodHideDone"${planState.hideDone ? ' checked' : ''}> Скрыть выполненные</label>
           </div>`;
         ids.planWrap.innerHTML = `<div id="planScaler">
