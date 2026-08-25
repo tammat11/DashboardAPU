@@ -1318,14 +1318,23 @@
       .plan-view-btn { padding: 7px 18px; border: 1px solid #d4dccb; border-radius: 10px; background: #fff; color: #5a6157; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s ease; }
       .plan-view-btn:hover { border-color: #a2c037; }
       .plan-view-btn.active { background: #222221; color: #fff; border-color: #222221; }
-      .svod-summary { display: flex; flex-wrap: wrap; gap: 8px 22px; justify-content: center; align-items: center; margin: 0 0 12px; font-size: 14px; color: var(--text-main); }
-      .svod-summary b { font-size: 16px; }
-      .svod-summary .svod-legend { font-size: 12px; color: var(--text-muted); }
-      .svod-summary .svod-legend i { font-style: normal; font-weight: 900; }
-      .svod-wrap { overflow: auto; max-height: calc(100vh - 240px); border: 1px solid #cfd4c8; border-radius: 10px; }
-      .svod-table { border-collapse: collapse; width: max-content; min-width: 100%; background: #fff; }
-      .svod-table th { position: sticky; top: 0; z-index: 2; background: #222221; color: #fff; font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: .2px; padding: 9px 8px; border: 1px solid #3a3a38; text-align: center; vertical-align: middle; white-space: normal; }
-      .svod-table td { border: 1px solid #dde1d7; padding: 6px 9px; white-space: pre-wrap; line-height: 1.35; vertical-align: top; overflow-wrap: anywhere; }
+      .svod-summary { display: flex; flex-wrap: wrap; gap: 6px 20px; justify-content: center; align-items: center; margin: 2px 0 10px; font-size: 13px; color: var(--text-main); }
+      .svod-summary b { font-size: 15px; }
+      .svod-hide { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600; color: #5a6157; }
+      .svod-hide input { cursor: pointer; }
+      .svod-wrap { overflow: auto; max-height: calc(100vh - 170px); border: 1px solid #cfd4c8; border-radius: 10px; }
+      .svod-table { border-collapse: collapse; width: max-content; min-width: 100%; background: #fff; font-size: 11.5px; }
+      .svod-table th { position: sticky; top: 0; z-index: 2; background: #222221; color: #fff; font-weight: 800; font-size: 10.5px; text-transform: uppercase; letter-spacing: .2px; padding: 7px 7px; border: 1px solid #3a3a38; text-align: center; vertical-align: middle; white-space: normal; }
+      .svod-table td { border: 1px solid #e0e4da; padding: 4px 7px; white-space: pre-wrap; line-height: 1.3; vertical-align: top; overflow-wrap: anywhere; }
+      .svod-table td.g-goal { background: #222221; color: #fff; font-weight: 800; font-size: 12px; text-align: center; vertical-align: middle; }
+      .svod-table td.g-strat { background: #a2c037; color: #243024; font-weight: 800; text-align: center; vertical-align: middle; }
+      .svod-table td.g-tnum { background: #e5ecc6; font-weight: 800; text-align: center; vertical-align: middle; }
+      .svod-table td.g-ttask { background: #e5ecc6; font-weight: 700; vertical-align: top; }
+      .svod-table td.g-snum { text-align: center; white-space: nowrap; font-weight: 700; color: #5a6157; }
+      .svod-table td.g-due { text-align: center; white-space: nowrap; }
+      .svod-table td.g-due.over { color: #ef4444; font-weight: 800; }
+      .svod-table td.g-team { font-size: 11px; }
+      .svod-table .svod-rg { color: #8a8f88; font-size: 10px; margin-top: 2px; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
       .sd-dept summary { list-style: none; cursor: pointer; }
       .sd-dept summary::-webkit-details-marker { display: none; }
@@ -1568,6 +1577,10 @@
             <button id="planFilterOff" class="plan-filter-btn" data-plan="off">Вне плана</button>
             <button id="planFilterAll" class="plan-filter-btn active" data-plan="all">Все</button>
           </span>
+          <span class="plan-filter" id="planViewToggle" role="group" aria-label="Вид плана" hidden>
+            <button class="plan-filter-btn active" data-pv="plan">📊 План</button>
+            <button class="plan-filter-btn" data-pv="excel">📋 Excel</button>
+          </span>
           <span class="divider"></span>
           <span class="view-switcher">
             <button id="viewBtn3" class="view-btn">🖼️ Галерея</button>
@@ -1803,7 +1816,7 @@
         periodMonthsYear: document.getElementById('periodMonthsYear'),
         searchInput: document.getElementById('searchInput'),
         searchClear: document.getElementById('searchClear'),
-        planFilterBtns: Array.from(document.querySelectorAll('.plan-filter-btn')),
+        planFilterBtns: Array.from(document.querySelectorAll('.plan-filter-btn[data-plan]')),
         viewBtn1: document.getElementById('viewBtn1'),
         viewBtn3: document.getElementById('viewBtn3'),
         viewBtn4: document.getElementById('viewBtn4'),
@@ -2819,94 +2832,103 @@
       if (ids.chatClose) ids.chatClose.addEventListener('click', closeChat);
 
       // ── ОП 2026 Plan dashboard ───────────────────────────────────────────
-      const planState = { loading: false, data: null, error: null, excel: false, svod: null };
+      const planState = { loading: false, data: null, error: null, excel: false, svod: null, hideDone: false };
 
-      // Переключатель вида «План» ↔ «Excel (Свод Финал)».
-      function planToggleHtml() {
-        return `<div class="plan-view-toggle">
-            <button class="plan-view-btn${planState.excel ? '' : ' active'}" data-pv="plan">📊 План</button>
-            <button class="plan-view-btn${planState.excel ? ' active' : ''}" data-pv="excel">📋 Excel</button>
-          </div>`;
+      // Переключатель вида «План» ↔ «Excel (Свод Финал)» живёт в навбаре (#planViewToggle),
+      // виден только на странице «План».
+      function syncPlanViewToggleUI() {
+        const box = document.getElementById('planViewToggle');
+        if (!box) return;
+        box.querySelectorAll('[data-pv]').forEach(b =>
+          b.classList.toggle('active', (b.dataset.pv === 'excel') === planState.excel));
       }
-      function bindPlanToggle() {
-        document.querySelectorAll('.plan-view-btn').forEach(btn => {
-          btn.addEventListener('click', () => {
-            const want = btn.dataset.pv === 'excel';
-            if (want === planState.excel) return;
-            planState.excel = want;
-            if (planState.data) drawPlan(planState.data);
-          });
-        });
-      }
+      function bindPlanToggle() { syncPlanViewToggleUI(); }
 
       async function drawPlanExcel() {
-        const toggle = planToggleHtml();
         if (!planState.svod) {
-          ids.planWrap.innerHTML = `<div id="planScaler">${toggle}<div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка листа…</div></div>`;
-          bindPlanToggle();
+          ids.planWrap.innerHTML = `<div id="planScaler"><div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка листа…</div></div>`;
           try {
-            const r = await fetch('svod-final.json', { cache: 'force-cache' });
+            const r = await fetch('svod-final.json', { cache: 'no-store' });
             planState.svod = await r.json();
           } catch (e) {
-            ids.planWrap.innerHTML = `<div id="planScaler">${toggle}<div style="padding:40px;text-align:center;color:#c0392b">Не удалось загрузить «Свод Финал»</div></div>`;
-            bindPlanToggle();
+            ids.planWrap.innerHTML = `<div id="planScaler"><div style="padding:40px;text-align:center;color:#c0392b">Не удалось загрузить «Свод Финал»</div></div>`;
             return;
           }
         }
         const s = planState.svod;
-        // Живой статус из проекта 51: сопоставляем по коду подзадачи (1.1.1.1).
+        // Живой статус из проекта 51 по коду подзадачи (1.1.1.1).
         const codeStatus = new Map();
         (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => (t.steps || []).forEach(st => {
           if (st.code) codeStatus.set(String(st.code).trim(), { done: st.done === true, dl: st.deadline ? new Date(st.deadline) : null });
         }))));
         const nowT = Date.now();
-        let doneN = 0, overN = 0, pendN = 0, totalN = 0, matched = 0;
-        const cols = Object.keys(s.widths).map(L => `<col style="width:${s.widths[L]}px">`).join('');
-        const headTh = s.header.map(h => `<th>${planEscape(h)}</th>`).join('');
-        const bodyRows = s.rows.map(cells => {
-          const eCell = cells.find(c => c.c === 5);
-          const code = eCell && String(eCell.v || '').trim();
-          let status = null;
-          if (code && codeStatus.has(code)) {
-            matched++; totalN++;
-            const info = codeStatus.get(code);
-            if (info.done) { status = 'done'; doneN++; }
-            else if (info.dl && info.dl.getTime() < nowT) { status = 'overdue'; overN++; }
-            else { status = 'pending'; pendN++; }
-          }
-          const trBg = status === 'done' ? 'background:rgba(34,160,107,.12)'
-                     : status === 'overdue' ? 'background:rgba(239,68,68,.10)' : '';
-          const tds = cells.map(cell => {
-            let st = `background:${cell.bg || 'transparent'};color:${cell.fc || '#2a2a28'};font-weight:${cell.b ? '800' : '400'};font-size:${Math.round(cell.sz * 1.18)}px;text-align:${cell.ha};vertical-align:${cell.va === 'center' ? 'middle' : (cell.va || 'top')}`;
-            let content = planEscape(cell.v);
-            // Маркер факта в колонке «Подзадача» + подсветка просроченного срока.
-            if (cell.c === 6 && status) {
-              const m = status === 'done' ? '✓' : status === 'overdue' ? '●' : '○';
-              const mc = status === 'done' ? '#22a06b' : status === 'overdue' ? '#ef4444' : '#b0b6ae';
-              content = `<span style="color:${mc};font-weight:900;margin-right:7px">${m}</span>${content}`;
-            }
-            if (cell.c === 8 && status === 'overdue') st += ';color:#ef4444;font-weight:800';
-            return `<td${cell.rs > 1 ? ` rowspan="${cell.rs}"` : ''}${cell.cs > 1 ? ` colspan="${cell.cs}"` : ''} style="${st}">${content}</td>`;
-          }).join('');
-          return `<tr style="${trBg}">${tds}</tr>`;
-        }).join('');
+        const statusOf = code => {
+          const info = code && codeStatus.get(String(code).trim());
+          if (!info) return null;
+          if (info.done) return 'done';
+          if (info.dl && info.dl.getTime() < nowT) return 'overdue';
+          return 'pending';
+        };
+        // Сводка по всем пунктам (до скрытия).
+        let doneN = 0, overN = 0, pendN = 0, totalN = 0;
+        s.rows.forEach(r => { const st = statusOf(r[4]); if (st) { totalN++; if (st === 'done') doneN++; else if (st === 'overdue') overN++; else pendN++; } });
         const factPct = totalN ? Math.round(doneN / totalN * 100) : 0;
-        const summary = matched
-          ? `<div class="svod-summary">
-              <span><b style="color:#22a06b">${doneN}</b> выполнено</span>
-              <span><b style="color:#ef4444">${overN}</b> просрочено</span>
-              <span><b style="color:#8a8f88">${pendN}</b> в работе</span>
-              <span>Прогресс: <b>${factPct}%</b> (${doneN}/${totalN})</span>
-              <span class="svod-legend"><i style="color:#22a06b">✓</i> выполнено · <i style="color:#ef4444">●</i> просрочено · <i style="color:#b0b6ae">○</i> в срок</span>
-            </div>`
-          : `<div class="svod-summary"><span style="color:var(--text-muted)">Факт из проекта 51 подгрузится после загрузки «Плана»</span></div>`;
+
+        // Скрыть выполненные — фильтруем строки, объединения пересчитаются ниже.
+        const rows = planState.hideDone
+          ? s.rows.filter(r => statusOf(r[4]) !== 'done')
+          : s.rows;
+
+        // Пересчёт объединений: группируем подряд идущие строки по A / A|B / A|B|C.
+        const kG = r => r[0], kS = r => r[0] + '¦' + r[1], kT = r => r[0] + '¦' + r[1] + '¦' + r[2];
+        const span = (i, key) => { let n = 1; const k = key(rows[i]); while (i + n < rows.length && key(rows[i + n]) === k) n++; return n; };
+        const team = (resp, exec, grp) => {
+          const parts = [];
+          if (resp) parts.push(`<b>${planEscape(resp)}</b>`);
+          if (exec && exec !== resp) parts.push(planEscape(exec));
+          const top = parts.join(' · ');
+          const rg = grp ? `<div class="svod-rg">${planEscape(grp)}</div>` : '';
+          return top + rg;
+        };
+        let body = '';
+        for (let i = 0; i < rows.length; i++) {
+          const r = rows[i];
+          const st = statusOf(r[4]);
+          const trBg = st === 'done' ? 'background:rgba(34,160,107,.12)' : st === 'overdue' ? 'background:rgba(239,68,68,.10)' : '';
+          const firstG = i === 0 || kG(rows[i - 1]) !== kG(r);
+          const firstS = i === 0 || kS(rows[i - 1]) !== kS(r);
+          const firstT = i === 0 || kT(rows[i - 1]) !== kT(r);
+          let tds = '';
+          if (firstG) tds += `<td class="g-goal" rowspan="${span(i, kG)}">${planEscape(r[0])}</td>`;
+          if (firstS) tds += `<td class="g-strat" rowspan="${span(i, kS)}">${planEscape(r[1])}</td>`;
+          if (firstT) tds += `<td class="g-tnum" rowspan="${span(i, kT)}">${planEscape(r[2])}</td><td class="g-ttask" rowspan="${span(i, kT)}">${planEscape(r[3])}</td>`;
+          const mark = st === 'done' ? '<span style="color:#22a06b;font-weight:900;margin-right:6px">✓</span>'
+                     : st === 'overdue' ? '<span style="color:#ef4444;font-weight:900;margin-right:6px">●</span>'
+                     : st === 'pending' ? '<span style="color:#b0b6ae;font-weight:900;margin-right:6px">○</span>' : '';
+          tds += `<td class="g-snum">${planEscape(r[4])}</td>`;
+          tds += `<td class="g-sub">${mark}${planEscape(r[5])}</td>`;
+          tds += `<td class="g-form">${planEscape(r[6])}</td>`;
+          tds += `<td class="g-due${st === 'overdue' ? ' over' : ''}">${planEscape(r[7])}</td>`;
+          tds += `<td class="g-team">${team(r[8], r[9], r[10])}</td>`;
+          body += `<tr style="${trBg}">${tds}</tr>`;
+        }
+        const cols = [210, 175, 56, 300, 66, 330, 175, 84, 220].map(w => `<col style="width:${w}px">`).join('');
+        const headers = ['Стратегические цели', 'Стратегические задачи', '№', 'Тактические задачи', '№', 'Тактические подзадачи', 'Форма результата', 'Срок', 'Команда'];
+        const headTh = headers.map(h => `<th>${planEscape(h)}</th>`).join('');
+        const summary = `<div class="svod-summary">
+            <span><b style="color:#22a06b">${doneN}</b> выполнено</span>
+            <span><b style="color:#ef4444">${overN}</b> просрочено</span>
+            <span><b style="color:#8a8f88">${pendN}</b> в работе</span>
+            <span>Прогресс: <b>${factPct}%</b></span>
+            <label class="svod-hide"><input type="checkbox" id="svodHideDone"${planState.hideDone ? ' checked' : ''}> Скрыть выполненные</label>
+          </div>`;
         ids.planWrap.innerHTML = `<div id="planScaler">
-            ${toggle}
-            <div style="font-weight:900;font-size:22px;text-align:center;margin:4px 0 10px;color:var(--text-main)">${planEscape(s.title)}</div>
             ${summary}
             <div class="svod-wrap"><table class="svod-table"><colgroup>${cols}</colgroup>
-              <thead><tr>${headTh}</tr></thead><tbody>${bodyRows}</tbody></table></div>
+              <thead><tr>${headTh}</tr></thead><tbody>${body}</tbody></table></div>
           </div>`;
+        const hd = document.getElementById('svodHideDone');
+        if (hd) hd.addEventListener('change', () => { planState.hideDone = hd.checked; drawPlanExcel(); });
         bindPlanToggle();
       }
 
@@ -3286,7 +3308,6 @@
 
         ids.planWrap.innerHTML = `
           <div id="planScaler" style="transform-origin:top left">
-          ${planToggleHtml()}
           <div style="padding:6px 0 12px;position:relative;text-align:center">
             <div style="font-weight:900;font-size:30px;color:var(--text-main);line-height:1.2">Оперативный план IC Group 2026</div>
             <span style="position:absolute;top:6px;right:0;font-size:13px;color:var(--text-muted)">обновлено ${updAt}
@@ -5399,6 +5420,17 @@
         });
       }
 
+      // Навбар-переключатель «План» ↔ «Excel» (виден только на странице «План»).
+      document.querySelectorAll('#planViewToggle [data-pv]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const want = btn.dataset.pv === 'excel';
+          if (want === planState.excel) return;
+          planState.excel = want;
+          syncPlanViewToggleUI();
+          if (planState.data) drawPlan(planState.data); else renderPlan();
+        });
+      });
+
       if (ids.periodBtn) {
         const MONTH_NAMES = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
         const MONTH_SHORT = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
@@ -5603,6 +5635,13 @@
         if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
         if (ids.viewBtn6) ids.viewBtn6.classList.toggle('active', mode === 'table6');
         if (ids.viewBtn7) ids.viewBtn7.classList.toggle('active', mode === 'table7');
+        // На странице «План» показываем переключатель План/Excel вместо фильтра
+        // «По плану/Вне плана/Все».
+        const isPlanPage = mode === 'table6';
+        const pf = document.querySelector('.plan-filter[aria-label="Фильтр по плану"]');
+        const pvt = document.getElementById('planViewToggle');
+        if (pf) pf.hidden = isPlanPage;
+        if (pvt) { pvt.hidden = !isPlanPage; syncPlanViewToggleUI(); }
         renderTable();
       }
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
