@@ -1351,8 +1351,9 @@
       .svod-table td.g-snum { text-align: center; white-space: nowrap; font-weight: 700; color: #5a6157; }
       .svod-table td.g-due { text-align: center; white-space: nowrap; }
       .svod-table td.g-due.over { color: #ef4444; font-weight: 800; }
-      .svod-table td.g-team { font-size: 11px; }
+      .svod-table td.g-team { font-size: 11px; vertical-align: middle; }
       .svod-table .svod-rg { color: #8a8f88; font-size: 10px; margin-top: 2px; }
+      .svod-table .svod-role { font-weight: 700; color: #b0b6ae; }
       .svod-table .svod-res { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; white-space: nowrap; }
       .svod-table .svod-tlink { color: inherit; text-decoration: none; cursor: pointer; }
       .svod-table .svod-tlink:hover { color: #1d4ed8; text-decoration: underline; }
@@ -2894,6 +2895,24 @@
         })));
         const portal = state.portalHost || 'tootopbrass.bitrix24.kz';
         const totalResults = Array.from(tactRes.values()).reduce((a, b) => a + b, 0);
+        // Команда — по тактической задаче из Bitrix (одна на все подзадачи):
+        // Ответственный + Соисполнители + Наблюдатели.
+        const tactTeam = new Map();
+        (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
+          if (t.code) tactTeam.set(String(t.code).trim(), {
+            resp: (t.responsible && t.responsible.name) || '',
+            acc: (t.accomplices || []).map(x => x.name),
+            obs: (t.observers || []).map(x => x.name)
+          });
+        })));
+        const teamCell = code => {
+          const tt = tactTeam.get(String(code).trim());
+          if (!tt) return '';
+          const resp = tt.resp ? `<div><b>${planEscape(tt.resp)}</b></div>` : '';
+          const acc = tt.acc.length ? `<div class="svod-rg"><span class="svod-role">Соисп:</span> ${tt.acc.map(planEscape).join(', ')}</div>` : '';
+          const obs = tt.obs.length ? `<div class="svod-rg"><span class="svod-role">Набл:</span> ${tt.obs.map(planEscape).join(', ')}</div>` : '';
+          return resp + acc + obs;
+        };
         const nowT = Date.now();
         const statusOf = code => {
           const info = code && codeStatus.get(String(code).trim());
@@ -2966,7 +2985,8 @@
           tds += `<td class="g-sub">${mark}${planEscape(r[5])}</td>`;
           tds += `<td class="g-form">${planEscape(r[6])}</td>`;
           tds += `<td class="g-due${st === 'overdue' ? ' over' : ''}">${planEscape(r[7])}</td>`;
-          tds += `<td class="g-team">${team(r[8], r[9], r[10])}</td>`;
+          // Команда — одна ячейка на тактическую задачу (объединена по строкам).
+          if (firstT) tds += `<td class="g-team" rowspan="${span(i, kT)}">${teamCell(r[2])}</td>`;
           // Жирнее разделитель между тактическими задачами.
           body += `<tr class="${firstT && i > 0 ? 'tstart' : ''}" style="${trBg}">${tds}</tr>`;
         }

@@ -201,6 +201,7 @@ export default async function handler(req, res) {
         deadline: tt.deadline || tt.DEADLINE || null,
         responsibleId: String(tt.responsibleId || tt.RESPONSIBLE_ID || ''),
         auditorIds: idList(tt.auditors ?? tt.AUDITORS),
+        accompliceIds: idList(tt.accomplices ?? tt.ACCOMPLICES),
         resultCount: resultCounts[id] || 0,
         steps: items.map(parseStep).filter(step => !isExcludedPerson(step.responsible))
       };
@@ -212,6 +213,7 @@ export default async function handler(req, res) {
     Object.values(tactByCode).forEach(t => {
       if (t.responsibleId) memberIds.push(t.responsibleId);
       (t.auditorIds || []).forEach(id => memberIds.push(id));
+      (t.accompliceIds || []).forEach(id => memberIds.push(id));
       t.steps.forEach(s => (s.members || []).forEach(m => memberIds.push(m.id)));
     });
     const usersMap = memberIds.length ? await fetchUsers(memberIds) : {};
@@ -220,8 +222,13 @@ export default async function handler(req, res) {
       t.observers = (t.auditorIds || [])
         .map(id => usersMap[id])
         .filter(u => u && u.id !== t.responsibleId && !isExcludedPerson(u.name));
+      // Соисполнители — отдельно от наблюдателей и от ответственного.
+      t.accomplices = (t.accompliceIds || [])
+        .map(id => usersMap[id])
+        .filter(u => u && u.id !== t.responsibleId && !isExcludedPerson(u.name));
       delete t.responsibleId;
       delete t.auditorIds;
+      delete t.accompliceIds;
     });
     Object.values(tactByCode).forEach(t => t.steps.forEach(s => {
       const executors = [];
