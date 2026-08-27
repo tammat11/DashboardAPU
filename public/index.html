@@ -3328,33 +3328,42 @@
           const d = st.deadline ? new Date(st.deadline).getTime() : 0;
           return !!d && d >= range.start.getTime() && d <= range.end.getTime();
         };
+        // Руководители — эти четверо (в этом порядке).
+        const BOSS_ORDER = ['ларион', 'данара', 'лейла', 'ирина'];
+        const isBossMgr = name => BOSS_ORDER.some(x => String(name || '').toLowerCase().includes(x));
+        const ordIdx = name => { const n = String(name || '').toLowerCase(); const i = BOSS_ORDER.findIndex(x => n.includes(x)); return i < 0 ? 99 : i; };
+        // Служебный пункт «Указать результат…» не считаем нигде.
+        const isBoiler = s => /указать результат/i.test(String((s && s.text) || ''));
         // Агрегаты по тактическим задачам + сбор по руководителям и целям.
-        const mgrs = new Map();  // имя руководителя → агрегат
+        const mgrs = new Map();  // канонический ключ (BOSS_ORDER) → агрегат
         let T = { total: 0, done: 0, overdue: 0, soon: 0, tacts: 0, results: 0 };
         const goalStats = [];
         goals.forEach(g => {
           let gt = 0, gd = 0, go = 0;
           (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
-            const steps = (t.steps || []).filter(stepInRange);
-            if (!steps.length) return; // задача без пунктов в периоде не показывается
+            const steps = (t.steps || []).filter(s => !isBoiler(s) && stepInRange(s));
+            if (!steps.length) return; // задача без (реальных) пунктов в периоде не показывается
             let td = 0, to = 0, ts = 0;
             steps.forEach(s => { const st = stStatus(s); if (st === 'done') td++; else if (st === 'overdue') to++; else if (st === 'soon') ts++; });
+            // Глобальные и по-целевые счётчики — по одному разу на задачу.
             T.total += steps.length; T.done += td; T.overdue += to; T.soon += ts; T.tacts++; T.results += (t.resultCount || 0);
             gt += steps.length; gd += td; go += to;
-            const key = (t.responsible && t.responsible.name) || '— не назначен';
-            if (!mgrs.has(key)) mgrs.set(key, { name: key, person: t.responsible, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] });
-            const m = mgrs.get(key);
-            m.total += steps.length; m.done += td; m.overdue += to; m.soon += ts; m.results += (t.resultCount || 0);
-            m.tacts.push({ ...t, steps, _g: g, _str: str, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
+            // Привязка к руководителям: ответственный ИЛИ соисполнители из четвёрки.
+            const people = [t.responsible, ...(t.accomplices || [])].filter(Boolean);
+            const seen = new Set();
+            people.forEach(p => {
+              const idx = ordIdx(p.name); if (idx >= 99 || seen.has(idx)) return;
+              seen.add(idx);
+              const key = BOSS_ORDER[idx];
+              if (!mgrs.has(key)) mgrs.set(key, { name: p.name, person: p, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] });
+              const m = mgrs.get(key);
+              m.total += steps.length; m.done += td; m.overdue += to; m.soon += ts; m.results += (t.resultCount || 0);
+              m.tacts.push({ ...t, steps, _g: g, _str: str, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
+            });
           }));
           goalStats.push({ code: g.code, title: g.title, num: g.num, total: gt, done: gd, overdue: go });
         });
-        // Руководители — только эти четверо; остальные ответственные не считаются.
-        const BOSS_ORDER = ['ларион', 'данара', 'лейла', 'ирина'];
-        const isBossMgr = name => BOSS_ORDER.some(x => String(name || '').toLowerCase().includes(x));
-        const ordIdx = name => { const n = String(name || '').toLowerCase(); const i = BOSS_ORDER.findIndex(x => n.includes(x)); return i < 0 ? 99 : i; };
-        const managers = [...mgrs.values()].filter(m => isBossMgr(m.name))
-          .sort((a, b) => ordIdx(a.name) - ordIdx(b.name));
+        const managers = BOSS_ORDER.map(k => mgrs.get(k)).filter(Boolean);
         const progress = pct(T.done, T.total);
 
         const kpi = (label, value, sub, cls) =>
@@ -3435,7 +3444,8 @@
           const goalLabel = t._g ? `<div class="boss-task-goal">${planEscape(t._g.code || '')}. ${planEscape(t._g.title || '')}</div>` : '';
           const stratLabel = t._str ? `<div class="boss-task-strat">${planEscape(t._str.code || '')} ${planEscape(t._str.title || '')}</div>` : '';
           const execAv = t.responsible ? planAvatar(t.responsible, 26, tcol) : '';
-          return `<div class="boss-task" style="border-left-color:${tcol}">
+          const doneBg = tp === 100 ? 'background:#eefaf0;' : '';
+          return `<div class="boss-task${tp === 100 ? ' done' : ''}" style="border-left-color:${tcol};${doneBg}">
             ${goalLabel}${stratLabel}
             <div class="boss-task-head">
               ${execAv}
