@@ -1410,9 +1410,14 @@
       .boss-tlink:hover { color: #1d4ed8; text-decoration: underline; }
       .boss-task-badge { font-size: 14px; font-weight: 900; font-variant-numeric: tabular-nums; flex-shrink: 0; }
       .boss-res { font-size: 10px; font-weight: 800; color: #1d4ed8; background: #dbeafe; border-radius: 7px; padding: 1px 6px; flex-shrink: 0; }
-      .boss-osteps { margin-top: 6px; padding-top: 5px; border-top: 1px dashed rgba(0,0,0,.08); }
-      .boss-ostep { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; color: #c0453f; padding: 2px 0; line-height: 1.3; }
-      .boss-ostep span { flex-shrink: 0; font-weight: 700; }
+      .boss-steps { margin-top: 6px; padding-top: 5px; border-top: 1px dashed rgba(0,0,0,.08); }
+      .boss-step { display: grid; grid-template-columns: 16px 1fr auto; gap: 7px; align-items: baseline; font-size: 11px; color: #5a6157; padding: 2px 0; line-height: 1.3; }
+      .boss-step-mk { text-align: center; font-weight: 800; }
+      .boss-step-dt { flex: none; font-weight: 700; white-space: nowrap; }
+      .boss-step.done { color: #8a8f88; } .boss-step.done .boss-step-mk { color: #22a06b; } .boss-step.done .boss-step-tx { text-decoration: line-through; }
+      .boss-step.overdue { color: #c0453f; } .boss-step.overdue .boss-step-mk { color: #ef4444; } .boss-step.overdue .boss-step-dt { color: #c0453f; }
+      .boss-step.soon .boss-step-mk { color: #f97316; }
+      .boss-step.pending .boss-step-mk { color: #b0b6ae; }
       .svod-table .svod-tlink { color: inherit; text-decoration: none; cursor: pointer; }
       .svod-table .svod-tlink:hover { color: #1d4ed8; text-decoration: underline; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
@@ -3310,6 +3315,13 @@
           if (d && d - now <= 14 * 864e5) return 'soon';
           return 'pending';
         };
+        // Период: учитываем только пункты со сроком в выбранном окне («Все время» — все).
+        const range = getPeriodRange(state.period);
+        const stepInRange = st => {
+          if (!range) return true;
+          const d = st.deadline ? new Date(st.deadline).getTime() : 0;
+          return !!d && d >= range.start.getTime() && d <= range.end.getTime();
+        };
         // Агрегаты по тактическим задачам + сбор по руководителям и целям.
         const mgrs = new Map();  // имя руководителя → агрегат
         let T = { total: 0, done: 0, overdue: 0, soon: 0, tacts: 0, results: 0 };
@@ -3317,7 +3329,8 @@
         goals.forEach(g => {
           let gt = 0, gd = 0, go = 0;
           (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
-            const steps = t.steps || [];
+            const steps = (t.steps || []).filter(stepInRange);
+            if (!steps.length) return; // задача без пунктов в периоде не показывается
             let td = 0, to = 0, ts = 0;
             steps.forEach(s => { const st = stStatus(s); if (st === 'done') td++; else if (st === 'overdue') to++; else if (st === 'soon') ts++; });
             T.total += steps.length; T.done += td; T.overdue += to; T.soon += ts; T.tacts++; T.results += (t.resultCount || 0);
@@ -3326,7 +3339,7 @@
             if (!mgrs.has(key)) mgrs.set(key, { name: key, person: t.responsible, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] });
             const m = mgrs.get(key);
             m.total += steps.length; m.done += td; m.overdue += to; m.soon += ts; m.results += (t.resultCount || 0);
-            m.tacts.push({ ...t, _g: g, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
+            m.tacts.push({ ...t, steps, _g: g, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
           }));
           goalStats.push({ code: g.code, title: g.title, num: g.num, total: gt, done: gd, overdue: go });
         });
@@ -3395,22 +3408,29 @@
           const tcol = t._stOver > 0 ? PLAN_COLORS.overdue : tp === 100 ? PLAN_COLORS.done : t._stSoon > 0 ? PLAN_COLORS.soon : '#8a8f88';
           const link = t.id ? `https://${planEscape(portal)}/company/personal/user/0/tasks/task/view/${t.id}/` : '';
           const titleH = link ? `<a href="${link}" target="_blank" rel="noopener" class="boss-tlink">${planEscape(t.code)} ${planEscape(t.title)}</a>` : `${planEscape(t.code)} ${planEscape(t.title)}`;
-          const overSteps = (t.steps || []).filter(s => stStatus(s) === 'overdue')
-            .map(s => `<div class="boss-ostep">• ${planEscape(s.text)} <span>${fmtD(s.deadline)}</span></div>`).join('');
+          // Все пункты чек-листа со статусом (✓ выполнено / ● просрочено / ○ в срок),
+          // а не только просрочки — отчёт показывает и закрытое.
+          const stepsHtml = (t.steps || [])
+            .filter(s => !/указать результат/i.test(String(s.text || '')))
+            .map(s => {
+              const ss = stStatus(s);
+              const mk = ss === 'done' ? '✓' : ss === 'overdue' ? '●' : ss === 'soon' ? '🔥' : '○';
+              return `<div class="boss-step ${ss}"><span class="boss-step-mk">${mk}</span><span class="boss-step-tx">${planEscape(s.text)}</span><span class="boss-step-dt">${fmtD(s.deadline)}</span></div>`;
+            }).join('');
           return `<div class="boss-task" style="border-left-color:${tcol}">
             <div class="boss-task-head">
               <span class="boss-task-title">${titleH}</span>
               <span class="boss-task-badge" style="color:${tcol}">${t._stDone}/${t._stTotal}</span>
               ${t.resultCount ? `<span class="boss-res">📎 ${t.resultCount}</span>` : ''}
             </div>
-            ${overSteps ? `<div class="boss-osteps">${overSteps}</div>` : ''}
+            ${stepsHtml ? `<div class="boss-steps">${stepsHtml}</div>` : ''}
           </div>`;
         };
 
         let selPanel = '';
         if (sel) {
           const p = pct(sel.done, sel.total), pcol = mColor(sel);
-          const tacts = sel.tacts.slice().sort((a, b) => (b._stOver - a._stOver) || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
+          const tacts = sel.tacts.slice().sort((a, b) => String(a.code || '').localeCompare(String(b.code || ''), undefined, { numeric: true }));
           selPanel = `<div class="boss-sel-head">
               ${sel.person ? planAvatar(sel.person, 52, pcol) : ''}
               <div class="boss-sel-id">
