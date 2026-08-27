@@ -1357,6 +1357,55 @@
       .svod-table .svod-tm-lbl { flex: none; font-weight: 800; color: #9aa0a6; min-width: 44px; }
       .svod-table .svod-rg { color: #8a8f88; font-size: 10px; margin-top: 2px; }
       .svod-table .svod-res { display: inline-block; margin-left: 6px; padding: 1px 6px; border-radius: 8px; background: #dbeafe; color: #1d4ed8; font-size: 10px; font-weight: 800; white-space: nowrap; }
+      /* ── «Для шефа» — штаб-панель ── */
+      .boss-page { max-width: 1500px; margin: 0 auto; padding: 4px 4px 40px; }
+      .boss-title { text-align: center; font-size: 24px; font-weight: 900; color: var(--text-main); margin: 6px 0 16px; }
+      .boss-upd { display: block; font-size: 12px; font-weight: 600; color: var(--text-muted); margin-top: 3px; }
+      .boss-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 10px; margin-bottom: 16px; }
+      .boss-kpi { display: flex; flex-direction: column; gap: 2px; padding: 13px 15px; border: 1px solid var(--border-color); border-left-width: 4px; border-radius: 12px; background: var(--surface); }
+      .boss-kpi-l { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .03em; color: #7b827b; }
+      .boss-kpi-v { font-size: 25px; font-weight: 900; line-height: 1.05; color: var(--text-main); }
+      .boss-kpi-s { font-size: 11px; color: #8a8f88; }
+      .boss-kpi.good { border-left-color: #22a06b; } .boss-kpi.good .boss-kpi-v { color: #1c8a5b; }
+      .boss-kpi.warn { border-left-color: #e0a52e; } .boss-kpi.warn .boss-kpi-v { color: #b7791f; }
+      .boss-kpi.bad  { border-left-color: #dc2626; } .boss-kpi.bad .boss-kpi-v  { color: #c0453f; }
+      .boss-grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+      @media (max-width: 900px) { .boss-grid2 { grid-template-columns: 1fr; } }
+      .boss-card { background: var(--surface); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 18px; box-shadow: 0 2px 8px rgba(0,0,0,.02); }
+      .boss-h { margin: 0 0 12px; font-size: 15px; font-weight: 800; color: var(--text-main); }
+      .boss-lag-row { display: grid; grid-template-columns: 120px 1fr 34px; align-items: center; gap: 10px; padding: 5px 0; }
+      .boss-lag-name { font-size: 13px; font-weight: 700; text-align: right; color: #596259; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .boss-lag-track { height: 16px; background: #f1e3e3; border-radius: 8px; overflow: hidden; }
+      .boss-lag-fill { height: 100%; background: linear-gradient(90deg,#f26a6a,#dc2626); border-radius: 8px; }
+      .boss-lag-val { font-size: 14px; font-weight: 800; color: #c0453f; }
+      .boss-goal-row { display: grid; grid-template-columns: 34px minmax(0,1.4fr) 1fr 44px auto; align-items: center; gap: 9px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.045); font-size: 12.5px; }
+      .boss-goal-row:last-child { border-bottom: 0; }
+      .boss-goal-code { font-weight: 800; color: #596259; text-align: center; }
+      .boss-goal-title { font-weight: 650; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .boss-goal-track { height: 9px; background: #eef0ed; border-radius: 5px; overflow: hidden; }
+      .boss-goal-fill { height: 100%; border-radius: 5px; }
+      .boss-goal-pct { font-weight: 800; text-align: right; }
+      .boss-goal-meta { font-size: 11px; color: #8a8f88; white-space: nowrap; }
+      .boss-mgrs { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px,1fr)); gap: 14px; }
+      .boss-mgr { border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; background: #fcfdfb; }
+      .boss-mgr-head { display: flex; align-items: center; gap: 12px; }
+      .boss-mgr-id { flex: 1; min-width: 0; }
+      .boss-mgr-name { font-size: 16px; font-weight: 800; color: var(--text-main); }
+      .boss-mgr-chips { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; font-weight: 700; color: #8a8f88; margin-top: 3px; }
+      .boss-mgr-pct { font-size: 26px; font-weight: 900; flex-shrink: 0; }
+      .boss-mgr-track { height: 8px; background: #eef0ed; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+      .boss-mgr-fill { height: 100%; border-radius: 5px; }
+      .boss-tasks { display: flex; flex-direction: column; gap: 7px; max-height: 320px; overflow-y: auto; }
+      .boss-task { border: 1px solid rgba(0,0,0,.06); border-left: 4px solid #ccc; border-radius: 9px; padding: 8px 11px; background: #fff; }
+      .boss-task-head { display: flex; align-items: center; gap: 9px; }
+      .boss-task-title { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 650; line-height: 1.3; }
+      .boss-tlink { color: inherit; text-decoration: none; }
+      .boss-tlink:hover { color: #1d4ed8; text-decoration: underline; }
+      .boss-task-badge { font-size: 14px; font-weight: 900; font-variant-numeric: tabular-nums; flex-shrink: 0; }
+      .boss-res { font-size: 10px; font-weight: 800; color: #1d4ed8; background: #dbeafe; border-radius: 7px; padding: 1px 6px; flex-shrink: 0; }
+      .boss-osteps { margin-top: 6px; padding-top: 5px; border-top: 1px dashed rgba(0,0,0,.08); }
+      .boss-ostep { display: flex; justify-content: space-between; gap: 10px; font-size: 11px; color: #c0453f; padding: 2px 0; line-height: 1.3; }
+      .boss-ostep span { flex-shrink: 0; font-weight: 700; }
       .svod-table .svod-tlink { color: inherit; text-decoration: none; cursor: pointer; }
       .svod-table .svod-tlink:hover { color: #1d4ed8; text-decoration: underline; }
       .sd-dept { background: #fff; border: 1px solid var(--border-color); border-radius: 13px; overflow: hidden; box-shadow: 0 2px 7px rgba(0,0,0,.035); }
@@ -1612,6 +1661,7 @@
             <button id="viewBtn6" class="view-btn active">📊 План</button>
             <button id="viewBtn7" class="view-btn">📈 План+задачи</button>
             <button id="viewBtn1" class="view-btn">📊 Отчёт</button>
+            <button id="viewBtn8" class="view-btn">👑 Для шефа</button>
             <button id="viewBtn4" class="view-btn" hidden>🤖 AI Анализ</button>
           </span>
         </div>
@@ -1682,6 +1732,7 @@
         <div id="planWrap" hidden></div>
         <div id="planTasksWrap" hidden></div>
         <div id="structureWrap" hidden></div>
+        <div id="bossWrap" hidden></div>
 
         <div id="aiAnalysisWrap" hidden>
           <div id="aiAnalysisLoading" class="loading-panel">
@@ -1847,6 +1898,8 @@
         viewBtn5: document.getElementById('viewBtn5'),
         viewBtn6: document.getElementById('viewBtn6'),
         viewBtn7: document.getElementById('viewBtn7'),
+        viewBtn8: document.getElementById('viewBtn8'),
+        bossWrap: document.getElementById('bossWrap'),
         planWrap: document.getElementById('planWrap'),
         planTasksWrap: document.getElementById('planTasksWrap'),
         structureWrap: document.getElementById('structureWrap'),
@@ -3218,6 +3271,151 @@
         return { ...tact, totalSteps: steps.length, doneSteps: done, overdueSteps: overdue, soonSteps: soon };
       }
 
+      // ── «Для шефа»: штаб-панель по стратплану (проект 51) с разбивкой по
+      // руководителям — успеваемость, отставание, просрочки/выполненное сразу. ──
+      async function renderBoss() {
+        [ids.tableWrap, ids.galleryWrap, ids.zrsWrap, ids.aiAnalysisWrap, ids.planWrap, ids.planTasksWrap, ids.structureWrap]
+          .forEach(el => { if (el) el.hidden = true; });
+        if (ids.bossWrap) ids.bossWrap.hidden = false;
+        if (planState.data && Array.isArray(planState.data.goals)) { drawBoss(); return; }
+        ids.bossWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">Загружаем стратплан…</div>`;
+        let painted = false;
+        try {
+          const cr = await fetch('/op-plan-cache.json', { cache: 'no-store' });
+          if (cr.ok) { const cj = await cr.json(); if (cj && Array.isArray(cj.goals)) { planState.data = cj; drawBoss(); painted = true; } }
+        } catch {}
+        try {
+          const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), 15000);
+          let j; try { const r = await fetch('/api/op-plan', { signal: ctl.signal }); j = await r.json(); } finally { clearTimeout(timer); }
+          if (j && j.ok) { planState.data = j; drawBoss(); painted = true; }
+        } catch {}
+        if (!painted) ids.bossWrap.innerHTML = `<div style="text-align:center;padding:48px;color:#ef4444">Не удалось загрузить стратплан</div>`;
+      }
+
+      function drawBoss() {
+        const goals = (planState.data.goals || []).slice().sort((a, b) => (a.num || 0) - (b.num || 0));
+        const now = Date.now();
+        const pct = (d, t) => t ? Math.round(d / t * 100) : 0;
+        const stStatus = st => {
+          if (st.done) return 'done';
+          const d = st.deadline ? new Date(st.deadline).getTime() : 0;
+          if (d && d < now) return 'overdue';
+          if (d && d - now <= 14 * 864e5) return 'soon';
+          return 'pending';
+        };
+        // Агрегаты по тактическим задачам + сбор по руководителям и целям.
+        const mgrs = new Map();  // имя руководителя → агрегат
+        let T = { total: 0, done: 0, overdue: 0, soon: 0, tacts: 0, results: 0 };
+        const goalStats = [];
+        goals.forEach(g => {
+          let gt = 0, gd = 0, go = 0;
+          (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
+            const steps = t.steps || [];
+            let td = 0, to = 0, ts = 0;
+            steps.forEach(s => { const st = stStatus(s); if (st === 'done') td++; else if (st === 'overdue') to++; else if (st === 'soon') ts++; });
+            T.total += steps.length; T.done += td; T.overdue += to; T.soon += ts; T.tacts++; T.results += (t.resultCount || 0);
+            gt += steps.length; gd += td; go += to;
+            const key = (t.responsible && t.responsible.name) || '— не назначен';
+            if (!mgrs.has(key)) mgrs.set(key, { name: key, person: t.responsible, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] });
+            const m = mgrs.get(key);
+            m.total += steps.length; m.done += td; m.overdue += to; m.soon += ts; m.results += (t.resultCount || 0);
+            m.tacts.push({ ...t, _g: g, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
+          }));
+          goalStats.push({ code: g.code, title: g.title, num: g.num, total: gt, done: gd, overdue: go });
+        });
+        const managers = [...mgrs.values()].sort((a, b) => b.overdue - a.overdue || pct(a.done, a.total) - pct(b.done, b.total));
+        const progress = pct(T.done, T.total);
+
+        const kpi = (label, value, sub, cls) =>
+          `<div class="boss-kpi ${cls || ''}"><span class="boss-kpi-l">${label}</span><span class="boss-kpi-v">${value}</span><span class="boss-kpi-s">${sub}</span></div>`;
+        const kpis = [
+          kpi('Прогресс плана', progress + '%', `${T.done}/${T.total} шагов`, progress >= 66 ? 'good' : progress >= 33 ? 'warn' : 'bad'),
+          kpi('Выполнено', T.done, 'шагов', 'good'),
+          kpi('Просрочено', T.overdue, 'шагов', T.overdue ? 'bad' : 'good'),
+          kpi('Горит (≤14 дн)', T.soon, 'шагов', T.soon ? 'warn' : 'good'),
+          kpi('Задач', T.tacts, 'тактических', ''),
+          kpi('Результатов', '📎 ' + T.results, 'прикреплено', '')
+        ].join('');
+
+        // График отставания — просроченные шаги по руководителям (больше = хуже).
+        const lagList = managers.filter(m => m.overdue > 0);
+        const maxLag = Math.max(1, ...lagList.map(m => m.overdue));
+        const lagRows = lagList.map(m => `
+          <div class="boss-lag-row">
+            <span class="boss-lag-name" title="${planEscape(m.name)}">${planEscape(firstNameOnly(m.name))}</span>
+            <div class="boss-lag-track"><div class="boss-lag-fill" style="width:${(m.overdue / maxLag * 100).toFixed(1)}%"></div></div>
+            <span class="boss-lag-val">${m.overdue}</span>
+          </div>`).join('') || `<div style="padding:14px;color:var(--text-muted);text-align:center">Просрочек нет 🎉</div>`;
+
+        // Прогресс по целям.
+        const goalRows = goalStats.map(g => {
+          const p = pct(g.done, g.total);
+          const col = g.overdue > 0 ? PLAN_COLORS.overdue : p >= 66 ? PLAN_COLORS.done : p >= 33 ? PLAN_COLORS.soon : '#c3c7cc';
+          return `<div class="boss-goal-row">
+            <span class="boss-goal-code">${planEscape(g.code || '')}</span>
+            <span class="boss-goal-title" title="${planEscape(g.title)}">${planEscape(g.title)}</span>
+            <div class="boss-goal-track"><div class="boss-goal-fill" style="width:${p}%;background:${col}"></div></div>
+            <span class="boss-goal-pct" style="color:${col}">${p}%</span>
+            <span class="boss-goal-meta">${g.done}/${g.total}${g.overdue ? ` · <b style="color:${PLAN_COLORS.overdue}">${g.overdue} проср.</b>` : ''}</span>
+          </div>`;
+        }).join('');
+
+        // Карточки руководителей — успеваемость + задачи + просрочки сразу.
+        const fmtD = iso => { if (!iso) return ''; const d = new Date(iso); return isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`; };
+        const portal = state.portalHost || 'tootopbrass.bitrix24.kz';
+        const mgrCards = managers.map(m => {
+          const p = pct(m.done, m.total);
+          const pcol = m.overdue > 0 ? PLAN_COLORS.overdue : p >= 66 ? PLAN_COLORS.done : p >= 33 ? PLAN_COLORS.soon : '#8a8f88';
+          const tacts = m.tacts.slice().sort((a, b) => (b._stOver - a._stOver) || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
+          const taskRows = tacts.map(t => {
+            const tp = pct(t._stDone, t._stTotal);
+            const tcol = t._stOver > 0 ? PLAN_COLORS.overdue : tp === 100 ? PLAN_COLORS.done : t._stSoon > 0 ? PLAN_COLORS.soon : '#8a8f88';
+            const link = t.id ? `https://${planEscape(portal)}/company/personal/user/0/tasks/task/view/${t.id}/` : '';
+            const titleH = link ? `<a href="${link}" target="_blank" rel="noopener" class="boss-tlink">${planEscape(t.code)} ${planEscape(t.title)}</a>` : `${planEscape(t.code)} ${planEscape(t.title)}`;
+            // Просроченные шаги — сразу под задачей (не проваливаясь).
+            const overSteps = (t.steps || []).filter(s => stStatus(s) === 'overdue')
+              .map(s => `<div class="boss-ostep">• ${planEscape(s.text)} <span>${fmtD(s.deadline)}</span></div>`).join('');
+            return `<div class="boss-task" style="border-left-color:${tcol}">
+              <div class="boss-task-head">
+                <span class="boss-task-title">${titleH}</span>
+                <span class="boss-task-badge" style="color:${tcol}">${t._stDone}/${t._stTotal}</span>
+                ${t.resultCount ? `<span class="boss-res">📎 ${t.resultCount}</span>` : ''}
+              </div>
+              ${overSteps ? `<div class="boss-osteps">${overSteps}</div>` : ''}
+            </div>`;
+          }).join('');
+          return `<div class="boss-mgr">
+            <div class="boss-mgr-head">
+              ${m.person ? planAvatar(m.person, 46, pcol) : ''}
+              <div class="boss-mgr-id">
+                <div class="boss-mgr-name">${planEscape(firstNameOnly(m.name))}</div>
+                <div class="boss-mgr-chips">
+                  <span>${m.tacts.length} задач</span>
+                  <span style="color:${PLAN_COLORS.done}">✓ ${m.done}</span>
+                  ${m.overdue ? `<span style="color:${PLAN_COLORS.overdue}">● ${m.overdue}</span>` : ''}
+                  ${m.soon ? `<span style="color:${PLAN_COLORS.soon}">🔥 ${m.soon}</span>` : ''}
+                  ${m.results ? `<span>📎 ${m.results}</span>` : ''}
+                </div>
+              </div>
+              <div class="boss-mgr-pct" style="color:${pcol}">${p}%</div>
+            </div>
+            <div class="boss-mgr-track"><div class="boss-mgr-fill" style="width:${p}%;background:${pcol}"></div></div>
+            <div class="boss-tasks">${taskRows}</div>
+          </div>`;
+        }).join('');
+
+        const updAt = planState.data.fetchedAt ? new Date(planState.data.fetchedAt).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+        ids.bossWrap.innerHTML = `<div class="boss-page">
+          <div class="boss-title">Штаб-панель · Оперативный план 2026 <span class="boss-upd">обновлено ${updAt}</span></div>
+          <div class="boss-kpis">${kpis}</div>
+          <div class="boss-grid2">
+            <section class="boss-card"><h3 class="boss-h">🚩 Отставание по руководителям</h3><div class="boss-lag">${lagRows}</div></section>
+            <section class="boss-card"><h3 class="boss-h">🎯 Прогресс по целям</h3><div class="boss-goals">${goalRows}</div></section>
+          </div>
+          <section class="boss-card"><h3 class="boss-h">👤 Успеваемость по руководителям</h3><div class="boss-mgrs">${mgrCards}</div></section>
+        </div>`;
+      }
+
       function drawPlan(j) {
         const rawGoals = j.goals || [];
         if (!rawGoals.length) {
@@ -4485,8 +4683,10 @@
         const pvtBox = document.getElementById('planViewToggle');
         if (pfBox) pfBox.hidden = isPlan;
         if (pvtBox) { pvtBox.hidden = !isPlan; if (typeof syncPlanViewToggleUI === 'function') syncPlanViewToggleUI(); }
+        const isBoss = state.viewMode === 'boss';
         const statsGrid = document.querySelector('.stats-grid');
-        if (statsGrid) statsGrid.style.display = isPlan ? 'none' : '';
+        if (statsGrid) statsGrid.style.display = (isPlan || isBoss) ? 'none' : '';
+        if (ids.bossWrap) ids.bossWrap.hidden = !isBoss;
         // TV kiosk: no scrolling on the normal plan; Excel-вид — со скроллом.
         const kioskLock = isPlan && !planState.excel;
         document.documentElement.style.overflow = kioskLock ? 'hidden' : '';
@@ -4494,6 +4694,7 @@
         const chatFab = document.querySelector('.chat-fab');
         if (chatFab) chatFab.style.display = isPlan ? 'none' : '';
         if (ids.structureWrap) ids.structureWrap.hidden = true;
+        if (state.viewMode === 'boss') { renderBoss(); return; }
         if (state.viewMode === 'table1') { renderStructureDashboard(); return; }
         if (state.viewMode === 'table4') { renderAIAnalysis(); return; }
         if (state.viewMode === 'table5') { renderZRSGallery(); return; }
@@ -5795,8 +5996,10 @@
         if (ids.viewBtn5) ids.viewBtn5.classList.toggle('active', mode === 'table5');
         if (ids.viewBtn6) ids.viewBtn6.classList.toggle('active', mode === 'table6');
         if (ids.viewBtn7) ids.viewBtn7.classList.toggle('active', mode === 'table7');
+        if (ids.viewBtn8) ids.viewBtn8.classList.toggle('active', mode === 'boss');
         renderTable(); // показ переключателя План/Excel — внутри renderTable
       }
+      if (ids.viewBtn8) ids.viewBtn8.addEventListener('click', () => setView('boss'));
       if (ids.viewBtn1) ids.viewBtn1.addEventListener('click', () => setView('table1'));
       if (ids.viewBtn3) ids.viewBtn3.addEventListener('click', () => setView('table3'));
       if (ids.viewBtn4) ids.viewBtn4.addEventListener('click', () => setView('table4'));
