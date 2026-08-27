@@ -1378,10 +1378,10 @@
       .boss-lag-track { height: 16px; background: #f1e3e3; border-radius: 8px; overflow: hidden; }
       .boss-lag-fill { height: 100%; background: linear-gradient(90deg,#f26a6a,#dc2626); border-radius: 8px; }
       .boss-lag-val { font-size: 14px; font-weight: 800; color: #c0453f; }
-      .boss-goal-row { display: grid; grid-template-columns: 34px minmax(0,1.4fr) 1fr 44px auto; align-items: center; gap: 9px; padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,.045); font-size: 12.5px; }
+      .boss-goal-row { display: grid; grid-template-columns: 30px minmax(0,1.5fr) 90px 44px auto; align-items: center; gap: 9px; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,.045); font-size: 12.5px; }
       .boss-goal-row:last-child { border-bottom: 0; }
       .boss-goal-code { font-weight: 800; color: #596259; text-align: center; }
-      .boss-goal-title { font-weight: 650; color: var(--text-main); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .boss-goal-title { font-weight: 650; color: var(--text-main); line-height: 1.3; overflow-wrap: anywhere; }
       .boss-goal-track { height: 9px; background: #eef0ed; border-radius: 5px; overflow: hidden; }
       .boss-goal-fill { height: 100%; border-radius: 5px; }
       .boss-goal-pct { font-weight: 800; text-align: right; }
@@ -3397,7 +3397,7 @@
             ${m.person ? planAvatar(m.person, 34, pcol) : ''}
             <span class="boss-tab-id">
               <span class="boss-tab-name">${planEscape(firstNameOnly(m.name))}</span>
-              <span class="boss-tab-sub">${m.tacts.length} зад${m.overdue ? ` · <b style="color:${PLAN_COLORS.overdue}">${m.overdue}</b> проср` : ''}</span>
+              <span class="boss-tab-sub">${m.tacts.length} зад · <b style="color:${PLAN_COLORS.done}">✓ ${m.done}</b>${m.overdue ? ` · <b style="color:${PLAN_COLORS.overdue}">${m.overdue}</b> проср` : ''}</span>
             </span>
             <span class="boss-tab-pct" style="color:${pcol}">${p}%</span>
           </button>`;
