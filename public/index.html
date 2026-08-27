@@ -1408,7 +1408,8 @@
       .boss-sel-name { font-size: 20px; font-weight: 900; color: var(--text-main); }
       .boss-task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px,1fr)); gap: 10px; }
       .boss-task { border: 1px solid rgba(0,0,0,.06); border-left: 4px solid #ccc; border-radius: 9px; padding: 9px 12px; background: #fff; }
-      .boss-task-strat { font-size: 10.5px; font-weight: 700; color: #9aa0a6; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 4px; line-height: 1.25; }
+      .boss-task-goal { font-size: 9.5px; font-weight: 800; color: #7a6cc4; text-transform: uppercase; letter-spacing: .03em; line-height: 1.2; }
+      .boss-task-strat { font-size: 10.5px; font-weight: 700; color: #9aa0a6; text-transform: uppercase; letter-spacing: .02em; margin: 2px 0 4px; line-height: 1.25; }
       .boss-task-head { display: flex; align-items: center; gap: 9px; }
       .boss-task-title { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 650; line-height: 1.3; }
       .boss-tlink { color: inherit; text-decoration: none; }
@@ -3431,10 +3432,11 @@
               const mk = ss === 'done' ? '✓' : ss === 'overdue' ? '●' : ss === 'soon' ? '🔥' : '○';
               return `<div class="boss-step ${ss}"><span class="boss-step-mk">${mk}</span><span class="boss-step-tx">${planEscape(s.text)}</span><span class="boss-step-dt">${fmtD(s.deadline)}</span></div>`;
             }).join('');
+          const goalLabel = t._g ? `<div class="boss-task-goal">${planEscape(t._g.code || '')}. ${planEscape(t._g.title || '')}</div>` : '';
           const stratLabel = t._str ? `<div class="boss-task-strat">${planEscape(t._str.code || '')} ${planEscape(t._str.title || '')}</div>` : '';
           const execAv = t.responsible ? planAvatar(t.responsible, 26, tcol) : '';
           return `<div class="boss-task" style="border-left-color:${tcol}">
-            ${stratLabel}
+            ${goalLabel}${stratLabel}
             <div class="boss-task-head">
               ${execAv}
               <span class="boss-task-title">${titleH}</span>
