@@ -3323,7 +3323,11 @@
           }));
           goalStats.push({ code: g.code, title: g.title, num: g.num, total: gt, done: gd, overdue: go });
         });
-        const managers = [...mgrs.values()].sort((a, b) => b.overdue - a.overdue || pct(a.done, a.total) - pct(b.done, b.total));
+        // Руководители — только эти четверо; остальные ответственные не считаются.
+        const BOSS_MGR = ['лейла', 'ирина', 'данара', 'ларион'];
+        const isBossMgr = name => BOSS_MGR.some(x => String(name || '').toLowerCase().includes(x));
+        const managers = [...mgrs.values()].filter(m => isBossMgr(m.name))
+          .sort((a, b) => b.overdue - a.overdue || pct(a.done, a.total) - pct(b.done, b.total));
         const progress = pct(T.done, T.total);
 
         const kpi = (label, value, sub, cls) =>
