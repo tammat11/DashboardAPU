@@ -3334,6 +3334,34 @@
         const ordIdx = name => { const n = String(name || '').toLowerCase(); const i = BOSS_ORDER.findIndex(x => n.includes(x)); return i < 0 ? 99 : i; };
         // Служебный пункт «Указать результат…» не считаем нигде.
         const isBoiler = s => /указать результат/i.test(String((s && s.text) || ''));
+
+        // Привязка задачи к руководителю ПО ОРГСТРУКТУРЕ: ответственный → его отдел →
+        // вверх по дереву до отдела, чьим главой (UF_HEAD) является один из четвёрки.
+        const empById = new Map((state.allEmployees || []).map(e => [String(e.id), e]));
+        const depByName = new Map((state.departments || []).map(d => [d.NAME, d]));
+        const depById = new Map((state.departments || []).map(d => [String(d.ID), d]));
+        const HEAD_MGR = { '63': 'ларион', '51': 'данара', '1009': 'ирина', '71': 'лейла' };
+        const HEAD_ID = { 'ларион': '63', 'данара': '51', 'ирина': '1009', 'лейла': '71' };
+        const mgrPerson = key => { const e = empById.get(HEAD_ID[key]); return e ? { id: e.id, name: e.name, avatar: e.avatar } : { name: key }; };
+        const mgrByDept = deptId => {
+          let id = String(deptId || ''), guard = 0;
+          while (id && guard++ < 25) {
+            const d = depById.get(id); if (!d) break;
+            if (HEAD_MGR[String(d.UF_HEAD)]) return HEAD_MGR[String(d.UF_HEAD)];
+            id = String(d.PARENT || '');
+          }
+          return null;
+        };
+        const mgrForTask = t => {
+          // 1) по отделу ответственного
+          const emp = t.responsible && empById.get(String(t.responsible.id || ''));
+          if (emp && emp.dept) { const d = depByName.get(emp.dept); if (d) { const k = mgrByDept(d.ID); if (k) return k; } }
+          // 2) сам ответственный — руководитель
+          if (t.responsible) { const oi = ordIdx(t.responsible.name); if (oi < 99) return BOSS_ORDER[oi]; }
+          // 3) запасной вариант — соисполнитель-руководитель
+          for (const a of (t.accomplices || [])) { const oi = ordIdx(a.name); if (oi < 99) return BOSS_ORDER[oi]; }
+          return null;
+        };
         // Агрегаты по тактическим задачам + сбор по руководителям и целям.
         const mgrs = new Map();  // канонический ключ (BOSS_ORDER) → агрегат
         let T = { total: 0, done: 0, overdue: 0, soon: 0, tacts: 0, results: 0 };
@@ -3348,18 +3376,13 @@
             // Глобальные и по-целевые счётчики — по одному разу на задачу.
             T.total += steps.length; T.done += td; T.overdue += to; T.soon += ts; T.tacts++; T.results += (t.resultCount || 0);
             gt += steps.length; gd += td; go += to;
-            // Привязка к руководителям: ответственный ИЛИ соисполнители из четвёрки.
-            const people = [t.responsible, ...(t.accomplices || [])].filter(Boolean);
-            const seen = new Set();
-            people.forEach(p => {
-              const idx = ordIdx(p.name); if (idx >= 99 || seen.has(idx)) return;
-              seen.add(idx);
-              const key = BOSS_ORDER[idx];
-              if (!mgrs.has(key)) mgrs.set(key, { name: p.name, person: p, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] });
-              const m = mgrs.get(key);
-              m.total += steps.length; m.done += td; m.overdue += to; m.soon += ts; m.results += (t.resultCount || 0);
-              m.tacts.push({ ...t, steps, _g: g, _str: str, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
-            });
+            // Привязка к одному руководителю по оргструктуре.
+            const key = mgrForTask(t);
+            if (!key) return;
+            if (!mgrs.has(key)) { const p = mgrPerson(key); mgrs.set(key, { name: p.name, person: p, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] }); }
+            const m = mgrs.get(key);
+            m.total += steps.length; m.done += td; m.overdue += to; m.soon += ts; m.results += (t.resultCount || 0);
+            m.tacts.push({ ...t, steps, _g: g, _str: str, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
           }));
           goalStats.push({ code: g.code, title: g.title, num: g.num, total: gt, done: gd, overdue: go });
         });
