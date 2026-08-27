@@ -1386,17 +1386,24 @@
       .boss-goal-fill { height: 100%; border-radius: 5px; }
       .boss-goal-pct { font-weight: 800; text-align: right; }
       .boss-goal-meta { font-size: 11px; color: #8a8f88; white-space: nowrap; }
-      .boss-mgrs { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px,1fr)); gap: 14px; }
-      .boss-mgr { border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; background: #fcfdfb; }
-      .boss-mgr-head { display: flex; align-items: center; gap: 12px; }
-      .boss-mgr-id { flex: 1; min-width: 0; }
-      .boss-mgr-name { font-size: 16px; font-weight: 800; color: var(--text-main); }
       .boss-mgr-chips { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; font-weight: 700; color: #8a8f88; margin-top: 3px; }
-      .boss-mgr-pct { font-size: 26px; font-weight: 900; flex-shrink: 0; }
-      .boss-mgr-track { height: 8px; background: #eef0ed; border-radius: 5px; overflow: hidden; margin: 10px 0; }
+      .boss-mgr-pct { font-size: 30px; font-weight: 900; flex-shrink: 0; }
+      .boss-mgr-track { height: 8px; background: #eef0ed; border-radius: 5px; overflow: hidden; }
       .boss-mgr-fill { height: 100%; border-radius: 5px; }
-      .boss-tasks { display: flex; flex-direction: column; gap: 7px; max-height: 320px; overflow-y: auto; }
-      .boss-task { border: 1px solid rgba(0,0,0,.06); border-left: 4px solid #ccc; border-radius: 9px; padding: 8px 11px; background: #fff; }
+      /* Переключатели-руководители */
+      .boss-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+      .boss-tab { display: flex; align-items: center; gap: 9px; padding: 8px 14px 8px 8px; border: 1.5px solid var(--border-color); border-radius: 12px; background: #fff; cursor: pointer; transition: all .12s ease; }
+      .boss-tab:hover { border-color: var(--pc); }
+      .boss-tab.active { border-color: var(--pc); box-shadow: inset 0 0 0 1px var(--pc); background: #fbfdfa; }
+      .boss-tab-id { display: flex; flex-direction: column; line-height: 1.15; text-align: left; }
+      .boss-tab-name { font-size: 14px; font-weight: 800; color: var(--text-main); }
+      .boss-tab-sub { font-size: 10.5px; font-weight: 600; color: #8a8f88; }
+      .boss-tab-pct { font-size: 18px; font-weight: 900; margin-left: 4px; }
+      .boss-sel-head { display: flex; align-items: center; gap: 14px; padding: 4px 2px 14px; border-bottom: 1px solid rgba(0,0,0,.06); margin-bottom: 14px; }
+      .boss-sel-id { flex: 1; min-width: 0; }
+      .boss-sel-name { font-size: 20px; font-weight: 900; color: var(--text-main); }
+      .boss-task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px,1fr)); gap: 10px; }
+      .boss-task { border: 1px solid rgba(0,0,0,.06); border-left: 4px solid #ccc; border-radius: 9px; padding: 9px 12px; background: #fff; }
       .boss-task-head { display: flex; align-items: center; gap: 9px; }
       .boss-task-title { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 650; line-height: 1.3; }
       .boss-tlink { color: inherit; text-decoration: none; }
@@ -3364,49 +3371,63 @@
           </div>`;
         }).join('');
 
-        // Карточки руководителей — успеваемость + задачи + просрочки сразу.
+        // ── Переключатели-руководители + сетка их задач (всё видно, без скролла) ──
         const fmtD = iso => { if (!iso) return ''; const d = new Date(iso); return isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`; };
         const portal = state.portalHost || 'tootopbrass.bitrix24.kz';
-        const mgrCards = managers.map(m => {
-          const p = pct(m.done, m.total);
-          const pcol = m.overdue > 0 ? PLAN_COLORS.overdue : p >= 66 ? PLAN_COLORS.done : p >= 33 ? PLAN_COLORS.soon : '#8a8f88';
-          const tacts = m.tacts.slice().sort((a, b) => (b._stOver - a._stOver) || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
-          const taskRows = tacts.map(t => {
-            const tp = pct(t._stDone, t._stTotal);
-            const tcol = t._stOver > 0 ? PLAN_COLORS.overdue : tp === 100 ? PLAN_COLORS.done : t._stSoon > 0 ? PLAN_COLORS.soon : '#8a8f88';
-            const link = t.id ? `https://${planEscape(portal)}/company/personal/user/0/tasks/task/view/${t.id}/` : '';
-            const titleH = link ? `<a href="${link}" target="_blank" rel="noopener" class="boss-tlink">${planEscape(t.code)} ${planEscape(t.title)}</a>` : `${planEscape(t.code)} ${planEscape(t.title)}`;
-            // Просроченные шаги — сразу под задачей (не проваливаясь).
-            const overSteps = (t.steps || []).filter(s => stStatus(s) === 'overdue')
-              .map(s => `<div class="boss-ostep">• ${planEscape(s.text)} <span>${fmtD(s.deadline)}</span></div>`).join('');
-            return `<div class="boss-task" style="border-left-color:${tcol}">
-              <div class="boss-task-head">
-                <span class="boss-task-title">${titleH}</span>
-                <span class="boss-task-badge" style="color:${tcol}">${t._stDone}/${t._stTotal}</span>
-                ${t.resultCount ? `<span class="boss-res">📎 ${t.resultCount}</span>` : ''}
-              </div>
-              ${overSteps ? `<div class="boss-osteps">${overSteps}</div>` : ''}
-            </div>`;
-          }).join('');
-          return `<div class="boss-mgr">
-            <div class="boss-mgr-head">
-              ${m.person ? planAvatar(m.person, 46, pcol) : ''}
-              <div class="boss-mgr-id">
-                <div class="boss-mgr-name">${planEscape(firstNameOnly(m.name))}</div>
+        const mColor = m => { const p = pct(m.done, m.total); return m.overdue > 0 ? PLAN_COLORS.overdue : p >= 66 ? PLAN_COLORS.done : p >= 33 ? PLAN_COLORS.soon : '#8a8f88'; };
+        const selName = (planState.bossMgr && managers.some(m => m.name === planState.bossMgr)) ? planState.bossMgr : (managers[0] && managers[0].name);
+        const sel = managers.find(m => m.name === selName) || managers[0];
+
+        const tabs = managers.map(m => {
+          const p = pct(m.done, m.total), pcol = mColor(m);
+          return `<button class="boss-tab${m.name === selName ? ' active' : ''}" data-mgr="${planEscape(m.name)}" style="--pc:${pcol}">
+            ${m.person ? planAvatar(m.person, 34, pcol) : ''}
+            <span class="boss-tab-id">
+              <span class="boss-tab-name">${planEscape(firstNameOnly(m.name))}</span>
+              <span class="boss-tab-sub">${m.tacts.length} зад${m.overdue ? ` · <b style="color:${PLAN_COLORS.overdue}">${m.overdue}</b> проср` : ''}</span>
+            </span>
+            <span class="boss-tab-pct" style="color:${pcol}">${p}%</span>
+          </button>`;
+        }).join('');
+
+        const renderTask = t => {
+          const tp = pct(t._stDone, t._stTotal);
+          const tcol = t._stOver > 0 ? PLAN_COLORS.overdue : tp === 100 ? PLAN_COLORS.done : t._stSoon > 0 ? PLAN_COLORS.soon : '#8a8f88';
+          const link = t.id ? `https://${planEscape(portal)}/company/personal/user/0/tasks/task/view/${t.id}/` : '';
+          const titleH = link ? `<a href="${link}" target="_blank" rel="noopener" class="boss-tlink">${planEscape(t.code)} ${planEscape(t.title)}</a>` : `${planEscape(t.code)} ${planEscape(t.title)}`;
+          const overSteps = (t.steps || []).filter(s => stStatus(s) === 'overdue')
+            .map(s => `<div class="boss-ostep">• ${planEscape(s.text)} <span>${fmtD(s.deadline)}</span></div>`).join('');
+          return `<div class="boss-task" style="border-left-color:${tcol}">
+            <div class="boss-task-head">
+              <span class="boss-task-title">${titleH}</span>
+              <span class="boss-task-badge" style="color:${tcol}">${t._stDone}/${t._stTotal}</span>
+              ${t.resultCount ? `<span class="boss-res">📎 ${t.resultCount}</span>` : ''}
+            </div>
+            ${overSteps ? `<div class="boss-osteps">${overSteps}</div>` : ''}
+          </div>`;
+        };
+
+        let selPanel = '';
+        if (sel) {
+          const p = pct(sel.done, sel.total), pcol = mColor(sel);
+          const tacts = sel.tacts.slice().sort((a, b) => (b._stOver - a._stOver) || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
+          selPanel = `<div class="boss-sel-head">
+              ${sel.person ? planAvatar(sel.person, 52, pcol) : ''}
+              <div class="boss-sel-id">
+                <div class="boss-sel-name">${planEscape(firstNameOnly(sel.name))}</div>
                 <div class="boss-mgr-chips">
-                  <span>${m.tacts.length} задач</span>
-                  <span style="color:${PLAN_COLORS.done}">✓ ${m.done}</span>
-                  ${m.overdue ? `<span style="color:${PLAN_COLORS.overdue}">● ${m.overdue}</span>` : ''}
-                  ${m.soon ? `<span style="color:${PLAN_COLORS.soon}">🔥 ${m.soon}</span>` : ''}
-                  ${m.results ? `<span>📎 ${m.results}</span>` : ''}
+                  <span>${sel.tacts.length} задач</span>
+                  <span style="color:${PLAN_COLORS.done}">✓ ${sel.done} выполнено</span>
+                  ${sel.overdue ? `<span style="color:${PLAN_COLORS.overdue}">● ${sel.overdue} просрочено</span>` : ''}
+                  ${sel.soon ? `<span style="color:${PLAN_COLORS.soon}">🔥 ${sel.soon} горит</span>` : ''}
+                  ${sel.results ? `<span>📎 ${sel.results} результатов</span>` : ''}
                 </div>
+                <div class="boss-mgr-track" style="margin:8px 0 0"><div class="boss-mgr-fill" style="width:${p}%;background:${pcol}"></div></div>
               </div>
               <div class="boss-mgr-pct" style="color:${pcol}">${p}%</div>
             </div>
-            <div class="boss-mgr-track"><div class="boss-mgr-fill" style="width:${p}%;background:${pcol}"></div></div>
-            <div class="boss-tasks">${taskRows}</div>
-          </div>`;
-        }).join('');
+            <div class="boss-task-grid">${tacts.map(renderTask).join('')}</div>`;
+        }
 
         const updAt = planState.data.fetchedAt ? new Date(planState.data.fetchedAt).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
         ids.bossWrap.innerHTML = `<div class="boss-page">
@@ -3416,8 +3437,15 @@
             <section class="boss-card"><h3 class="boss-h">🚩 Отставание по руководителям</h3><div class="boss-lag">${lagRows}</div></section>
             <section class="boss-card"><h3 class="boss-h">🎯 Прогресс по целям</h3><div class="boss-goals">${goalRows}</div></section>
           </div>
-          <section class="boss-card"><h3 class="boss-h">👤 Успеваемость по руководителям</h3><div class="boss-mgrs">${mgrCards}</div></section>
+          <section class="boss-card">
+            <h3 class="boss-h">👤 Успеваемость по руководителям</h3>
+            <div class="boss-tabs">${tabs}</div>
+            ${selPanel}
+          </section>
         </div>`;
+        ids.bossWrap.querySelectorAll('.boss-tab').forEach(b => b.addEventListener('click', () => {
+          planState.bossMgr = b.dataset.mgr; drawBoss();
+        }));
       }
 
       function drawPlan(j) {
