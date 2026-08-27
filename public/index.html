@@ -1378,14 +1378,18 @@
       .boss-lag-track { height: 16px; background: #f1e3e3; border-radius: 8px; overflow: hidden; }
       .boss-lag-fill { height: 100%; background: linear-gradient(90deg,#f26a6a,#dc2626); border-radius: 8px; }
       .boss-lag-val { font-size: 14px; font-weight: 800; color: #c0453f; }
-      .boss-goal-row { display: grid; grid-template-columns: 30px minmax(0,1.5fr) 90px 44px auto; align-items: center; gap: 9px; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,.045); font-size: 12.5px; }
+      .boss-sub2 { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .03em; color: #7b827b; margin: 0 0 8px; }
+      .boss-lag-track.green { background: #e3f0e3; }
+      .boss-lag-fill.green { background: linear-gradient(90deg,#5fce7a,#22a06b); }
+      .boss-lag-val.green { color: #1c8a5b; }
+      .boss-goal-row { display: grid; grid-template-columns: 28px minmax(0,1fr) 120px 46px 128px; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(0,0,0,.045); font-size: 12.5px; }
       .boss-goal-row:last-child { border-bottom: 0; }
       .boss-goal-code { font-weight: 800; color: #596259; text-align: center; }
       .boss-goal-title { font-weight: 650; color: var(--text-main); line-height: 1.3; overflow-wrap: anywhere; }
       .boss-goal-track { height: 9px; background: #eef0ed; border-radius: 5px; overflow: hidden; }
       .boss-goal-fill { height: 100%; border-radius: 5px; }
       .boss-goal-pct { font-weight: 800; text-align: right; }
-      .boss-goal-meta { font-size: 11px; color: #8a8f88; white-space: nowrap; }
+      .boss-goal-meta { font-size: 11px; color: #8a8f88; white-space: nowrap; text-align: right; }
       .boss-mgr-chips { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; font-weight: 700; color: #8a8f88; margin-top: 3px; }
       .boss-mgr-pct { font-size: 30px; font-weight: 900; flex-shrink: 0; }
       .boss-mgr-track { height: 8px; background: #eef0ed; border-radius: 5px; overflow: hidden; }
@@ -1404,6 +1408,7 @@
       .boss-sel-name { font-size: 20px; font-weight: 900; color: var(--text-main); }
       .boss-task-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px,1fr)); gap: 10px; }
       .boss-task { border: 1px solid rgba(0,0,0,.06); border-left: 4px solid #ccc; border-radius: 9px; padding: 9px 12px; background: #fff; }
+      .boss-task-strat { font-size: 10.5px; font-weight: 700; color: #9aa0a6; text-transform: uppercase; letter-spacing: .02em; margin-bottom: 4px; line-height: 1.25; }
       .boss-task-head { display: flex; align-items: center; gap: 9px; }
       .boss-task-title { flex: 1; min-width: 0; font-size: 12.5px; font-weight: 650; line-height: 1.3; }
       .boss-tlink { color: inherit; text-decoration: none; }
@@ -3339,15 +3344,16 @@
             if (!mgrs.has(key)) mgrs.set(key, { name: key, person: t.responsible, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] });
             const m = mgrs.get(key);
             m.total += steps.length; m.done += td; m.overdue += to; m.soon += ts; m.results += (t.resultCount || 0);
-            m.tacts.push({ ...t, steps, _g: g, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
+            m.tacts.push({ ...t, steps, _g: g, _str: str, _stTotal: steps.length, _stDone: td, _stOver: to, _stSoon: ts });
           }));
           goalStats.push({ code: g.code, title: g.title, num: g.num, total: gt, done: gd, overdue: go });
         });
         // Руководители — только эти четверо; остальные ответственные не считаются.
-        const BOSS_MGR = ['лейла', 'ирина', 'данара', 'ларион'];
-        const isBossMgr = name => BOSS_MGR.some(x => String(name || '').toLowerCase().includes(x));
+        const BOSS_ORDER = ['ларион', 'данара', 'лейла', 'ирина'];
+        const isBossMgr = name => BOSS_ORDER.some(x => String(name || '').toLowerCase().includes(x));
+        const ordIdx = name => { const n = String(name || '').toLowerCase(); const i = BOSS_ORDER.findIndex(x => n.includes(x)); return i < 0 ? 99 : i; };
         const managers = [...mgrs.values()].filter(m => isBossMgr(m.name))
-          .sort((a, b) => b.overdue - a.overdue || pct(a.done, a.total) - pct(b.done, b.total));
+          .sort((a, b) => ordIdx(a.name) - ordIdx(b.name));
         const progress = pct(T.done, T.total);
 
         const kpi = (label, value, sub, cls) =>
@@ -3370,6 +3376,14 @@
             <div class="boss-lag-track"><div class="boss-lag-fill" style="width:${(m.overdue / maxLag * 100).toFixed(1)}%"></div></div>
             <span class="boss-lag-val">${m.overdue}</span>
           </div>`).join('') || `<div style="padding:14px;color:var(--text-muted);text-align:center">Просрочек нет 🎉</div>`;
+        // Зелёный график — сколько шагов выполнено каждым руководителем.
+        const maxDone = Math.max(1, ...managers.map(m => m.done));
+        const doneRows = managers.map(m => `
+          <div class="boss-lag-row">
+            <span class="boss-lag-name" title="${planEscape(m.name)}">${planEscape(firstNameOnly(m.name))}</span>
+            <div class="boss-lag-track green"><div class="boss-lag-fill green" style="width:${(m.done / maxDone * 100).toFixed(1)}%"></div></div>
+            <span class="boss-lag-val green">${m.done}</span>
+          </div>`).join('');
 
         // Прогресс по целям.
         const goalRows = goalStats.map(g => {
@@ -3417,8 +3431,12 @@
               const mk = ss === 'done' ? '✓' : ss === 'overdue' ? '●' : ss === 'soon' ? '🔥' : '○';
               return `<div class="boss-step ${ss}"><span class="boss-step-mk">${mk}</span><span class="boss-step-tx">${planEscape(s.text)}</span><span class="boss-step-dt">${fmtD(s.deadline)}</span></div>`;
             }).join('');
+          const stratLabel = t._str ? `<div class="boss-task-strat">${planEscape(t._str.code || '')} ${planEscape(t._str.title || '')}</div>` : '';
+          const execAv = t.responsible ? planAvatar(t.responsible, 26, tcol) : '';
           return `<div class="boss-task" style="border-left-color:${tcol}">
+            ${stratLabel}
             <div class="boss-task-head">
+              ${execAv}
               <span class="boss-task-title">${titleH}</span>
               <span class="boss-task-badge" style="color:${tcol}">${t._stDone}/${t._stTotal}</span>
               ${t.resultCount ? `<span class="boss-res">📎 ${t.resultCount}</span>` : ''}
@@ -3454,7 +3472,12 @@
           <div class="boss-title">Штаб-панель · Оперативный план 2026 <span class="boss-upd">обновлено ${updAt}</span></div>
           <div class="boss-kpis">${kpis}</div>
           <div class="boss-grid2">
-            <section class="boss-card"><h3 class="boss-h">🚩 Отставание по руководителям</h3><div class="boss-lag">${lagRows}</div></section>
+            <section class="boss-card"><h3 class="boss-h">Руководители</h3>
+              <div class="boss-sub2">🚩 Отставание (просрочено, шагов)</div>
+              <div class="boss-lag">${lagRows}</div>
+              <div class="boss-sub2" style="margin-top:14px">✅ Выполнено (шагов)</div>
+              <div class="boss-lag">${doneRows}</div>
+            </section>
             <section class="boss-card"><h3 class="boss-h">🎯 Прогресс по целям</h3><div class="boss-goals">${goalRows}</div></section>
           </div>
           <section class="boss-card">
