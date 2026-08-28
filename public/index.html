@@ -3295,6 +3295,13 @@
         [ids.tableWrap, ids.galleryWrap, ids.zrsWrap, ids.aiAnalysisWrap, ids.planWrap, ids.planTasksWrap, ids.structureWrap]
           .forEach(el => { if (el) el.hidden = true; });
         if (ids.bossWrap) ids.bossWrap.hidden = false;
+        // Оргструктура нужна для привязки задач по отделам — грузим, если ещё нет.
+        if (!(state.departments && state.departments.length)) {
+          try {
+            const r = await fetch('/report-cache.json', { cache: 'no-store' });
+            if (r.ok) { const p = await r.json(); if (p) { state.departments = p.departments || []; state.allEmployees = p.allEmployees || []; if (!state.portalHost) state.portalHost = p.portalHost || null; } }
+          } catch {}
+        }
         if (planState.data && Array.isArray(planState.data.goals)) { drawBoss(); return; }
         ids.bossWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">Загружаем стратплан…</div>`;
         let painted = false;
@@ -3340,13 +3347,29 @@
         const empById = new Map((state.allEmployees || []).map(e => [String(e.id), e]));
         const depByName = new Map((state.departments || []).map(d => [d.NAME, d]));
         const depById = new Map((state.departments || []).map(d => [String(d.ID), d]));
+        // Привязка отдела к руководителю — по НАЗВАНИЮ отдела (стабильно; в Bitrix
+        // UF_HEAD местами не задан, поэтому на него не опираемся).
+        const DEPT_MGR = {
+          'Административное управление': 'данара',
+          'Финансовое управление': 'ирина',
+          'УРК': 'лейла',
+          'Управление качеством': 'лейла',
+          'Коммерческое управление': 'ларион',
+          'Управление PR': 'ларион',
+          'Офис учредителя': 'ларион',
+          'IC Group': 'ларион'
+        };
         const HEAD_MGR = { '63': 'ларион', '51': 'данара', '1009': 'ирина', '71': 'лейла' };
-        const HEAD_ID = { 'ларион': '63', 'данара': '51', 'ирина': '1009', 'лейла': '71' };
-        const mgrPerson = key => { const e = empById.get(HEAD_ID[key]); return e ? { id: e.id, name: e.name, avatar: e.avatar } : { name: key }; };
+        const mgrPerson = key => {
+          const e = (state.allEmployees || []).find(x => String(x.name || '').toLowerCase().includes(key));
+          const cap = key.charAt(0).toUpperCase() + key.slice(1);
+          return e ? { id: e.id, name: e.name, avatar: e.avatar } : { name: cap };
+        };
         const mgrByDept = deptId => {
           let id = String(deptId || ''), guard = 0;
           while (id && guard++ < 25) {
             const d = depById.get(id); if (!d) break;
+            if (DEPT_MGR[d.NAME]) return DEPT_MGR[d.NAME];
             if (HEAD_MGR[String(d.UF_HEAD)]) return HEAD_MGR[String(d.UF_HEAD)];
             id = String(d.PARENT || '');
           }
