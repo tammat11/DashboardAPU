@@ -3376,12 +3376,14 @@
           return null;
         };
         const mgrForTask = t => {
-          // 1) по отделу ответственного
+          // 1) ПО ПОСТАНОВЩИКУ — кто поставил задачу (основной признак стратплана)
+          if (t.creator) { const oi = ordIdx(t.creator.name); if (oi < 99) return BOSS_ORDER[oi]; }
+          // 2) запасной: по отделу ответственного (оргструктура)
           const emp = t.responsible && empById.get(String(t.responsible.id || ''));
           if (emp && emp.dept) { const d = depByName.get(emp.dept); if (d) { const k = mgrByDept(d.ID); if (k) return k; } }
-          // 2) сам ответственный — руководитель
+          // 3) сам ответственный — руководитель
           if (t.responsible) { const oi = ordIdx(t.responsible.name); if (oi < 99) return BOSS_ORDER[oi]; }
-          // 3) запасной вариант — соисполнитель-руководитель
+          // 4) соисполнитель-руководитель
           for (const a of (t.accomplices || [])) { const oi = ordIdx(a.name); if (oi < 99) return BOSS_ORDER[oi]; }
           return null;
         };
@@ -3399,7 +3401,7 @@
             // Глобальные и по-целевые счётчики — по одному разу на задачу.
             T.total += steps.length; T.done += td; T.overdue += to; T.soon += ts; T.tacts++; T.results += (t.resultCount || 0);
             gt += steps.length; gd += td; go += to;
-            // Привязка к одному руководителю по оргструктуре.
+            // Привязка к одному руководителю — по постановщику (иначе оргструктура).
             const key = mgrForTask(t);
             if (!key) return;
             if (!mgrs.has(key)) { const p = mgrPerson(key); mgrs.set(key, { name: p.name, person: p, total: 0, done: 0, overdue: 0, soon: 0, results: 0, tacts: [] }); }

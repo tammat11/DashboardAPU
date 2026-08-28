@@ -46,7 +46,7 @@ async function fetchOpTasks() {
     const payload = await bx('tasks.task.list', {
       order: { ID: 'asc' },
       filter: { GROUP_ID: OP_GROUP_ID },
-      select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID', 'ACCOMPLICES', 'AUDITORS'],
+      select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID', 'CREATED_BY', 'ACCOMPLICES', 'AUDITORS'],
       start
     });
     const page = payload.result?.tasks || payload.result || [];
@@ -200,6 +200,7 @@ export default async function handler(req, res) {
         title: String(tt.title || tt.TITLE || '').replace(/^[\d.]+\s*/, ''),
         deadline: tt.deadline || tt.DEADLINE || null,
         responsibleId: String(tt.responsibleId || tt.RESPONSIBLE_ID || ''),
+        creatorId: String(tt.createdBy || tt.CREATED_BY || ''),
         auditorIds: idList(tt.auditors ?? tt.AUDITORS),
         accompliceIds: idList(tt.accomplices ?? tt.ACCOMPLICES),
         resultCount: resultCounts[id] || 0,
@@ -212,6 +213,7 @@ export default async function handler(req, res) {
     const memberIds = [];
     Object.values(tactByCode).forEach(t => {
       if (t.responsibleId) memberIds.push(t.responsibleId);
+      if (t.creatorId) memberIds.push(t.creatorId);
       (t.auditorIds || []).forEach(id => memberIds.push(id));
       (t.accompliceIds || []).forEach(id => memberIds.push(id));
       t.steps.forEach(s => (s.members || []).forEach(m => memberIds.push(m.id)));
@@ -219,6 +221,7 @@ export default async function handler(req, res) {
     const usersMap = memberIds.length ? await fetchUsers(memberIds) : {};
     Object.values(tactByCode).forEach(t => {
       t.responsible = usersMap[t.responsibleId] || null;
+      t.creator = usersMap[t.creatorId] || null;
       t.observers = (t.auditorIds || [])
         .map(id => usersMap[id])
         .filter(u => u && u.id !== t.responsibleId && !isExcludedPerson(u.name));
@@ -227,6 +230,7 @@ export default async function handler(req, res) {
         .map(id => usersMap[id])
         .filter(u => u && u.id !== t.responsibleId && !isExcludedPerson(u.name));
       delete t.responsibleId;
+      delete t.creatorId;
       delete t.auditorIds;
       delete t.accompliceIds;
     });
