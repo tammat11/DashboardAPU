@@ -3863,14 +3863,14 @@
             s2.style.width = (100 / scale) + '%';
             scale = clamp(avail / s2.scrollHeight);
           }
-          // Lock width, then derive the final scale + height from the SAME
-          // measurement so the box height matches exactly (no clipping, no gap).
+          // ВАЖНО: ширину (100/scale%) и трансформ scale(scale) считаем от ОДНОГО
+          // значения scale — иначе отрендеренная ширина ≠ ширине родителя и справа
+          // остаётся зазор («съезжает влево»). Высоту берём по факту при этой ширине.
           s2.style.width = (100 / scale) + '%';
           const contentH = s2.scrollHeight;
-          const finalScale = clamp(avail / contentH);
           s2.style.transformOrigin = 'top left';
-          s2.style.transform = `scale(${finalScale})`;
-          parent.style.height = Math.ceil(contentH * finalScale) + 'px';
+          s2.style.transform = `scale(${scale})`;
+          parent.style.height = Math.ceil(contentH * scale) + 'px';
           parent.style.overflow = 'hidden';
         }, 50);
         if (!planFitBound) {
