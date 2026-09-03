@@ -4303,24 +4303,31 @@
           <polyline points="${ratioPath}" fill="none" stroke="#317fd4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
           ${ratioPoints}
         </svg>`;
-        // Per-person load = executor + participation («Помогает»), same basis as
-        // the department workload above.
-        const personLoad = emp => emp.rows.length + (emp.helping ? emp.helping.size : 0) + planStepsOf(emp.rows).length;
+        // «Отклонения нагрузки» — строго ПО ИСПОЛНИТЕЛЮ: только задачи, где человек
+        // ответственный (без соисполнителя/наблюдателя и без пунктов чек-листов).
+        // Пороги тоже считаем в исполнительской шкале (задачи отдела ÷ сотрудники).
+        const personLoad = emp => emp.rows.length;
+        const execRatio = d => d.employeeCount ? d.rows.length / d.employeeCount : 0;
+        const tbuExec = ratioDepts.length
+          ? ratioDepts.reduce((sum, d) => sum + execRatio(d), 0) / ratioDepts.length
+          : 0;
         const lowLoadPeople = depts.flatMap(d => {
-          const threshold = Math.max(1, d.workloadRatio * .4);
+          const ratio = execRatio(d);
+          const threshold = Math.max(1, ratio * .4);
           return Array.from(d.people.values())
             .filter(emp => personLoad(emp) < threshold)
-            .map(emp => ({ ...emp, load: personLoad(emp), deptName: d.name, deptRatio: d.workloadRatio }));
+            .map(emp => ({ ...emp, load: personLoad(emp), deptName: d.name, deptRatio: ratio }));
         }).sort((a, b) =>
           a.load - b.load ||
           b.deptRatio - a.deptRatio ||
           a.name.localeCompare(b.name, 'ru')
         );
-        const highLoadPeople = depts.flatMap(d =>
-          Array.from(d.people.values())
-            .filter(emp => personLoad(emp) > tbu)
-            .map(emp => ({ ...emp, load: personLoad(emp), deptName: d.name, deptRatio: d.workloadRatio }))
-        ).sort((a, b) => b.load - a.load || a.name.localeCompare(b.name, 'ru'));
+        const highLoadPeople = depts.flatMap(d => {
+          const ratio = execRatio(d);
+          return Array.from(d.people.values())
+            .filter(emp => personLoad(emp) > tbuExec)
+            .map(emp => ({ ...emp, load: personLoad(emp), deptName: d.name, deptRatio: ratio }));
+        }).sort((a, b) => b.load - a.load || a.name.localeCompare(b.name, 'ru'));
         const loadAvatar = emp => {
           const initials = escapeHtml(getInitials(emp.name));
           const fallback = `<span style="background:${avatarColor(emp.id || emp.name)}">${initials}</span>`;
