@@ -14,15 +14,15 @@
               "id": "13783",
               "code": "1.1.1",
               "title": "Построить модель P&L по каждому объекту: выручка, прямая себестоимость, доля партнёра, доля IC Group 13%",
-              "deadline": "2026-09-15T18:00:00+05:00",
-              "resultCount": 1,
+              "deadline": "2026-09-28T18:00:00+05:00",
+              "resultCount": 4,
               "steps": [
                 {
                   "code": "1.1.1.1",
                   "text": "Собрать текущую управленческую отчётность по ИП партнёрам за период 01.01.2026-01.08.2026",
                   "deadline": "2026-08-24",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [
                     {
                       "id": "433",
@@ -142,11 +142,17 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/80a/80aef5240298d22fa00d2e7eb16d1650/WhatsApp Image 2026-07-22 at 08.53.26.png"
+                },
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                 },
                 {
                   "id": "55",
@@ -187,28 +193,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                },
-                {
-                  "id": "1163",
-                  "name": "Расул Ахметов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3a5/3a50d26f9a0670d05c1eafb78ba34682/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
-                },
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
                 },
                 {
                   "id": "1163",
@@ -304,7 +288,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -329,13 +314,6 @@
                   "id": "1009",
                   "name": "Ирина Технеряднева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "55",
-                  "name": "Анара Закирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
                 }
               ]
             },
@@ -393,7 +371,8 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -418,13 +397,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                 }
               ]
             },
@@ -478,7 +450,7 @@
                 {
                   "code": "1.1.4.2",
                   "text": "Собрать бюджеты ИП на 2П 2026 в едином формате",
-                  "deadline": "2026-09-01",
+                  "deadline": "2026-09-04",
                   "responsible": "",
                   "done": false,
                   "executors": [
@@ -495,7 +467,7 @@
                   "text": "Утвердить формат ежемесячного план-факт-отчёта: разрезы, метрики, отклонения",
                   "deadline": "2026-08-20",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [
                     {
                       "id": "433",
@@ -508,7 +480,7 @@
                 {
                   "code": "1.1.4.4",
                   "text": "Собрать план выручки и затрат по каждому объекту и партнёру на 6 месяцев (июль-декабрь)",
-                  "deadline": "2026-08-18",
+                  "deadline": "2026-09-11",
                   "responsible": "",
                   "done": false,
                   "executors": [
@@ -518,9 +490,9 @@
                       "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                     },
                     {
-                      "id": "55",
-                      "name": "Анара Закирова",
-                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
                     }
                   ],
                   "observers": []
@@ -585,7 +557,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -636,53 +609,21 @@
                   "name": "Расул Ахметов",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3a5/3a50d26f9a0670d05c1eafb78ba34682/avatar.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "55",
-                  "name": "Анара Закирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
-                },
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
-                },
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                },
-                {
-                  "id": "433",
-                  "name": "Балжан Шынарбай",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                },
-                {
-                  "id": "1143",
-                  "name": "Бекарыс Бахытжан",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
               ]
             },
             {
               "id": "13791",
               "code": "1.1.5",
               "title": "Реализовать финансовый дашборд в Power BI: EBITDA, маржа, кредиты",
-              "deadline": "2026-09-20T18:00:00+05:00",
-              "resultCount": 0,
+              "deadline": "2026-09-30T18:00:00+05:00",
+              "resultCount": 2,
               "steps": [
                 {
                   "code": "1.1.5.1",
                   "text": "Утвердить макет дашборда: показатели, разрезы, целевые значения",
                   "deadline": "2026-09-01",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -691,14 +632,14 @@
                   "text": "Настроить подключения к источникам (1С, Битрикс, платёжный календарь)",
                   "deadline": "2026-09-02",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
                 {
                   "code": "1.1.5.3",
                   "text": "Реализовать дашборд, провести тестирование с финансовым директором",
-                  "deadline": "2026-09-10",
+                  "deadline": "2026-09-30",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -709,7 +650,7 @@
                   "text": "Утвердить регламент обновления, доступов и еженедельного разбора",
                   "deadline": "2026-09-20",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -720,6 +661,21 @@
                   "responsible": "",
                   "done": false,
                   "executors": [],
+                  "observers": []
+                },
+                {
+                  "code": null,
+                  "text": "Написать ТЗ для разработчика для доработок UH",
+                  "deadline": "2026-09-01",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    }
+                  ],
                   "observers": []
                 }
               ],
@@ -733,38 +689,7 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
-                {
-                  "id": "43",
-                  "name": "Ольга Савина",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/80a/80aef5240298d22fa00d2e7eb16d1650/WhatsApp Image 2026-07-22 at 08.53.26.png"
-                },
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                },
-                {
-                  "id": "1011",
-                  "name": "Диана Маслова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a10/a100cdad48d3ff8e25597e084c59e595/avatar.png"
-                },
-                {
-                  "id": "1133",
-                  "name": "Светлана Крысун",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/de4/de4c1b8b213b1ec882d8c8bc0c617d9c/foto na Bitriks.jpg.png"
-                },
-                {
-                  "id": "1143",
-                  "name": "Бекарыс Бахытжан",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
+              "observers": [],
               "accomplices": [
                 {
                   "id": "51",
@@ -777,9 +702,14 @@
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
                 },
                 {
-                  "id": "1143",
-                  "name": "Бекарыс Бахытжан",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                  "id": "1009",
+                  "name": "Ирина Технеряднева",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                },
+                {
+                  "id": "1133",
+                  "name": "Светлана Крысун",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/de4/de4c1b8b213b1ec882d8c8bc0c617d9c/foto na Bitriks.jpg.png"
                 }
               ]
             }
@@ -881,7 +811,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -893,28 +824,6 @@
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 },
                 {
-                  "id": "491",
-                  "name": "Алина Сидорова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/fa4/fa454d9fbbe2d2f102ad759f43095272/upload.phpgaction_uncloudcfile_229799lsignature_229799.80ddc71249a483a8d81e751c943e61aeaf90b3b2456aada61de0b1be7e48f44c.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                },
-                {
-                  "id": "1083",
-                  "name": "Асия Ибрагимова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "55",
-                  "name": "Анара Закирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
-                },
-                {
                   "id": "433",
                   "name": "Балжан Шынарбай",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
@@ -923,6 +832,11 @@
                   "id": "491",
                   "name": "Алина Сидорова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/fa4/fa454d9fbbe2d2f102ad759f43095272/upload.phpgaction_uncloudcfile_229799lsignature_229799.80ddc71249a483a8d81e751c943e61aeaf90b3b2456aada61de0b1be7e48f44c.png"
+                },
+                {
+                  "id": "1009",
+                  "name": "Ирина Технеряднева",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
                 },
                 {
                   "id": "1083",
@@ -1023,7 +937,8 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -1053,18 +968,6 @@
                   "id": "1041",
                   "name": "Вечеслав Ким",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/12a/12ae6e9f1c492f29c52bfbffeaf4b3d1/photo_2025-12-22_16-53-21.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "433",
-                  "name": "Балжан Шынарбай",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
-                },
-                {
-                  "id": "435",
-                  "name": "Айнур Бейсенова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/d06/d06ec9c591b7d967663721fb0173a237/foto.png"
                 }
               ]
             },
@@ -1122,7 +1025,8 @@
                 "name": "Ирина Технеряднева",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -1148,8 +1052,7 @@
                   "name": "Светлана Крысун",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/de4/de4c1b8b213b1ec882d8c8bc0c617d9c/foto na Bitriks.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13799",
@@ -1205,7 +1108,8 @@
                 "name": "Ирина Технеряднева",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -1231,20 +1135,19 @@
                   "name": "Елизавета Гутник",
                   "avatar": ""
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13801",
               "code": "1.2.5",
               "title": "Утвердить план выхода на 8 млрд ₸ выручки с разбивкой по каналам и сегментам",
-              "deadline": "2026-08-28T18:00:00+05:00",
-              "resultCount": 0,
+              "deadline": "2026-09-21T18:00:00+05:00",
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "1.2.5.1",
                   "text": "Провести декомпозицию 8 млрд ₸ по каналам продаж и сегментам клиентов (Расписать, из каких клиентов и откуда придут 8 млрд ₸ — нельзя иметь одну большую цифру без разбивки)",
-                  "deadline": "2026-08-14",
+                  "deadline": "2026-09-20",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -1252,17 +1155,53 @@
                 },
                 {
                   "code": "1.2.5.2",
-                  "text": "Утвердить месячные и квартальные цели по каналам и ответственным",
-                  "deadline": "2026-08-25",
+                  "text": "Определить фактическую выручку по действующим договорам с января по июль 2026 года. Рассчитать разрыв до 8 млрд ₸",
+                  "deadline": "2026-08-30",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "1.2.5.3",
+                  "text": "Сформировать прогноз увеличения по каждому действующему клиенту",
+                  "deadline": "2026-09-10",
                   "responsible": "",
                   "done": false,
-                  "executors": [],
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "1.2.5.2",
+                  "text": "Утвердить месячные и квартальные цели продаж",
+                  "deadline": "2026-09-15",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "435",
+                      "name": "Айнур Бейсенова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/d06/d06ec9c591b7d967663721fb0173a237/foto.png"
+                    }
+                  ],
                   "observers": []
                 },
                 {
                   "code": "1.2.5.3",
                   "text": "Настроить в Power BI дашборд отслеживания выполнения плана выручки",
-                  "deadline": "2026-08-28",
+                  "deadline": "2026-09-20",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -1288,16 +1227,12 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
-                },
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
                 },
                 {
                   "id": "433",
@@ -1308,18 +1243,6 @@
                   "id": "435",
                   "name": "Айнур Бейсенова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/d06/d06ec9c591b7d967663721fb0173a237/foto.png"
-                },
-                {
-                  "id": "1143",
-                  "name": "Бекарыс Бахытжан",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "433",
-                  "name": "Балжан Шынарбай",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
                 }
               ]
             }
@@ -1374,16 +1297,17 @@
                 }
               ],
               "responsible": {
-                "id": "131",
-                "name": "Алмас Кудашев",
-                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/b1e/b1e66e7e98cc32a752d6da12e85dbe63/Foto Almas.png"
+                "id": "1207",
+                "name": "Назель Жамиева",
+                "avatar": ""
               },
               "creator": {
                 "id": "1009",
                 "name": "Ирина Технеряднева",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -1408,13 +1332,6 @@
                   "id": "1157",
                   "name": "Нурсулу Baimukhan",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "43",
-                  "name": "Ольга Савина",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/80a/80aef5240298d22fa00d2e7eb16d1650/WhatsApp Image 2026-07-22 at 08.53.26.png"
                 }
               ]
             },
@@ -1463,16 +1380,17 @@
                 }
               ],
               "responsible": {
-                "id": "131",
-                "name": "Алмас Кудашев",
-                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/b1e/b1e66e7e98cc32a752d6da12e85dbe63/Foto Almas.png"
+                "id": "1207",
+                "name": "Назель Жамиева",
+                "avatar": ""
               },
               "creator": {
                 "id": "1009",
                 "name": "Ирина Технеряднева",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -1503,8 +1421,7 @@
                   "name": "Нурсулу Baimukhan",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13807",
@@ -1551,16 +1468,17 @@
                 }
               ],
               "responsible": {
-                "id": "131",
-                "name": "Алмас Кудашев",
-                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/b1e/b1e66e7e98cc32a752d6da12e85dbe63/Foto Almas.png"
+                "id": "1207",
+                "name": "Назель Жамиева",
+                "avatar": ""
               },
               "creator": {
                 "id": "1009",
                 "name": "Ирина Технеряднева",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -1591,8 +1509,7 @@
                   "name": "Нурсулу Baimukhan",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         }
@@ -1718,18 +1635,7 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
-                },
-                {
-                  "id": "1147",
-                  "name": "Мархаба Дюсюмбекова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
+              "observers": [],
               "accomplices": [
                 {
                   "id": "63",
@@ -1797,7 +1703,8 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -1807,18 +1714,6 @@
                   "id": "433",
                   "name": "Балжан Шынарбай",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 },
                 {
                   "id": "1009",
@@ -1887,7 +1782,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -1923,8 +1819,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13817",
@@ -2008,7 +1903,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -2034,13 +1930,6 @@
                   "name": "Алина Сидорова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/fa4/fa454d9fbbe2d2f102ad759f43095272/upload.phpgaction_uncloudcfile_229799lsignature_229799.80ddc71249a483a8d81e751c943e61aeaf90b3b2456aada61de0b1be7e48f44c.png"
                 },
-                {
-                  "id": "1083",
-                  "name": "Асия Ибрагимова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
                 {
                   "id": "1083",
                   "name": "Асия Ибрагимова",
@@ -2102,7 +1991,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -2142,13 +2032,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
                 }
               ]
             },
@@ -2206,7 +2089,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -2241,13 +2125,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 }
               ]
             },
@@ -2305,11 +2182,17 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
+                },
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
                 },
                 {
                   "id": "433",
@@ -2330,13 +2213,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
                 }
               ]
             }
@@ -2389,7 +2265,13 @@
                   "deadline": "2026-09-21",
                   "responsible": "",
                   "done": false,
-                  "executors": [],
+                  "executors": [
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    }
+                  ],
                   "observers": []
                 },
                 {
@@ -2412,13 +2294,7 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
-                {
-                  "id": "433",
-                  "name": "Балжан Шынарбай",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
-                }
-              ],
+              "observers": [],
               "accomplices": [
                 {
                   "id": "63",
@@ -2437,14 +2313,14 @@
               "code": "2.3.2",
               "title": "Разработать продающую презентацию: технологии, стандарты, прозрачность",
               "deadline": "2026-08-31T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "2.3.2.1",
                   "text": "Собрать материалы: технологии, стандарты, кейсы, отзывы, цифры",
                   "deadline": "2026-08-10",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -2453,7 +2329,7 @@
                   "text": "Разработать сценарий продающей презентации и структуру",
                   "deadline": "2026-08-20",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -2462,7 +2338,7 @@
                   "text": "Оформить презентацию в брендовом стиле и утвердить",
                   "deadline": "2026-08-31",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -2471,7 +2347,7 @@
                   "text": "📝 Указать результат выполнения (обязательно перед завершением)",
                   "deadline": null,
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 }
@@ -2486,11 +2362,17 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
+                {
+                  "id": "63",
+                  "name": "Ларион Лян",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 },
                 {
                   "id": "71",
@@ -2506,13 +2388,6 @@
                   "id": "1041",
                   "name": "Вечеслав Ким",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/12a/12ae6e9f1c492f29c52bfbffeaf4b3d1/photo_2025-12-22_16-53-21.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 }
               ]
             },
@@ -2570,7 +2445,8 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -2610,13 +2486,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 }
               ]
             },
@@ -2707,33 +2576,7 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
-                {
-                  "id": "55",
-                  "name": "Анара Закирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
-                },
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
-                },
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                },
-                {
-                  "id": "433",
-                  "name": "Балжан Шынарбай",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                }
-              ],
+              "observers": [],
               "accomplices": [
                 {
                   "id": "55",
@@ -2773,7 +2616,7 @@
               "code": "2.4.1",
               "title": "Утвердить новую структуру аккаунтов: 3 потока (входящая/обратная связь, работа с ИП, реализация-документы)",
               "deadline": "2026-07-25T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "2.4.1.1",
@@ -2822,7 +2665,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -2837,13 +2681,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                 }
               ]
             },
@@ -2901,19 +2738,13 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                 },
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
-                }
-              ],
-              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -2975,7 +2806,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -3000,13 +2832,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
                 }
               ]
             },
@@ -3064,7 +2889,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -3085,8 +2911,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         }
@@ -3106,14 +2931,14 @@
               "code": "3.1.1",
               "title": "Утвердить процедуру отбора кандидатов в партнёры: критерии, этапы, оценка",
               "deadline": "2026-09-16T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "3.1.1.1",
                   "text": "Разработать критерии отбора: опыт, ценности, финансовая устойчивость",
                   "deadline": "2026-09-01",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -3155,7 +2980,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -3166,8 +2992,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13843",
@@ -3223,7 +3048,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -3238,13 +3064,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "81",
-                  "name": "Людмила Муллахунова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/50d/50d9a636118fc5ab838754e5561c808e/922d6a37-8a30-414f-b273-f11b9c468104.jpg.png"
                 }
               ]
             },
@@ -3302,7 +3121,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -3338,8 +3158,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13847",
@@ -3395,19 +3214,13 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
                 },
-                {
-                  "id": "1147",
-                  "name": "Мархаба Дюсюмбекова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -3480,7 +3293,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -3505,13 +3319,6 @@
                   "id": "1083",
                   "name": "Асия Ибрагимова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
                 }
               ]
             },
@@ -3592,16 +3399,12 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
-                },
-                {
-                  "id": "131",
-                  "name": "Алмас Кудашев",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/b1e/b1e66e7e98cc32a752d6da12e85dbe63/Foto Almas.png"
                 },
                 {
                   "id": "223",
@@ -3627,13 +3430,11 @@
                   "id": "1083",
                   "name": "Асия Ибрагимова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
+                },
                 {
-                  "id": "55",
-                  "name": "Анара Закирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
+                  "id": "1207",
+                  "name": "Назель Жамиева",
+                  "avatar": ""
                 }
               ]
             },
@@ -3650,7 +3451,13 @@
                   "deadline": "2026-09-10",
                   "responsible": "",
                   "done": false,
-                  "executors": [],
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    }
+                  ],
                   "observers": []
                 },
                 {
@@ -3659,7 +3466,13 @@
                   "deadline": "2026-09-20",
                   "responsible": "",
                   "done": false,
-                  "executors": [],
+                  "executors": [
+                    {
+                      "id": "1207",
+                      "name": "Назель Жамиева",
+                      "avatar": ""
+                    }
+                  ],
                   "observers": []
                 },
                 {
@@ -3668,7 +3481,23 @@
                   "deadline": "2026-09-30",
                   "responsible": "",
                   "done": false,
-                  "executors": [],
+                  "executors": [
+                    {
+                      "id": "55",
+                      "name": "Анара Закирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
+                    },
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "1207",
+                      "name": "Назель Жамиева",
+                      "avatar": ""
+                    }
+                  ],
                   "observers": []
                 },
                 {
@@ -3691,7 +3520,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -3701,11 +3531,6 @@
                   "id": "55",
                   "name": "Анара Закирова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
-                },
-                {
-                  "id": "131",
-                  "name": "Алмас Кудашев",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/b1e/b1e66e7e98cc32a752d6da12e85dbe63/Foto Almas.png"
                 },
                 {
                   "id": "223",
@@ -3721,13 +3546,11 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
+                },
                 {
-                  "id": "1147",
-                  "name": "Мархаба Дюсюмбекова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
+                  "id": "1207",
+                  "name": "Назель Жамиева",
+                  "avatar": ""
                 }
               ]
             },
@@ -3785,7 +3608,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -3795,6 +3619,11 @@
                   "id": "55",
                   "name": "Анара Закирова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
+                },
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
                 },
                 {
                   "id": "281",
@@ -3821,13 +3650,6 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
-                }
               ]
             }
           ]
@@ -3847,13 +3669,13 @@
               "id": "13857",
               "code": "4.1.1",
               "title": "Внедрить именные бейджи и QR-карточки операторов на объекте",
-              "deadline": "2026-09-30T18:00:00+05:00",
+              "deadline": "2026-10-30T20:00:00+05:00",
               "resultCount": 0,
               "steps": [
                 {
                   "code": "4.1.1.1",
                   "text": "Разработать стандарт бейджа с QR-кодом (профиль оператора, отзывы)",
-                  "deadline": "2026-09-10",
+                  "deadline": "2026-10-10",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -3862,7 +3684,7 @@
                 {
                   "code": "4.1.1.2",
                   "text": "Разработать веб-страницу оператора для QR-перехода",
-                  "deadline": "2026-09-20",
+                  "deadline": "2026-10-20",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -3871,7 +3693,7 @@
                 {
                   "code": "4.1.1.3",
                   "text": "Запустить производство и выдачу бейджей операторам",
-                  "deadline": "2026-09-30",
+                  "deadline": "2026-10-30",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -3897,7 +3719,13 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "55",
+                  "name": "Анара Закирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
+                },
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -3912,13 +3740,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "55",
-                  "name": "Анара Закирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
                 }
               ]
             },
@@ -3985,7 +3806,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -4011,8 +3833,7 @@
                   "name": "Асия Ибрагимова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13861",
@@ -4077,7 +3898,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -4092,13 +3914,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
                 }
               ]
             },
@@ -4156,7 +3971,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -4176,13 +3992,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                 }
               ]
             },
@@ -4240,7 +4049,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -4271,13 +4081,6 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                }
               ]
             }
           ]
@@ -4296,7 +4099,7 @@
                 {
                   "code": "4.2.1.1",
                   "text": "Разработать механику: клиент оставляет благодарность через QR/приложение",
-                  "deadline": "2026-09-04",
+                  "deadline": "2026-10-02",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -4305,7 +4108,7 @@
                 {
                   "code": "4.2.1.2",
                   "text": "Реализовать техническую часть (форма благодарности + уведомления)",
-                  "deadline": "2026-09-15",
+                  "deadline": "2026-10-15",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -4314,7 +4117,7 @@
                 {
                   "code": "4.2.1.3",
                   "text": "Запустить программу с коммуникацией клиентам и операторам",
-                  "deadline": "2026-09-30",
+                  "deadline": "2026-10-30",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -4340,7 +4143,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -4376,13 +4180,6 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                }
               ]
             },
             {
@@ -4395,7 +4192,7 @@
                 {
                   "code": "4.2.2.1",
                   "text": "Разработать концепцию серии и утвердить контент-план на 3 месяца",
-                  "deadline": "2026-09-07",
+                  "deadline": "2026-09-15",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -4439,14 +4236,14 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "1041",
                   "name": "Вечеслав Ким",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/12a/12ae6e9f1c492f29c52bfbffeaf4b3d1/photo_2025-12-22_16-53-21.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         }
@@ -4465,15 +4262,15 @@
               "id": "13871",
               "code": "5.1.1",
               "title": "Провести аудит текущего разрыва между Битрикс и 1С — что и где теряется (в работе)",
-              "deadline": "2026-08-28T18:00:00+05:00",
+              "deadline": "2026-09-04T20:00:00+05:00",
               "resultCount": 0,
               "steps": [
                 {
                   "code": "5.1.1.1",
                   "text": "Провести интервью с ключевыми пользователями",
-                  "deadline": "2026-08-10",
+                  "deadline": "2026-08-17",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [
                     {
                       "id": "43",
@@ -4511,16 +4308,16 @@
                 {
                   "code": "5.1.1.2",
                   "text": "Составить карту потоков данных между Битрикс и 1С",
-                  "deadline": "2026-08-27",
+                  "deadline": "2026-09-03",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
                 {
                   "code": "5.1.1.3",
                   "text": "Идентифицировать точки разрыва и составить приоритетный отчёт",
-                  "deadline": "2026-08-28",
+                  "deadline": "2026-09-04",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -4546,38 +4343,7 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
-                {
-                  "id": "43",
-                  "name": "Ольга Савина",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/80a/80aef5240298d22fa00d2e7eb16d1650/WhatsApp Image 2026-07-22 at 08.53.26.png"
-                },
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                },
-                {
-                  "id": "433",
-                  "name": "Балжан Шынарбай",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                },
-                {
-                  "id": "1077",
-                  "name": "Елизавета Гутник",
-                  "avatar": ""
-                },
-                {
-                  "id": "1157",
-                  "name": "Нурсулу Baimukhan",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
-                }
-              ],
+              "observers": [],
               "accomplices": [
                 {
                   "id": "43",
@@ -4600,14 +4366,34 @@
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
                 },
                 {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "433",
+                  "name": "Балжан Шынарбай",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                },
+                {
                   "id": "1009",
                   "name": "Ирина Технеряднева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
                 },
                 {
+                  "id": "1077",
+                  "name": "Елизавета Гутник",
+                  "avatar": ""
+                },
+                {
                   "id": "1083",
                   "name": "Асия Ибрагимова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
+                },
+                {
+                  "id": "1157",
+                  "name": "Нурсулу Baimukhan",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
                 }
               ]
             },
@@ -4623,14 +4409,14 @@
                   "text": "Разработать функциональные требования по циклу счёт-оплата-подтверждение",
                   "deadline": "2026-09-01",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
                 {
                   "code": "5.1.2.2",
                   "text": "Провести согласование с бухгалтерией и аккаунтами",
-                  "deadline": "2026-09-10",
+                  "deadline": "2026-09-17",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -4665,7 +4451,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -4701,8 +4488,7 @@
                   "name": "Нурсулу Baimukhan",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13875",
@@ -4758,7 +4544,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -4804,8 +4591,7 @@
                   "name": "Нурсулу Baimukhan",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13877",
@@ -4861,7 +4647,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "43",
                   "name": "Ольга Савина",
@@ -4888,6 +4675,11 @@
                   "avatar": ""
                 },
                 {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
@@ -4896,13 +4688,6 @@
                   "id": "1157",
                   "name": "Нурсулу Baimukhan",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "1143",
-                  "name": "Бекарыс Бахытжан",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
               ]
             }
@@ -4966,7 +4751,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -5002,8 +4788,7 @@
                   "name": "Асия Ибрагимова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13881",
@@ -5059,7 +4844,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -5090,8 +4876,7 @@
                   "name": "Асия Ибрагимова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/7ed/7ede931cd523ff0c0bb605ba4056c881/DSF3539 copy.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -5104,7 +4889,7 @@
               "code": "5.3.1",
               "title": "Провести ревизию существующих дашбордов, утвердить ТЗ на 3 ключевых дашборда: финансы, операции, партнёры",
               "deadline": "2026-09-17T18:00:00+05:00",
-              "resultCount": 1,
+              "resultCount": 2,
               "steps": [
                 {
                   "code": "5.3.1.1",
@@ -5129,7 +4914,7 @@
                   "text": "Утвердить актуализированное ТЗ на 3 ключевых дашборда",
                   "deadline": "2026-09-04",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -5138,7 +4923,7 @@
                   "text": "Встреча по требованиям",
                   "deadline": "2026-09-08",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [
                     {
                       "id": "51",
@@ -5183,7 +4968,7 @@
                   "text": "📝 Указать результат выполнения (обязательно перед завершением)",
                   "deadline": null,
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 }
@@ -5198,38 +4983,7 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
-                },
-                {
-                  "id": "281",
-                  "name": "Тамерлан Матов",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
-                },
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                },
-                {
-                  "id": "1011",
-                  "name": "Диана Маслова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a10/a100cdad48d3ff8e25597e084c59e595/avatar.png"
-                },
-                {
-                  "id": "1133",
-                  "name": "Светлана Крысун",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/de4/de4c1b8b213b1ec882d8c8bc0c617d9c/foto na Bitriks.jpg.png"
-                },
-                {
-                  "id": "1143",
-                  "name": "Бекарыс Бахытжан",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
+              "observers": [],
               "accomplices": [
                 {
                   "id": "51",
@@ -5272,7 +5026,7 @@
               "id": "13885",
               "code": "5.3.2",
               "title": "Реализовать финансовый дашборд: EBITDA, маржа, кредитная нагрузка, выручка",
-              "deadline": "2026-09-01T18:00:00+05:00",
+              "deadline": "2026-09-30T18:00:00+05:00",
               "resultCount": 0,
               "steps": [
                 {
@@ -5307,7 +5061,7 @@
                 {
                   "code": "5.3.2.3",
                   "text": "Утвердить дашборд и запустить в промышленную эксплуатацию",
-                  "deadline": "2026-09-01",
+                  "deadline": "2026-09-30",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -5333,7 +5087,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -5363,18 +5118,6 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "1009",
-                  "name": "Ирина Технеряднева",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                },
-                {
-                  "id": "1133",
-                  "name": "Светлана Крысун",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/de4/de4c1b8b213b1ec882d8c8bc0c617d9c/foto na Bitriks.jpg.png"
                 }
               ]
             },
@@ -5413,6 +5156,24 @@
                   "observers": []
                 },
                 {
+                  "code": "5.3.3.4",
+                  "text": "Написать ТЗ для дэшборда",
+                  "deadline": "2026-09-10",
+                  "responsible": "Имирова Лейла",
+                  "done": false,
+                  "executors": [],
+                  "observers": []
+                },
+                {
+                  "code": "5.3.3.5",
+                  "text": "БД по аудитам, замечаниям, обзвону и тд",
+                  "deadline": "2026-09-07",
+                  "responsible": "Бахытжан Бекарыс",
+                  "done": false,
+                  "executors": [],
+                  "observers": []
+                },
+                {
                   "code": null,
                   "text": "📝 Указать результат выполнения (обязательно перед завершением)",
                   "deadline": null,
@@ -5432,7 +5193,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -5453,8 +5215,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13889",
@@ -5510,7 +5271,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -5541,13 +5303,6 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "71",
-                  "name": "Лейла Имирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
-                }
               ]
             }
           ]
@@ -5560,13 +5315,13 @@
               "id": "13891",
               "code": "5.4.1",
               "title": "Утвердить карту бизнес-процессов компании и определить степень автоматизации каждого",
-              "deadline": "2026-08-25T18:00:00+05:00",
+              "deadline": "2026-09-25T20:00:00+05:00",
               "resultCount": 0,
               "steps": [
                 {
                   "code": "5.4.1.1",
                   "text": "Провести инвентаризацию процессов по подразделениям",
-                  "deadline": "2026-08-26",
+                  "deadline": "2026-09-10",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -5575,7 +5330,7 @@
                 {
                   "code": "5.4.1.2",
                   "text": "Оценить степень автоматизации каждого процесса (0-100%)",
-                  "deadline": "2026-08-28",
+                  "deadline": "2026-09-16",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -5584,7 +5339,7 @@
                 {
                   "code": "5.4.1.3",
                   "text": "Утвердить карту процессов с приоритезацией автоматизации",
-                  "deadline": "2026-08-31",
+                  "deadline": "2026-09-22",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -5610,7 +5365,13 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -5631,13 +5392,6 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
-                }
               ]
             },
             {
@@ -5645,14 +5399,14 @@
               "code": "5.4.2",
               "title": "Утвердить регламенты ключевых процессов в Битрикс (задачи, документооборот, согласования)",
               "deadline": "2026-09-29T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "5.4.2.1",
                   "text": "Провести инвентаризацию процессов (задачи, документы, согласования)",
                   "deadline": "2026-08-26",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -5703,7 +5457,13 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -5714,13 +5474,6 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
-                }
               ]
             },
             {
@@ -5728,14 +5481,14 @@
               "code": "5.4.3",
               "title": "Запустить план повышения автоматизации до 85% по приоритетным процессам (представитель для аудита уже определён)",
               "deadline": "2026-09-21T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "5.4.3.1",
                   "text": "Определить процессы, требующие автоматизации, с приоритетами",
                   "deadline": "2026-09-01",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -5777,7 +5530,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -5798,8 +5552,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13897",
@@ -5855,7 +5608,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -5871,8 +5625,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -5943,7 +5696,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -5964,8 +5718,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         }
@@ -6008,7 +5761,7 @@
                 {
                   "code": "6.1.1.3",
                   "text": "Провести пилот на реальных объектах и утвердить",
-                  "deadline": "2026-08-28",
+                  "deadline": "2026-09-10",
                   "responsible": "",
                   "done": false,
                   "executors": [
@@ -6040,21 +5793,21 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "113",
                   "name": "Дина Конысбаева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/90f/90fd9f7efd64dc2eb251d3886a5c855d/ef496168-1be9-4c78-93a9-20d8815cb56b.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13903",
               "code": "6.1.2",
               "title": "Утвердить единые стандарты уборки IC Group (книга стандартов)",
               "deadline": "2026-09-01T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "6.1.2.1",
@@ -6068,9 +5821,9 @@
                 {
                   "code": "6.1.2.2",
                   "text": "Дополнить недостающие разделы и оформить в брендовом стиле",
-                  "deadline": "2026-09-01",
+                  "deadline": "2026-09-04",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [
                     {
                       "id": "81",
@@ -6083,7 +5836,7 @@
                 {
                   "code": "6.1.2.3",
                   "text": "Утвердить книгу стандартов и обеспечить доступ команде",
-                  "deadline": "2026-09-02",
+                  "deadline": "2026-09-07",
                   "responsible": "",
                   "done": false,
                   "executors": [
@@ -6115,7 +5868,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "113",
                   "name": "Дина Конысбаева",
@@ -6131,22 +5885,21 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13905",
               "code": "6.1.3",
               "title": "Утвердить процедуру тестирования и сертификации операторов и партнёров",
               "deadline": "2026-09-21T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 2,
               "steps": [
                 {
                   "code": "6.1.3.1",
                   "text": "Разработать формат тестирования: теория + практика + оценка",
                   "deadline": "2026-09-07",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -6155,7 +5908,7 @@
                   "text": "Утвердить критерии сертификации и уровни (Junior/Middle/Senior)",
                   "deadline": "2026-09-14",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -6188,7 +5941,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "113",
                   "name": "Дина Конысбаева",
@@ -6199,8 +5953,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -6213,14 +5966,14 @@
               "code": "6.2.1",
               "title": "Разработать обучающие материалы offline (пособия, видео, плакаты)",
               "deadline": "2026-09-21T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 2,
               "steps": [
                 {
                   "code": "6.2.1.1",
                   "text": "Разработать структуру пособий по типам объектов",
                   "deadline": "2026-09-07",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -6229,7 +5982,7 @@
                   "text": "Отснять обучающие видео и подготовить плакаты",
                   "deadline": "2026-09-14",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -6238,7 +5991,7 @@
                   "text": "Утвердить пакет учебных материалов offline",
                   "deadline": "2026-09-21",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -6247,7 +6000,7 @@
                   "text": "📝 Указать результат выполнения (обязательно перед завершением)",
                   "deadline": null,
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 }
@@ -6262,7 +6015,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "113",
                   "name": "Дина Конысбаева",
@@ -6278,8 +6032,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13909",
@@ -6335,7 +6088,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "113",
                   "name": "Дина Конысбаева",
@@ -6356,8 +6110,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13911",
@@ -6413,7 +6166,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -6429,8 +6183,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -6492,14 +6245,14 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13915",
@@ -6555,7 +6308,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -6571,8 +6325,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13917",
@@ -6628,7 +6381,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "1009",
                   "name": "Ирина Технеряднева",
@@ -6644,8 +6398,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13919",
@@ -6701,7 +6454,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -6712,8 +6466,7 @@
                   "name": "Людмила Муллахунова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/50d/50d9a636118fc5ab838754e5561c808e/922d6a37-8a30-414f-b273-f11b9c468104.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -6726,7 +6479,7 @@
               "code": "6.4.1",
               "title": "Утвердить единые чек-листы аудитов по типам объектов",
               "deadline": "2026-09-02T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 2,
               "steps": [
                 {
                   "code": "6.4.1.1",
@@ -6742,7 +6495,7 @@
                   "text": "Провести пилот чек-листов на реальных объектах",
                   "deadline": "2026-08-27",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [
                     {
                       "id": "81",
@@ -6787,7 +6540,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "113",
                   "name": "Дина Конысбаева",
@@ -6802,9 +6556,7 @@
                   "id": "1143",
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
-                }
-              ],
-              "accomplices": [
+                },
                 {
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
@@ -6868,7 +6620,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -6878,13 +6631,6 @@
                   "id": "81",
                   "name": "Людмила Муллахунова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/50d/50d9a636118fc5ab838754e5561c808e/922d6a37-8a30-414f-b273-f11b9c468104.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "55",
-                  "name": "Анара Закирова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c57/c5727985b35ab72cfa458ec257e98256/avatar.png"
                 },
                 {
                   "id": "1083",
@@ -6947,7 +6693,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -6958,8 +6705,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13927",
@@ -7015,7 +6761,8 @@
                 "name": "Лейла Имирова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "81",
                   "name": "Людмила Муллахунова",
@@ -7036,8 +6783,7 @@
                   "name": "Бекарыс Бахытжан",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         }
@@ -7057,7 +6803,7 @@
               "code": "7.1.1",
               "title": "Утвердить программу и логистику 1-го ретрита (сутки тишины в горах)",
               "deadline": "2026-08-07T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "7.1.1.1",
@@ -7106,7 +6852,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -7117,8 +6864,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13931",
@@ -7174,7 +6920,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -7190,8 +6937,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13933",
@@ -7247,7 +6993,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -7258,8 +7005,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13935",
@@ -7315,7 +7061,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -7326,8 +7073,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -7389,7 +7135,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -7410,8 +7157,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13939",
@@ -7467,14 +7213,14 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "1141",
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13941",
@@ -7530,7 +7276,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -7541,8 +7288,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -7604,7 +7350,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -7615,8 +7362,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13945",
@@ -7672,7 +7418,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "1069",
                   "name": "Владимир Пак",
@@ -7683,8 +7430,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13947",
@@ -7740,7 +7486,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "223",
                   "name": "Арай Нургалиева",
@@ -7756,8 +7503,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13949",
@@ -7813,7 +7559,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -7834,8 +7581,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         }
@@ -7904,7 +7650,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -7915,15 +7662,14 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13953",
               "code": "8.1.2",
               "title": "Утвердить бюджет и список поставщиков формы / канцтоваров",
               "deadline": "2026-08-16T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "8.1.2.1",
@@ -7972,7 +7718,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "1009",
                   "name": "Ирина Технеряднева",
@@ -7983,8 +7730,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13955",
@@ -8040,7 +7786,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -8056,8 +7803,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13957",
@@ -8113,7 +7859,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "55",
                   "name": "Анара Закирова",
@@ -8129,8 +7876,7 @@
                   "name": "Айгерим Жумаш",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/f6b/f6bf0a173d56fc882e6ac30ab2dcd3a1/DSF3133 copy_resized.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         }
@@ -8199,7 +7945,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -8210,8 +7957,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13961",
@@ -8267,7 +8013,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -8283,15 +8030,14 @@
                   "name": "Ирина Технеряднева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13963",
               "code": "9.1.3",
               "title": "Утвердить шаблоны ТЗ для типовых задач (IT, документы, мероприятия)",
               "deadline": "2026-08-27T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "9.1.3.1",
@@ -8340,7 +8086,13 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
@@ -8360,13 +8112,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                 }
               ]
             },
@@ -8424,7 +8169,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "281",
                   "name": "Тамерлан Матов",
@@ -8440,8 +8186,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             }
           ]
         },
@@ -8503,7 +8248,8 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -8519,13 +8265,6 @@
                   "name": "Ирина Технеряднева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
-                }
               ]
             },
             {
@@ -8533,14 +8272,14 @@
               "code": "9.2.2",
               "title": "Утвердить регламент ежемесячного отчёта руководителей с привязкой к плану",
               "deadline": "2026-09-27T18:00:00+05:00",
-              "resultCount": 0,
+              "resultCount": 1,
               "steps": [
                 {
                   "code": "9.2.2.1",
                   "text": "Разработать шаблон ежемесячного отчёта руководителя",
                   "deadline": "2026-09-01",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -8549,7 +8288,7 @@
                   "text": "Утвердить регламент отчётности с привязкой к плану",
                   "deadline": "2026-09-06",
                   "responsible": "",
-                  "done": false,
+                  "done": true,
                   "executors": [],
                   "observers": []
                 },
@@ -8582,23 +8321,27 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "63",
+                  "name": "Ларион Лян",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                },
                 {
                   "id": "71",
                   "name": "Лейла Имирова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
                 },
                 {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
                   "id": "1009",
                   "name": "Ирина Технеряднева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 }
               ]
             },
@@ -8647,7 +8390,8 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -8662,13 +8406,6 @@
                   "id": "1009",
                   "name": "Ирина Технеряднева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 }
               ]
             },
@@ -8726,11 +8463,17 @@
                 "name": "Ларион Лян",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
+                {
+                  "id": "63",
+                  "name": "Ларион Лян",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 },
                 {
                   "id": "71",
@@ -8746,18 +8489,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
-                },
-                {
-                  "id": "63",
-                  "name": "Ларион Лян",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
                 }
               ]
             }
@@ -8786,7 +8517,7 @@
                 {
                   "code": "9.3.1.2",
                   "text": "Разработать новое штатное расписание с учётом новых ролей",
-                  "deadline": "2026-08-24",
+                  "deadline": "2026-10-24",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -8795,7 +8526,7 @@
                 {
                   "code": "9.3.1.4",
                   "text": "Утвердить штатное расписание",
-                  "deadline": "2026-09-01",
+                  "deadline": "2026-10-01",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -8804,7 +8535,7 @@
                 {
                   "code": "9.3.1.3",
                   "text": "Описать функционал каждого сотрудника",
-                  "deadline": "2026-09-30",
+                  "deadline": "2026-10-30",
                   "responsible": "",
                   "done": false,
                   "executors": [],
@@ -8830,7 +8561,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -8851,8 +8583,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13977",
@@ -8908,7 +8639,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -8919,8 +8651,7 @@
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
                 }
-              ],
-              "accomplices": []
+              ]
             },
             {
               "id": "13979",
@@ -8976,7 +8707,8 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
                 {
                   "id": "51",
                   "name": "Данара Баканова",
@@ -8996,13 +8728,6 @@
                   "id": "1147",
                   "name": "Мархаба Дюсюмбекова",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/91f/91f23ad6cfe4d6d58a8983f641be21fa/avatar.png"
-                }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
                 }
               ]
             },
@@ -9060,7 +8785,13 @@
                 "name": "Данара Баканова",
                 "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
               },
-              "observers": [
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
                 {
                   "id": "63",
                   "name": "Ларион Лян",
@@ -9076,13 +8807,6 @@
                   "name": "Ирина Технеряднева",
                   "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
                 }
-              ],
-              "accomplices": [
-                {
-                  "id": "51",
-                  "name": "Данара Баканова",
-                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
-                }
               ]
             }
           ]
@@ -9090,5 +8814,5 @@
       ]
     }
   ],
-  "fetchedAt": "2026-08-28T07:11:10.249Z"
+  "fetchedAt": "2026-09-14T05:32:41.826Z"
 }

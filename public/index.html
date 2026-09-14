@@ -3677,10 +3677,23 @@
               || String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')))
             .map(s => planStepRow(s, now))
             .join('') || `<div style="padding:6px 4px;color:var(--text-muted);font-size:12px">Шаги не заданы</div>`;
+          // Аватарки участников: ответственный (зел.), постановщик (фиол.),
+          // соисполнители (оранж.), наблюдатели (син.). Один человек — один раз,
+          // с кольцом по самой «главной» роли (порядок ниже).
+          const seenPeople = new Set();
+          const addPerson = (person, ring) => {
+            if (!person || !person.name) return null;
+            const key = String(person.id || person.name);
+            if (seenPeople.has(key)) return null;
+            seenPeople.add(key);
+            return { person, ring };
+          };
           const peopleRow = [
-            ...(t.responsible ? [{ person: t.responsible, ring: '#7cc437' }] : []),
-            ...(t.observers || []).map(o => ({ person: o, ring: '#3b82f6' }))
-          ];
+            addPerson(t.responsible, '#7cc437'),
+            addPerson(t.creator, '#8b5cf6'),
+            ...(t.accomplices || []).map(a => addPerson(a, '#f59e0b')),
+            ...(t.observers || []).map(o => addPerson(o, '#3b82f6'))
+          ].filter(Boolean);
           const gColor = goalColor(t._goalNum);
           // Completed tasks don't burn, no matter the date.
           const heat = p === 100 ? 0 : planFireLevel(t.deadline);
