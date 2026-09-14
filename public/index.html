@@ -1804,7 +1804,7 @@
         filteredRows: [],
         departments: [],
         refreshTimer: null,
-        refreshIntervalMs: 5 * 60 * 1000,
+        refreshIntervalMs: 30 * 60 * 1000,
         portalHost: null,
         searchQuery: '',
         period: 'all', // 'all' | 'week' | 'lastWeek' | 'month:YYYY-MM' | 'range:YYYY-MM-DD:YYYY-MM-DD'
@@ -3188,6 +3188,26 @@
         } finally {
           planState.loading = false;
         }
+      }
+
+      // Фоновая синхронизация плана (op-plan): тихо тянем свежие данные и
+      // перерисовываем активный план-вид. Фильтры живут в planState/state, поэтому
+      // при перерисовке не теряются. Ошибки/таймауты — молча оставляем прошлые данные.
+      async function refreshPlanData() {
+        if (planState.loading) return;
+        try {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 15000);
+          let j;
+          try {
+            const r = await fetch('/api/op-plan', { signal: controller.signal });
+            j = await r.json();
+          } finally { clearTimeout(timer); }
+          if (!j || !j.ok || !Array.isArray(j.goals)) return;
+          planState.data = j;
+          // Перерисовать только если открыт план-вид (иначе обновятся при заходе).
+          if (['table6', 'table7', 'boss'].includes(state.viewMode)) renderTable();
+        } catch { /* оставляем прошлый снимок */ }
       }
 
       const PLAN_COLORS = { done: '#22c55e', overdue: '#ef4444', soon: '#f97316' };
@@ -5843,7 +5863,8 @@
         state.departments = payload.departments || [];
         state.allEmployees = payload.allEmployees || [];
         removeExcludedDepartments();
-        state.refreshIntervalMs = payload.refreshIntervalMs || state.refreshIntervalMs;
+        // Интервал автосинхронизации задаётся фронтом (30 мин) и не переопределяется
+        // из payload — иначе старый снимок report-cache.json (300000) сбрасывал бы его.
         state.portalHost = payload.portalHost || null;
         applyFilters();
       }
@@ -5908,6 +5929,7 @@
 
         state.refreshTimer = setTimeout(() => {
           loadReport('GET');
+          refreshPlanData();
         }, state.refreshIntervalMs);
       }
 
