@@ -2957,8 +2957,46 @@
           planState.excelProject = p;
           // Сброс фильтров по целям — они разные у проектов.
           planState.svodGoals = [];
-          drawPlanExcel();
+          redrawPlanPage();
         }));
+      }
+      // Перерисовать страницу «План» в текущем режиме (карточки или Excel).
+      function redrawPlanPage() {
+        if (state.viewMode !== 'table6') return;
+        if (planState.excel) drawPlanExcel(); else drawPlan(planState.data || { goals: [] });
+      }
+      // Загрузка проекта 57: снимок из кэша сразу, живые данные — фоном.
+      async function loadData57() {
+        planState._load57 = true;
+        try {
+          const cr = await fetch('/op-plan-cache-57.json', { cache: 'no-store' });
+          if (cr.ok) { const cj = await cr.json(); if (cj && Array.isArray(cj.goals)) planState.data57 = cj; }
+        } catch {}
+        const live = (async () => {
+          const controller = new AbortController();
+          const timer = setTimeout(() => controller.abort(), 15000);
+          try {
+            const r = await fetch('/api/op-plan?group=57', { signal: controller.signal });
+            const j = await r.json();
+            if (j.ok && Array.isArray(j.goals)) { planState.data57 = j; return true; }
+          } catch {} finally { clearTimeout(timer); }
+          return false;
+        })();
+        if (!planState.data57) await live;
+        else live.then(ok => { if (ok && planState.excelProject === '57') redrawPlanPage(); });
+        planState._load57 = false;
+        if (!planState.data57) planState._err57 = true;
+      }
+      // Общая проверка для обоих видов: true — данные 57 готовы; иначе рисует
+      // заглушку (загрузка/ошибка) и сама перерисует страницу по готовности.
+      function ensureData57() {
+        if (planState.data57) return true;
+        const msg = planState._err57 ? 'Не удалось загрузить план ERP Платформы' : 'Загрузка плана ERP Платформы…';
+        ids.planWrap.style.height = ''; ids.planWrap.style.overflow = '';
+        ids.planWrap.innerHTML = `<div id="planScaler">${svodProjToggle('57')}<div style="padding:40px;text-align:center;color:var(--text-muted)">${msg}</div></div>`;
+        bindSvodProj();
+        if (!planState._load57 && !planState._err57) loadData57().then(redrawPlanPage);
+        return false;
       }
 
       async function drawPlanExcel() {
@@ -2968,22 +3006,7 @@
         ids.planWrap.style.overflow = '';
         const proj = planState.excelProject || '51';
         // Проект 57 (ERP) подгружаем по требованию, кэш — в planState.data57.
-        if (proj === '57' && !planState.data57 && !planState._load57) {
-          planState._load57 = true;
-          ids.planWrap.innerHTML = `<div id="planScaler">${svodProjToggle(proj)}<div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка плана ERP Платформы…</div></div>`;
-          bindSvodProj();
-          try {
-            const cr = await fetch('/op-plan-cache-57.json', { cache: 'no-store' });
-            if (cr.ok) { const cj = await cr.json(); if (cj && Array.isArray(cj.goals)) planState.data57 = cj; }
-          } catch {}
-          try {
-            const r = await fetch('/api/op-plan?group=57');
-            const j = await r.json();
-            if (j.ok && Array.isArray(j.goals)) planState.data57 = j;
-          } catch {}
-          planState._load57 = false;
-          return drawPlanExcel();
-        }
+        if (proj === '57' && !ensureData57()) return;
         // ФУЛ-СИНК: таблица целиком строится из живого дерева проекта (op-plan),
         // без статичного svod-final.json. Формат строки — массив A…K, чтобы дальше
         // работали те же рендер/фильтры/объединения.
@@ -3624,14 +3647,20 @@
       }
 
       function drawPlan(j) {
+        // Excel-вид (лист «Свод Финал») — отдельная отрисовка со своим выбором проекта.
+        if (planState.excel) { drawPlanExcel(); return; }
+        // Проект 57 (ERP Платформа) — то же дерево из planState.data57.
+        const planProj = planState.excelProject || '51';
+        if (planProj === '57') {
+          if (!ensureData57()) return;
+          j = planState.data57;
+        }
         const rawGoals = j.goals || [];
         if (!rawGoals.length) {
           ids.planWrap.innerHTML = `<div style="text-align:center;padding:48px;color:var(--text-muted)">В группе ОП 2026 нет задач с тегами вида «ОП2026:1.1»</div>`;
           return;
         }
 
-        // Excel-вид (лист «Свод Финал») — отдельная отрисовка.
-        if (planState.excel) { drawPlanExcel(); return; }
 
         const pct = (d, t) => t ? Math.round(d / t * 100) : 0;
         const sum = (arr, key) => arr.reduce((a, x) => a + x[key], 0);
@@ -3883,7 +3912,8 @@
         ids.planWrap.innerHTML = `
           <div id="planScaler" style="transform-origin:top left">
           <div style="padding:6px 0 12px;position:relative;text-align:center">
-            <div style="font-weight:900;font-size:30px;color:var(--text-main);line-height:1.2">Оперативный план IC Group 2026</div>
+            ${svodProjToggle(planProj)}
+            <div style="font-weight:900;font-size:30px;color:var(--text-main);line-height:1.2">${planProj === '57' ? 'ERP Платформа IC Group' : 'Оперативный план IC Group 2026'}</div>
             <span style="position:absolute;top:6px;right:0;font-size:13px;color:var(--text-muted)">обновлено ${updAt}
               <button id="planRefresh" style="margin-left:8px;background:none;border:1px solid rgba(233,235,232,.9);
                       border-radius:8px;padding:3px 9px;cursor:pointer;font-size:11px;color:var(--text-muted)">↻</button>
@@ -3896,8 +3926,12 @@
           </div>`;
 
         const btn = document.getElementById('planRefresh');
-        if (btn) btn.addEventListener('click', () => { planState.data = null; renderPlan(); });
+        if (btn) btn.addEventListener('click', () => {
+          if (planProj === '57') { planState.data57 = null; planState._err57 = false; redrawPlanPage(); }
+          else { planState.data = null; renderPlan(); }
+        });
         bindPlanToggle();
+        bindSvodProj();
 
         // Kiosk fit: scale the whole plan down so it always fits one screen —
         // no scrolling or clicking needed (unusable with a TV remote).
