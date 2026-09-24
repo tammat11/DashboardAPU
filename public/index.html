@@ -1318,6 +1318,10 @@
       .plan-view-btn { padding: 7px 18px; border: 1px solid #d4dccb; border-radius: 10px; background: #fff; color: #5a6157; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s ease; }
       .plan-view-btn:hover { border-color: #a2c037; }
       .plan-view-btn.active { background: #222221; color: #fff; border-color: #222221; }
+      .svod-projsel { display: flex; gap: 8px; justify-content: center; margin: 2px 0 12px; }
+      .svod-projbtn { padding: 7px 20px; border: 1px solid #d4dccb; border-radius: 999px; background: #fff; color: #5a6157; font-size: 13px; font-weight: 800; cursor: pointer; transition: all .15s ease; }
+      .svod-projbtn:hover { border-color: #a2c037; }
+      .svod-projbtn.active { background: #8ac43f; color: #fff; border-color: #8ac43f; box-shadow: 0 2px 8px rgba(138,196,63,.28); }
       .svod-summary { display: flex; flex-wrap: wrap; gap: 6px 20px; justify-content: center; align-items: center; margin: 2px 0 10px; font-size: 13px; color: var(--text-main); }
       .svod-summary b { font-size: 15px; }
       .svod-hide { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; font-weight: 600; color: #5a6157; }
@@ -2927,7 +2931,7 @@
       if (ids.chatClose) ids.chatClose.addEventListener('click', closeChat);
 
       // ── ОП 2026 Plan dashboard ───────────────────────────────────────────
-      const planState = { loading: false, data: null, error: null, excel: false, svod: null, hideDone: false, svodQ: '', svodF: 'all', svodGoals: [] };
+      const planState = { loading: false, data: null, error: null, excel: false, svod: null, hideDone: false, svodQ: '', svodF: 'all', svodGoals: [], excelProject: '51', data57: null, _load57: false };
 
       // Переключатель вида «План» ↔ «Excel (Свод Финал)» живёт в навбаре (#planViewToggle),
       // виден только на странице «План».
@@ -2939,22 +2943,60 @@
       }
       function bindPlanToggle() { syncPlanViewToggleUI(); }
 
+      // Переключатель проекта в Excel-виде (51 «ОП 2026» / 57 «ERP Платформа»).
+      function svodProjToggle(proj) {
+        return `<div class="svod-projsel">
+            <button class="svod-projbtn${proj === '51' ? ' active' : ''}" data-proj="51">📋 ОП 2026</button>
+            <button class="svod-projbtn${proj === '57' ? ' active' : ''}" data-proj="57">🖥️ ERP Платформа</button>
+          </div>`;
+      }
+      function bindSvodProj() {
+        document.querySelectorAll('.svod-projbtn').forEach(b => b.addEventListener('click', () => {
+          const p = b.dataset.proj;
+          if (p === planState.excelProject) return;
+          planState.excelProject = p;
+          // Сброс фильтров по целям — они разные у проектов.
+          planState.svodGoals = [];
+          drawPlanExcel();
+        }));
+      }
+
       async function drawPlanExcel() {
         // Сбрасываем возможную фиксированную высоту/overflow, оставшуюся от
         // kiosk-подгонки обычного «Плана», — иначе Excel-таблица обрезается.
         ids.planWrap.style.height = '';
         ids.planWrap.style.overflow = '';
-        // ФУЛ-СИНК: таблица целиком строится из живого дерева проекта 51 (op-plan),
+        const proj = planState.excelProject || '51';
+        // Проект 57 (ERP) подгружаем по требованию, кэш — в planState.data57.
+        if (proj === '57' && !planState.data57 && !planState._load57) {
+          planState._load57 = true;
+          ids.planWrap.innerHTML = `<div id="planScaler">${svodProjToggle(proj)}<div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка плана ERP Платформы…</div></div>`;
+          bindSvodProj();
+          try {
+            const cr = await fetch('/op-plan-cache-57.json', { cache: 'no-store' });
+            if (cr.ok) { const cj = await cr.json(); if (cj && Array.isArray(cj.goals)) planState.data57 = cj; }
+          } catch {}
+          try {
+            const r = await fetch('/api/op-plan?group=57');
+            const j = await r.json();
+            if (j.ok && Array.isArray(j.goals)) planState.data57 = j;
+          } catch {}
+          planState._load57 = false;
+          return drawPlanExcel();
+        }
+        // ФУЛ-СИНК: таблица целиком строится из живого дерева проекта (op-plan),
         // без статичного svod-final.json. Формат строки — массив A…K, чтобы дальше
         // работали те же рендер/фильтры/объединения.
-        if (!planState.data || !Array.isArray(planState.data.goals)) {
-          ids.planWrap.innerHTML = `<div id="planScaler"><div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка плана ОП 2026…</div></div>`;
+        const pdata = proj === '57' ? planState.data57 : planState.data;
+        if (!pdata || !Array.isArray(pdata.goals)) {
+          ids.planWrap.innerHTML = `<div id="planScaler">${svodProjToggle(proj)}<div style="padding:40px;text-align:center;color:var(--text-muted)">Загрузка плана…</div></div>`;
+          bindSvodProj();
           return;
         }
         const fmtD = iso => { if (!iso) return ''; const d = new Date(iso); return isNaN(d) ? '' : `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()}`; };
         const isBoiler = txt => /указать результат/i.test(String(txt || ''));
         const svodRows = [];
-        (planState.data.goals || []).slice().sort((a, b) => (a.num || 0) - (b.num || 0)).forEach(g => {
+        (pdata.goals || []).slice().sort((a, b) => (a.num || 0) - (b.num || 0)).forEach(g => {
           (g.children || []).forEach(str => {
             (str.tacts || []).forEach(t => {
               const steps = (t.steps || []).filter(st => !isBoiler(st.text));
@@ -2967,15 +3009,15 @@
           });
         });
         const s = { rows: svodRows };
-        // Живой статус из проекта 51 по коду подзадачи (1.1.1.1).
+        // Живой статус по коду подзадачи (1.1.1.1).
         const codeStatus = new Map();
-        (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => (t.steps || []).forEach(st => {
+        (pdata.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => (t.steps || []).forEach(st => {
           if (st.code) codeStatus.set(String(st.code).trim(), { done: st.done === true, dl: st.deadline ? new Date(st.deadline) : null });
         }))));
         // Кол-во прикреплённых результатов (вкладка «Результат») по тактической задаче.
         const tactRes = new Map();
         const tactId = new Map();      // код тактической задачи → id задачи Bitrix
-        (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
+        (pdata.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
           if (t.code) { tactRes.set(String(t.code).trim(), t.resultCount || 0); if (t.id) tactId.set(String(t.code).trim(), String(t.id)); }
         })));
         const portal = state.portalHost || 'tootopbrass.bitrix24.kz';
@@ -2983,7 +3025,7 @@
         // Команда — по тактической задаче из Bitrix (одна на все подзадачи):
         // Ответственный + Соисполнители + Наблюдатели.
         const tactTeam = new Map();
-        (planState.data && planState.data.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
+        (pdata.goals || []).forEach(g => (g.children || []).forEach(str => (str.tacts || []).forEach(t => {
           if (t.code) tactTeam.set(String(t.code).trim(), {
             resp: (t.responsible && t.responsible.name) || '',
             acc: (t.accomplices || []).map(x => x.name),
@@ -3086,7 +3128,7 @@
         // Цели — мультивыбор (римская метка + полное название в подсказке).
         const goalsList = [...new Set(s.rows.map(r => r[0]))];
         const goalRoman = new Map();
-        (planState.data.goals || []).forEach(g => goalRoman.set(g.title, g.code || ''));
+        (pdata.goals || []).forEach(g => goalRoman.set(g.title, g.code || ''));
         const romanOf = t => goalRoman.get(t) || (String(t).match(/^([IVX]+)\./) || [, ''])[1] || String(t).slice(0, 3);
         const goalChips = goalsList.map(g =>
           `<button class="svod-gchip${goalSel.includes(g) ? ' active' : ''}" data-g="${planEscape(g)}" title="${planEscape(g)}">${planEscape(romanOf(g))}</button>`).join('');
@@ -3112,10 +3154,12 @@
           </div>
           <div class="svod-goals"><span class="svod-goals-lbl">Цели:</span>${goalChips}${goalSel.length ? `<button class="svod-gchip svod-gclear" data-g="__clear">Сброс</button>` : ''}</div>`;
         ids.planWrap.innerHTML = `<div id="planScaler">
+            ${svodProjToggle(proj)}
             ${summary}
             <div class="svod-wrap">${rows.length ? `<table class="svod-table"><colgroup>${cols}</colgroup>
               <thead><tr>${headTh}</tr></thead><tbody>${body}</tbody></table>` : `<div style="padding:40px;text-align:center;color:var(--text-muted)">Ничего не найдено</div>`}</div>
           </div>`;
+        bindSvodProj();
         const hd = document.getElementById('svodHideDone');
         if (hd) hd.addEventListener('change', () => { planState.hideDone = hd.checked; drawPlanExcel(); });
         document.querySelectorAll('.svod-chip').forEach(c => c.addEventListener('click', () => {
@@ -3205,6 +3249,14 @@
           } finally { clearTimeout(timer); }
           if (!j || !j.ok || !Array.isArray(j.goals)) return;
           planState.data = j;
+          // Проект 57 (ERP) — обновляем, только если он уже загружался.
+          if (planState.data57) {
+            try {
+              const r2 = await fetch('/api/op-plan?group=57');
+              const j2 = await r2.json();
+              if (j2 && j2.ok && Array.isArray(j2.goals)) planState.data57 = j2;
+            } catch {}
+          }
           // Перерисовать только если открыт план-вид (иначе обновятся при заходе).
           if (['table6', 'table7', 'boss'].includes(state.viewMode)) renderTable();
         } catch { /* оставляем прошлый снимок */ }

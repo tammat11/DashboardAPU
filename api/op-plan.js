@@ -40,12 +40,12 @@ async function bx(method, params = {}) {
   return json;
 }
 
-async function fetchOpTasks() {
+async function fetchOpTasks(groupId = OP_GROUP_ID) {
   const tasks = [];
   for (let start = 0; ; start += TASKS_PAGE_SIZE) {
     const payload = await bx('tasks.task.list', {
       order: { ID: 'asc' },
-      filter: { GROUP_ID: OP_GROUP_ID },
+      filter: { GROUP_ID: groupId },
       select: ['ID', 'TITLE', 'TAGS', 'STATUS', 'REAL_STATUS', 'DEADLINE', 'RESPONSIBLE_ID', 'CREATED_BY', 'ACCOMPLICES', 'AUDITORS'],
       start
     });
@@ -106,6 +106,19 @@ function opCode(task) {
 }
 
 const ROMAN = { I: 1, II: 2, III: 3, IV: 4, V: 5, VI: 6, VII: 7, VIII: 8, IX: 9 };
+
+// Проект 57 (ERP Платформа): тегов нет, код задачи зашит в начало названия
+// («1.1.1 Составить реестр …»). Возвращаем «1.1.1».
+function titleCode(task) {
+  const m = String(task.title || task.TITLE || '').trim().match(/^(\d+(?:\.\d+)+)\s+/);
+  return m ? m[1] : null;
+}
+
+// Конфиг проектов: 51 — по тегам (роман-цели), 57 — по кодам из названия.
+const GROUPS = {
+  '51': { id: 51, mode: 'tag' },
+  '57': { id: 57, mode: 'title', goalLabel: n => `Раздел ${n}` }
+};
 
 // Step title format: "1.1.1.1 Текст задачи · до 01.08.2026 · исполнитель: Шынырбай Б."
 function parseStep(item) {
@@ -169,17 +182,20 @@ export default async function handler(req, res) {
   }
 
   try {
-    const tasks = (await fetchOpTasks()).filter(task => !isExcludedTask(task));
+    const cfg = GROUPS[String(req.query?.group || '')] || GROUPS['51'];
+    const tasks = (await fetchOpTasks(cfg.id)).filter(task => !isExcludedTask(task));
 
     const goals = [], strat = [], tact = [];
     for (const t of tasks) {
-      const code = opCode(t);
+      // Код: у проекта 51 — из тега (ОП2026:…), у 57 — из начала названия.
+      const code = cfg.mode === 'tag' ? opCode(t) : titleCode(t);
       if (!code) continue;
       t._code = code;
       const depth = code.split('.').length - 1;
-      if (ROMAN[code] !== undefined) goals.push(t);
-      else if (depth === 1) strat.push(t);
+      if (cfg.mode === 'tag' && ROMAN[code] !== undefined) goals.push(t);
+      else if (cfg.mode === 'tag' && depth === 1) strat.push(t);
       else if (depth === 2) tact.push(t);
+      // В title-режиме отдельных задач-целей/стратзадач нет — их синтезируем ниже.
     }
 
     const tactIds = tact.map(t => String(t.id || t.ID));
@@ -247,30 +263,56 @@ export default async function handler(req, res) {
       delete s.members;
     }));
 
-    const tree = goals.map(g => {
-      const gNum = ROMAN[g._code] || 0;
+    let tree;
+    if (cfg.mode === 'tag') {
+      tree = goals.map(g => {
+        const gNum = ROMAN[g._code] || 0;
 
-      const children = strat
-        .filter(s => s._code.split('.')[0] === String(gNum))
-        .sort((a, b) => a._code.localeCompare(b._code, undefined, { numeric: true }))
-        .map(s => ({
-          code: s._code,
-          title: String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, ''),
-          tacts: Object.values(tactByCode)
-            .filter(t => t.code.startsWith(s._code + '.'))
-            .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
-        }));
+        const children = strat
+          .filter(s => s._code.split('.')[0] === String(gNum))
+          .sort((a, b) => a._code.localeCompare(b._code, undefined, { numeric: true }))
+          .map(s => ({
+            code: s._code,
+            title: String(s.title || s.TITLE || '').replace(/^[\d.]+\s*/, ''),
+            tacts: Object.values(tactByCode)
+              .filter(t => t.code.startsWith(s._code + '.'))
+              .sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
+          }));
 
-      return {
-        code: g._code,
-        num: gNum,
-        title: String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim(),
-        children
-      };
-    }).sort((a, b) => a.num - b.num);
+        return {
+          code: g._code,
+          num: gNum,
+          title: String(g.title || g.TITLE || '').replace(/^[IVX]+\.\s*/, '').trim(),
+          children
+        };
+      }).sort((a, b) => a.num - b.num);
+    } else {
+      // title-режим (проект 57): цель = X, стратзадача = X.Y — синтезируем из
+      // кодов тактических задач (X.Y.Z), т.к. отдельных задач для них нет.
+      const byGoal = new Map();
+      Object.values(tactByCode).forEach(t => {
+        const parts = t.code.split('.');
+        const gk = parts[0], sk = `${parts[0]}.${parts[1]}`;
+        if (!byGoal.has(gk)) byGoal.set(gk, new Map());
+        const sm = byGoal.get(gk);
+        if (!sm.has(sk)) sm.set(sk, []);
+        sm.get(sk).push(t);
+      });
+      tree = [...byGoal.keys()].sort((a, b) => (+a) - (+b)).map(gk => ({
+        code: gk,
+        num: +gk,
+        title: (cfg.goalLabel ? cfg.goalLabel(gk) : `Раздел ${gk}`),
+        children: [...byGoal.get(gk).keys()].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).map(sk => ({
+          code: sk,
+          title: sk,
+          tacts: byGoal.get(gk).get(sk).sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true }))
+        }))
+      }));
+    }
 
     return res.status(200).json({
       ok: true,
+      group: cfg.id,
       goals: tree,
       fetchedAt: new Date().toISOString()
     });

@@ -1,0 +1,2371 @@
+{
+  "ok": true,
+  "group": 57,
+  "goals": [
+    {
+      "code": "1",
+      "num": 1,
+      "title": "Раздел 1",
+      "children": [
+        {
+          "code": "1.1",
+          "title": "1.1",
+          "tacts": [
+            {
+              "id": "16039",
+              "code": "1.1.1",
+              "title": "Составить реестр наработок и утвердить архитектуру",
+              "deadline": "2026-09-08T18:00:00+05:00",
+              "resultCount": 2,
+              "steps": [
+                {
+                  "code": "1.1.1.1",
+                  "text": "Выгрузить перечень процессов Bitrix24 и внутренних платформ (HR-платформа, OZYM, 1С)",
+                  "deadline": "2026-09-05",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "1.1.1.2",
+                  "text": "Утвердить архитектуру ERP и API-контракт обмена с 1С и Платформой Занятости",
+                  "deadline": "2026-09-08",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "281",
+                "name": "Тамерлан Матов",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "1009",
+                  "name": "Ирина Технеряднева",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "1.2",
+          "title": "1.2",
+          "tacts": [
+            {
+              "id": "16041",
+              "code": "1.2.1",
+              "title": "Свести чек-листы в единый редактируемый конструктор",
+              "deadline": "2026-09-17T18:00:00+05:00",
+              "resultCount": 1,
+              "steps": [
+                {
+                  "code": "1.2.1.1",
+                  "text": "Свести чек-листы по сегментам в структуру участок→зона→пункт→критерий",
+                  "deadline": "2026-09-10",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "81",
+                      "name": "Людмила Муллахунова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/50d/50d9a636118fc5ab838754e5561c808e/922d6a37-8a30-414f-b273-f11b9c468104.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "1.2.1.2",
+                  "text": "Реализовать конструктор чек-листов в базе (редактируемые шаблоны без хардкода)",
+                  "deadline": "2026-09-17",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "71",
+                "name": "Лейла Имирова",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "81",
+                  "name": "Людмила Муллахунова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/50d/50d9a636118fc5ab838754e5561c808e/922d6a37-8a30-414f-b273-f11b9c468104.jpg.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "1.3",
+          "title": "1.3",
+          "tacts": [
+            {
+              "id": "16043",
+              "code": "1.3.1",
+              "title": "Запустить форму регистрации и перенести базу",
+              "deadline": "2026-09-18T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "1.3.1.1",
+                  "text": "Утвердить форму анкеты под интеграцию с Платформой Занятости (база уже заведена — нужна ретроспективная сверка)",
+                  "deadline": "2026-09-08",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "1.3.1.2",
+                  "text": "Зарегистрировать всю текущую базу партнёров и операторов в системе",
+                  "deadline": "2026-09-18",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "71",
+                "name": "Лейла Имирова",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "1.4",
+          "title": "1.4",
+          "tacts": [
+            {
+              "id": "16045",
+              "code": "1.4.1",
+              "title": "Загрузить контент и реализовать статус допуска",
+              "deadline": "2026-10-02T18:00:00+05:00",
+              "resultCount": 1,
+              "steps": [
+                {
+                  "code": "1.4.1.1",
+                  "text": "Загрузить видеоролики и тесты по типовым работам и сегментам объектов",
+                  "deadline": "2026-09-12",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "81",
+                      "name": "Людмила Муллахунова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/50d/50d9a636118fc5ab838754e5561c808e/922d6a37-8a30-414f-b273-f11b9c468104.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "1.4.1.2",
+                  "text": "Реализовать LMS-модуль и статус «допущен/не допущен», блокирующий назначение на заказ",
+                  "deadline": "2026-09-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "71",
+                "name": "Лейла Имирова",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "81",
+                  "name": "Людмила Муллахунова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/50d/50d9a636118fc5ab838754e5561c808e/922d6a37-8a30-414f-b273-f11b9c468104.jpg.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "2",
+      "num": 2,
+      "title": "Раздел 2",
+      "children": [
+        {
+          "code": "2.1",
+          "title": "2.1",
+          "tacts": [
+            {
+              "id": "16047",
+              "code": "2.1.1",
+              "title": "Юридическая сверка",
+              "deadline": "2026-09-25T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "2.1.1.1",
+                  "text": "Провести юридическую проверку модели выплат самозанятым под режим Единый платёж (ЕП) и сверить с условиями Платформы Занятости",
+                  "deadline": "2026-09-25",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1157",
+                      "name": "Нурсулу Baimukhan",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                    },
+                    {
+                      "id": "1207",
+                      "name": "Назель Жамиева",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1009",
+                "name": "Ирина Технеряднева",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "1157",
+                  "name": "Нурсулу Baimukhan",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                },
+                {
+                  "id": "1207",
+                  "name": "Назель Жамиева",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "2.2",
+          "title": "2.2",
+          "tacts": [
+            {
+              "id": "16049",
+              "code": "2.2.1",
+              "title": "Перевести все текущие заказы и выплаты на сквозной поток через Платформу Занятости",
+              "deadline": "2026-10-05T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "2.2.1.1",
+                  "text": "Реализовать передачу заказа как основания для начисления: заказ → объём → исполнитель → сумма",
+                  "deadline": "2026-09-28",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "2.2.1.2",
+                  "text": "Настроить обязательную привязку каждой выплаты к заказу (требование юриста для снижения риска переквалификации ГПХ)",
+                  "deadline": "2026-09-28",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1157",
+                      "name": "Нурсулу Baimukhan",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    },
+                    {
+                      "id": "1207",
+                      "name": "Назель Жамиева",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "2.2.1.3",
+                  "text": "Реализовать в приложении оператора кнопку «Подписать АВР» с переходом на Платформу Занятости",
+                  "deadline": "2026-10-02",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1157",
+                      "name": "Нурсулу Baimukhan",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    },
+                    {
+                      "id": "1207",
+                      "name": "Назель Жамиева",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "2.2.1.4",
+                  "text": "Перевести весь текущий объём выплат самозанятым на Платформу Занятости без параллельного ручного процесса",
+                  "deadline": "2026-10-05",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1157",
+                      "name": "Нурсулу Baimukhan",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    },
+                    {
+                      "id": "1207",
+                      "name": "Назель Жамиева",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "2.2.1.5",
+                  "text": "Настроить периодичность выплат 2–3 раза в месяц с гибкими датами и суммами",
+                  "deadline": "2026-10-05",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1157",
+                      "name": "Нурсулу Baimukhan",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "1009",
+                  "name": "Ирина Технеряднева",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1157",
+                  "name": "Нурсулу Baimukhan",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                },
+                {
+                  "id": "1207",
+                  "name": "Назель Жамиева",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "3",
+      "num": 3,
+      "title": "Раздел 3",
+      "children": [
+        {
+          "code": "3.1",
+          "title": "3.1",
+          "tacts": [
+            {
+              "id": "16051",
+              "code": "3.1.1",
+              "title": "Модуль объектов и участков",
+              "deadline": "2026-09-25T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "3.1.1.1",
+                  "text": "Реализовать карточку контракта → объекта → участков с услугами и историей",
+                  "deadline": "2026-09-22",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "3.1.1.2",
+                  "text": "Реализовать закрепление участков за операторами с автопередачей данных при замене исполнителя",
+                  "deadline": "2026-09-25",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1163",
+                      "name": "Расул Ахметов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3a5/3a50d26f9a0670d05c1eafb78ba34682/avatar.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1163",
+                  "name": "Расул Ахметов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3a5/3a50d26f9a0670d05c1eafb78ba34682/avatar.png"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "3.2",
+          "title": "3.2",
+          "tacts": [
+            {
+              "id": "16053",
+              "code": "3.2.1",
+              "title": "Плановые и дополнительные заказы",
+              "deadline": "2026-09-27T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "3.2.1.1",
+                  "text": "Реализовать график ОПУ и автоформирование плановых заказов",
+                  "deadline": "2026-09-26",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "3.2.1.2",
+                  "text": "Реализовать форму доп. заявки заказчика и её конвертацию в заказ",
+                  "deadline": "2026-09-27",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                }
+              ]
+            },
+            {
+              "id": "16055",
+              "code": "3.2.2",
+              "title": "Диспетчерская и мобильное приложение оператора",
+              "deadline": "2026-10-02T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "3.2.2.1",
+                  "text": "Реализовать диспетчерскую IC Group и кабинет партнёра (приём заказа, закрепление оператора)",
+                  "deadline": "2026-09-30",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "3.2.2.2",
+                  "text": "Реализовать мобильное приложение оператора: приём заказа, чек-лист, фото, офлайн-режим",
+                  "deadline": "2026-10-02",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "3.3",
+          "title": "3.3",
+          "tacts": [
+            {
+              "id": "16057",
+              "code": "3.3.1",
+              "title": "Модуль аудита",
+              "deadline": "2026-10-04T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "3.3.1.1",
+                  "text": "Реализовать аудит (чек-лист, фото, комментарии) и повторную уборку при замечаниях",
+                  "deadline": "2026-10-04",
+                  "responsible": "",
+                  "done": true,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "4",
+      "num": 4,
+      "title": "Раздел 4",
+      "children": [
+        {
+          "code": "4.1",
+          "title": "4.1",
+          "tacts": [
+            {
+              "id": "16059",
+              "code": "4.1.1",
+              "title": "Пилот и go/no-go решение",
+              "deadline": "2026-10-12T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "4.1.1.1",
+                  "text": "Запустить пилот на 15–20 объектах: заказ → исполнение → аудит → выплата через Платформу Занятости",
+                  "deadline": "2026-10-10",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1157",
+                      "name": "Нурсулу Baimukhan",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "4.1.1.2",
+                  "text": "Устранить критичные замечания пилота и принять решение о запуске массового внедрения",
+                  "deadline": "2026-10-12",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1009",
+                  "name": "Ирина Технеряднева",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1157",
+                  "name": "Нурсулу Baimukhan",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "5",
+      "num": 5,
+      "title": "Раздел 5",
+      "children": [
+        {
+          "code": "5.1",
+          "title": "5.1",
+          "tacts": [
+            {
+              "id": "16061",
+              "code": "5.1.1",
+              "title": "Биллинг-движок платформы",
+              "deadline": "2026-10-20T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "5.1.1.1",
+                  "text": "Реализовать удержание комиссии (take rate) с каждой транзакции по заказу как часть финансового закрытия",
+                  "deadline": "2026-10-10",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1157",
+                      "name": "Нурсулу Baimukhan",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "5.1.1.2",
+                  "text": "Спроектировать тарифный план подписки для партнёров (приоритет в матчинге, аналитика, брендирование)",
+                  "deadline": "2026-10-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    },
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1009",
+                "name": "Ирина Технеряднева",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
+                {
+                  "id": "63",
+                  "name": "Ларион Лян",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                },
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1157",
+                  "name": "Нурсулу Baimukhan",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/4fa/4fab2cfb33bcf954140110044b2201bb/WhatsApp Image 2026-06-18 at 14.37.40.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "6",
+      "num": 6,
+      "title": "Раздел 6",
+      "children": [
+        {
+          "code": "6.1",
+          "title": "6.1",
+          "tacts": [
+            {
+              "id": "16063",
+              "code": "6.1.1",
+              "title": "Сегментация базы и график волн",
+              "deadline": "2026-10-13T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "6.1.1.1",
+                  "text": "Сегментировать все объекты по партнёрам/сегментам/регионам и распределить по волнам подключения",
+                  "deadline": "2026-10-13",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "6.1.1.2",
+                  "text": "Утвердить график ramp-up: неделя 1 — 30 объектов, неделя 2 — 60, с недели 3 — 100/неделю (см. лист «Волны внедрения»)",
+                  "deadline": "2026-10-13",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "71",
+                "name": "Лейла Имирова",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "6.2",
+          "title": "6.2",
+          "tacts": [
+            {
+              "id": "16065",
+              "code": "6.2.1",
+              "title": "Скоринг готовности партнёра к волне",
+              "deadline": "2026-10-16T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "6.2.1.1",
+                  "text": "Разработать скоринг-карту партнёра: обучены и допущены операторы, загружены чек-листы, настроены устройства",
+                  "deadline": "2026-10-16",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "6.2.1.2",
+                  "text": "Назначить менеджеров внедрения — кураторов групп партнёров",
+                  "deadline": "2026-10-16",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "71",
+                "name": "Лейла Имирова",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            },
+            {
+              "id": "16067",
+              "code": "6.2.2",
+              "title": "Еженедельный контроль факта по волнам",
+              "deadline": "2026-10-20T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "6.2.2.1",
+                  "text": "Реализовать еженедельный отчёт план/факт по волне: объекты подключены, % без замечаний с первого аудита",
+                  "deadline": "2026-10-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "6.2.2.2",
+                  "text": "Проводить еженедельную сверку с партнёрами и фиксировать отклонения от графика волны",
+                  "deadline": "2026-10-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "6.3",
+          "title": "6.3",
+          "tacts": [
+            {
+              "id": "16069",
+              "code": "6.3.1",
+              "title": "Горячая линия и устранение сбоев",
+              "deadline": "2026-10-20T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "6.3.1.1",
+                  "text": "Организовать горячую линию поддержки для партнёров и операторов на период волн",
+                  "deadline": "2026-10-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "6.3.1.2",
+                  "text": "Еженедельно устранять инциденты и блокеры, мешающие темпу 100 объектов/неделю",
+                  "deadline": "2026-10-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                }
+              ]
+            },
+            {
+              "id": "16071",
+              "code": "6.3.2",
+              "title": "Итоги внедрения к концу года",
+              "deadline": "2026-12-31T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "6.3.2.1",
+                  "text": "Подвести итоги волн внедрения на 31.12.2026: % покрытия базы объектов, % партнёров в системе",
+                  "deadline": "2026-12-31",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    },
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "51",
+                "name": "Данара Баканова",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "63",
+                  "name": "Ларион Лян",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                },
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "7",
+      "num": 7,
+      "title": "Раздел 7",
+      "children": [
+        {
+          "code": "7.1",
+          "title": "7.1",
+          "tacts": [
+            {
+              "id": "16073",
+              "code": "7.1.1",
+              "title": "Live-статус, фотофиксация, уведомления",
+              "deadline": "2026-11-20T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "7.1.1.1",
+                  "text": "Реализовать статус заказа в реальном времени и фотофиксацию «до/после» в кабинете заказчика",
+                  "deadline": "2026-11-05",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "7.1.1.2",
+                  "text": "Реализовать push/SMS-уведомления при просрочке, невыходе оператора и замечаниях аудита",
+                  "deadline": "2026-11-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1167",
+                "name": "Ахан Абдикарим",
+                "avatar": ""
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "8",
+      "num": 8,
+      "title": "Раздел 8",
+      "children": [
+        {
+          "code": "8.1",
+          "title": "8.1",
+          "tacts": [
+            {
+              "id": "16075",
+              "code": "8.1.1",
+              "title": "Каталог и заказ расходников v1",
+              "deadline": "2026-12-01T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "8.1.1.1",
+                  "text": "Сформировать каталог (химия, расходники, СИЗ, инвентарь, оборудование) и реализовать заказ партнёром внутри платформы",
+                  "deadline": "2026-12-01",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "51",
+                "name": "Данара Баканова",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "8.2",
+          "title": "8.2",
+          "tacts": [
+            {
+              "id": "16077",
+              "code": "8.2.1",
+              "title": "Автоопрос и лента замечаний",
+              "deadline": "2026-12-10T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "8.2.1.1",
+                  "text": "Реализовать автоматический опрос заказчика (NPS/CSAT) после закрытия заказа",
+                  "deadline": "2026-12-05",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "8.2.1.2",
+                  "text": "Реализовать единую ленту замечаний с ответственным и сроком устранения",
+                  "deadline": "2026-12-10",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "281",
+                      "name": "Тамерлан Матов",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "63",
+                "name": "Ларион Лян",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "281",
+                  "name": "Тамерлан Матов",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/249/249180c3701dd56968a05d847735a14a/IMG_6896.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "8.3",
+          "title": "8.3",
+          "tacts": [
+            {
+              "id": "16079",
+              "code": "8.3.1",
+              "title": "Дашборды по данным октября-декабря",
+              "deadline": "2026-12-25T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "8.3.1.1",
+                  "text": "Собрать данные первых волн внедрения и утвердить набор метрик по каждой роли",
+                  "deadline": "2026-12-15",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    },
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "8.3.1.2",
+                  "text": "Реализовать базовые ролевые дашборды и провести UAT",
+                  "deadline": "2026-12-25",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "433",
+                "name": "Балжан Шынарбай",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "1009",
+                  "name": "Ирина Технеряднева",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "code": "9",
+      "num": 9,
+      "title": "Раздел 9",
+      "children": [
+        {
+          "code": "9.1",
+          "title": "9.1",
+          "tacts": [
+            {
+              "id": "16081",
+              "code": "9.1.1",
+              "title": "Traction",
+              "deadline": "2026-12-18T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "9.1.1.1",
+                  "text": "Собрать текущий портфель контрактов/объектов по категориям клиентов и GMV за 2026 год",
+                  "deadline": "2026-12-15",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    },
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "9.1.1.2",
+                  "text": "Зафиксировать retention и среднюю длительность контракта, собрать LOI текущих клиентов",
+                  "deadline": "2026-12-18",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1009",
+                "name": "Ирина Технеряднева",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "63",
+                  "name": "Ларион Лян",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                },
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "433",
+                  "name": "Балжан Шынарбай",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                }
+              ]
+            },
+            {
+              "id": "16083",
+              "code": "9.1.2",
+              "title": "Unit-экономика",
+              "deadline": "2026-12-22T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "9.1.2.1",
+                  "text": "Рассчитать средний чек за м²/объект и целевой take rate с обоснованием",
+                  "deadline": "2026-12-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    },
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    },
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "9.1.2.2",
+                  "text": "Рассчитать CAC, LTV, contribution margin и точку безубыточности",
+                  "deadline": "2026-12-22",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    },
+                    {
+                      "id": "1009",
+                      "name": "Ирина Технеряднева",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "1009",
+                "name": "Ирина Технеряднева",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/a46/a463b99a5981d4a935f0d449b8406112/DSF3351 copy.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "63",
+                  "name": "Ларион Лян",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                },
+                {
+                  "id": "433",
+                  "name": "Балжан Шынарбай",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "9.2",
+          "title": "9.2",
+          "tacts": [
+            {
+              "id": "16085",
+              "code": "9.2.1",
+              "title": "Карта конкурентов и барьеры входа",
+              "deadline": "2026-12-20T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "9.2.1.1",
+                  "text": "Составить карту прямых и смежных игроков РК с сравнением по модели, географии, цене",
+                  "deadline": "2026-12-18",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    },
+                    {
+                      "id": "433",
+                      "name": "Балжан Шынарбай",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "9.2.1.2",
+                  "text": "Зафиксировать защитные активы платформы",
+                  "deadline": "2026-12-20",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "71",
+                      "name": "Лейла Имирова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "63",
+                "name": "Ларион Лян",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "71",
+                  "name": "Лейла Имирова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/100/1009c1e1dfd9340a7f384437174290ed/avatar.png"
+                },
+                {
+                  "id": "433",
+                  "name": "Балжан Шынарбай",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/878/878b111432c5b5f52fe37640d48f994e/DSF3040 copy.jpg.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "code": "9.3",
+          "title": "9.3",
+          "tacts": [
+            {
+              "id": "16087",
+              "code": "9.3.1",
+              "title": "Команда и кэп-тейбл",
+              "deadline": "2026-12-22T18:00:00+05:00",
+              "resultCount": 0,
+              "steps": [
+                {
+                  "code": "9.3.1.1",
+                  "text": "Свести фаундеров и ключевых участников, закрепить доли (кэп-тейбл)",
+                  "deadline": "2026-12-22",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "63",
+                      "name": "Ларион Лян",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+                    },
+                    {
+                      "id": "1207",
+                      "name": "Назель Жамиева",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                },
+                {
+                  "code": "9.3.1.2",
+                  "text": "Утвердить план найма критичных ролей на первые 12 месяцев после раунда",
+                  "deadline": "2026-12-22",
+                  "responsible": "",
+                  "done": false,
+                  "executors": [
+                    {
+                      "id": "51",
+                      "name": "Данара Баканова",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                    },
+                    {
+                      "id": "1143",
+                      "name": "Бекарыс Бахытжан",
+                      "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                    },
+                    {
+                      "id": "1167",
+                      "name": "Ахан Абдикарим",
+                      "avatar": ""
+                    }
+                  ],
+                  "observers": []
+                }
+              ],
+              "responsible": {
+                "id": "63",
+                "name": "Ларион Лян",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/8c9/8c9bb0f956bae29ae588802e76071520/09ddcdc11c4980f595c0ee3755858007.jpg.png"
+              },
+              "creator": {
+                "id": "489",
+                "name": "Технический Аккаунт",
+                "avatar": "https://cdn-ru.bitrix24.kz/b18522924/socialnetwork/ccc/cccb448f72c4d02ae8944fb1a278c09e/logo panel.jpg.png"
+              },
+              "observers": [],
+              "accomplices": [
+                {
+                  "id": "51",
+                  "name": "Данара Баканова",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/c68/c68a7e8606d783962dde58d33ec89432/WhatsApp Image 2024-05-14 at 18.20.44 _1_.png"
+                },
+                {
+                  "id": "1143",
+                  "name": "Бекарыс Бахытжан",
+                  "avatar": "https://cdn-ru.bitrix24.kz/b18522924/main/3bf/3bf2bb376373dc53eed2222e334cbe14/WhatsApp Image 2026-07-24 at 16.39.04.png"
+                },
+                {
+                  "id": "1167",
+                  "name": "Ахан Абдикарим",
+                  "avatar": ""
+                },
+                {
+                  "id": "1207",
+                  "name": "Назель Жамиева",
+                  "avatar": ""
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "fetchedAt": "2026-09-24T07:36:25.196Z"
+}
