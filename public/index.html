@@ -2506,7 +2506,11 @@
             </div>`;
         })() : '';
 
-        const cards = heroCard + sorted.filter(emp => String(emp.id) !== CEO_ID).map((emp) => {
+        // Сотрудников без задач в выбранном периоде/фильтре (counts уже строятся
+        // из filteredRows) не показываем — CEO в шапке остаётся всегда.
+        const cards = heroCard + sorted.filter(emp =>
+          String(emp.id) !== CEO_ID && (counts[String(emp.id)] || blank()).total > 0
+        ).map((emp) => {
           const c = counts[String(emp.id)] || blank();
           return `
             <div class="g-card pt-card" style="${overdueStyle(c)}"${overdueTitle(c)}>
